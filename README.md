@@ -6,7 +6,7 @@ Tested and working on an x86 platform running Ubuntu 16.04.4 LTS.
 Has the ability to run as privileged mode (for quick and easy), or non-privileged mode (not as quick and easy, but more secure).
 
 
-#### Up-and-Running - Non-Privileged Mode
+## Up-and-Running - Non-Privileged Mode
 
 Firstly, plug in your USB radio.
 
@@ -54,7 +54,7 @@ docker run \
  piaware
 ```
 
-#### Up-and-Running - Privileged Mode
+## Up-and-Running - Privileged Mode
 
 Firstly, plug in your USB radio.
 
@@ -94,7 +94,7 @@ docker run \
  piaware
 ```
 
-#### Runtime Configuration Options
+## Runtime Configuration Options
 
 There are a series of available variables you can tune at your own discretion. The defaults are most likely acceptable for most use cases.
 
@@ -105,7 +105,7 @@ There are a series of available variables you can tune at your own discretion. T
 * `LONG` - Antenna's longitude
 
 
-#### Ports
+## Ports
 
 The following ports are used by this container:
 
@@ -118,7 +118,7 @@ The following ports are used by this container:
 * `30104` - dump1090 TCP Beast input listen port - optional, recommended to leave unmapped unless explicitly needed
 
 
-#### Notes
+## Notes
 
 * You need to specify a persistent MAC address for the container, as this is used by FlightAware to track your PiAware instance.
 * Your site ID is housed in the path mapped to `/var/cache/piaware` in the container. Make sure you map this through to persistent storage or you'll create a new FlightAware site ID every time you launch the container.
