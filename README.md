@@ -35,7 +35,7 @@ docker run \
  -e LONG=<longitude_of_your_antenna> \
  -p 8080:8080 \
  -v </path/to/piaware_cache>:/var/cache/piaware \
- piaware
+ mikenye/piaware
 ```
 
 For example, based on the `lsusb` output above:
@@ -54,7 +54,7 @@ docker run \
  -e LONG=116.543 \
  -p 8080:8080 \
  -v /opt/piaware/piaware_cache:/var/cache/piaware \
- piaware
+ mikenye/piaware
 ```
 
 ## Up-and-Running - Privileged Mode
@@ -77,7 +77,7 @@ docker run \
  -e LONG=<longitude_of_your_antenna> \
  -p 8080:8080 \
  -v </path/to/piaware_cache>:/var/cache/piaware \
- piaware
+ mikenye/piaware
 ```
 
 For example, based on the `lsusb` output above:
@@ -96,7 +96,7 @@ docker run \
  -e LONG=116.543 \
  -p 8080:8080 \
  -v /opt/piaware/piaware_cache:/var/cache/piaware \
- piaware
+ mikenye/piaware
 ```
 
 ## Runtime Configuration Options
