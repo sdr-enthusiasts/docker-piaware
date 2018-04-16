@@ -1,7 +1,7 @@
 # docker-piaware
 PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa.
 
-Tested and working on an x86 platform running Ubuntu 16.04.4 LTS. 
+Tested and working on an x86 platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick). 
 
 Has the ability to run as privileged mode (for quick and easy), or non-privileged mode (not as quick and easy, but more secure).
 
