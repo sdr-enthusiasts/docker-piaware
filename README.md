@@ -101,7 +101,7 @@ docker run \
 
 ## Runtime Configuration Options
 
-There are a series of available variables you can tune at your own discretion. The defaults are most likely acceptable for most use cases.
+There are a series of available variables you are required to set:
 
 * `TZ` - Your local timezone
 * `USERNAME` - FlightAware account username
