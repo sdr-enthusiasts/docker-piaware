@@ -31,7 +31,7 @@ docker run \
  -e TZ="<your_timezone>" \
  -e USERNAME="<your_flightaware_username>" \
  -e PASSWORD="<your_flightaware_password>" \
- -e LAT=<lattitude_of_your_antenna> \
+ -e LAT=<latitude_of_your_antenna> \
  -e LONG=<longitude_of_your_antenna> \
  -p 8080:8080 \
  -v </path/to/piaware_cache>:/var/cache/piaware \
@@ -73,7 +73,7 @@ docker run \
  -e TZ="<your_timezone>" \
  -e USERNAME="<your_flightaware_username>" \
  -e PASSWORD="<your_flightaware_password>" \
- -e LAT=<lattitude_of_your_antenna> \
+ -e LAT=<latitude_of_your_antenna> \
  -e LONG=<longitude_of_your_antenna> \
  -p 8080:8080 \
  -v </path/to/piaware_cache>:/var/cache/piaware \
@@ -106,7 +106,7 @@ There are a series of available variables you are required to set:
 * `TZ` - Your local timezone
 * `USERNAME` - FlightAware account username
 * `PASSWORD` - FlightAware account password
-* `LAT` - Antenna's lattitude
+* `LAT` - Antenna's latitude
 * `LONG` - Antenna's longitude
 
 
