@@ -23,6 +23,7 @@ Start the docker container, passing through the USB device:
 ```
 docker run \
  -d \
+ --rm \
  --mac-address xx:xx:xx:xx:xx:xx \
  --name piaware \
  --device /dev/bus/usb/<usb_bus_number>/<usb_device_number> \
@@ -41,6 +42,7 @@ For example, based on the `lsusb` output above:
 ```
 docker run \
  -d \
+ --rm \
  --mac-address de:ad:be:ef:13:37 \
  --name piaware \
  --device /dev/bus/usb/001/004 \
@@ -63,6 +65,7 @@ Start the docker container:
 ```
 docker run \
  -d \
+ --rm \
  --mac-address xx:xx:xx:xx:xx:xx \
  --name piaware \
  --privileged
@@ -81,6 +84,7 @@ For example, based on the `lsusb` output above:
 ```
 docker run \
  -d \
+ --rm \
  --mac-address de:ad:be:ef:13:37 \
  --name piaware \
  --privileged
