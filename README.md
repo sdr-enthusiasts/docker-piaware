@@ -80,7 +80,7 @@ docker run \
  mikenye/piaware
 ```
 
-For example, based on the `lsusb` output above:
+For example:
 
 ```
 docker run \
