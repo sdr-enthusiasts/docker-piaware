@@ -7,6 +7,14 @@ Tested and working on:
  * x86 platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * if you get it running on a different platform (or if you have issues) please raise an issue
 
+## Tags
+ * ```latest``` latest x86 build
+ * ```latest-arm7l``` latest ARM build
+
+ARM support is currently experimental. If you run on ARM, please let me know your results by raising an issue over on the GitHub repository https://github.com/mikenye/docker-piaware by raising an issue!
+
+Once I've fully tested ARM support and I'm happy its stable, I'll roll both into a multi-platform image.
+
 ## Up-and-Running - Non-Privileged Mode
 
 Firstly, plug in your USB radio.
