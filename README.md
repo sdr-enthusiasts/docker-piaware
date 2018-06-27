@@ -7,13 +7,12 @@ Tested and working on:
  * x86 platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * if you get it running on a different platform (or if you have issues) please raise an issue
 
-## Tags
- * ```latest``` latest x86 build
- * ```latest-arm7l``` latest ARM build
-
-ARM support is currently experimental. If you run on ARM, please let me know your results by raising an issue over on the GitHub repository https://github.com/mikenye/docker-piaware by raising an issue!
-
-Once I've fully tested ARM support and I'm happy its stable, I'll roll both into a multi-platform image.
+## Multi Architecture Support
+Currently, this image should pull and run on the following architectures:
+ * ```arm64```: Linux x86-64
+ * ```arm32v7```, ```armv7l```: ARMv7 32-bit (Odroid HC1/HC2/XU4, RPi 2/3)
+ 
+ARM support is not as thoroughly tested as x86-64. If you run on ARM, please let me know your results by raising an issue over on the GitHub repository https://github.com/mikenye/docker-piaware by raising an issue!
 
 ## Up-and-Running - Non-Privileged Mode
 
