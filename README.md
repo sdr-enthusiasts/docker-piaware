@@ -1,5 +1,7 @@
 # docker-piaware
-PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa.
+FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa. Builds and runs on x86_64 and ARMv7 (see below).
+
+For more information on what PiAware is, see here: https://flightaware.com/adsb/piaware/
 
 Has the ability to run as privileged mode (for quick and easy), or non-privileged mode (not as quick and easy, but more secure).
 
