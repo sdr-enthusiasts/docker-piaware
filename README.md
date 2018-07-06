@@ -11,7 +11,7 @@ Tested and working on:
 
 ## Multi Architecture Support
 Currently, this image should pull and run on the following architectures:
- * ```arm64```: Linux x86-64
+ * ```amd64```: Linux x86-64
  * ```arm32v7```, ```armv7l```: ARMv7 32-bit (Odroid HC1/HC2/XU4, RPi 2/3)
  
 ARM support is not as thoroughly tested as x86-64. If you run on ARM, please let me know your results by raising an issue over on the GitHub repository https://github.com/mikenye/docker-piaware by raising an issue!
