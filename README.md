@@ -6,8 +6,8 @@ For more information on what PiAware is, see here: https://flightaware.com/adsb/
 Has the ability to run as privileged mode (for quick and easy), or non-privileged mode (not as quick and easy, but more secure).
 
 Tested and working on:
- * x86_64 (amd64) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
- * armv7l platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
+ * `x86_64` (`amd64`) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
+ * `armv7l` platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * if you get it running on a different platform (or if you have issues) please raise an issue
 
 ## Changelog
