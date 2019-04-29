@@ -3,7 +3,7 @@ FROM alpine:3.9
 ENV BRANCH_PIAWARE=v3.6.3 \
     BRANCH_TCLLIB=tcllib_1_18_1 \
     VERSION_S6OVERLAY=v1.22.1.0 \
-    ARCH_S6OVERLAY=amd64 \
+    ARCH_S6OVERLAY=armhf \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 
 ADD https://github.com/just-containers/s6-overlay/releases/download/${VERSION_S6OVERLAY}/s6-overlay-${ARCH_S6OVERLAY}.tar.gz /tmp/s6-overlay.tar.gz
