@@ -6,7 +6,8 @@ For more information on what PiAware is, see here: https://flightaware.com/adsb/
 Has the ability to run as privileged mode (for quick and easy), or non-privileged mode (not as quick and easy, but more secure).
 
 Tested and working on:
- * x86 platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
+ * x86_64 (amd64) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
+ * armv7l platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * if you get it running on a different platform (or if you have issues) please raise an issue
 
 ## Changelog
@@ -29,7 +30,39 @@ Currently, this image should pull and run on the following architectures:
  * ```amd64```: Linux x86-64
  * ```arm32v7```, ```armv7l```: ARMv7 32-bit (Odroid HC1/HC2/XU4, RPi 2/3)
  
-ARM support is not as thoroughly tested as x86-64. If you run on ARM, please let me know your results by raising an issue over on the GitHub repository https://github.com/mikenye/docker-piaware !
+## Prerequisites
+
+Before this container will work properly, you must blacklist the kernel modules for the RTL-SDR USB device from the host's kernel.
+
+To do this, create a file `/etc/modprobe.d/blacklist-rtl2832.conf` containing the following:
+
+```
+# Blacklist RTL2832 so docker container piaware can use the device
+
+blacklist rtl2832
+blacklist dvb_usb_rtl28xxu
+blacklist rtl2832_sdr
+```
+
+Once this is done, you can plug in your RTL-SDR USB device and start the container.
+
+Failure to do this will result in the error below being spammed to the container log.
+
+```
+2019-04-29 21:14:31.642500500  [dump1090-fa] Kernel driver is active, or device is claimed by second instance of librtlsdr.
+2019-04-29 21:14:31.642635500  [dump1090-fa] In the first case, please either detach or blacklist the kernel module
+2019-04-29 21:14:31.642663500  [dump1090-fa] (dvb_usb_rtl28xxu), or enable automatic detaching at compile time.
+2019-04-29 21:14:31.642677500  [dump1090-fa] 
+2019-04-29 21:14:31.642690500  [dump1090-fa] usb_claim_interface error -6
+```
+
+If you get the error above even after blacklisting the kernel modules as outlined above, the modules may still be loaded. You can unload them by running the following commands:
+
+```
+sudo rmmod rtl2832_sdr
+sudo rmmod dvb_usb_rtl28xxu
+sudo rmmod rtl2832
+```
 
 ## Up-and-Running - Non-Privileged Mode
 
