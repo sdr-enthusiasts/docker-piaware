@@ -17,6 +17,7 @@ Tested and working on:
 * `3.5.3`
   * `3.5.3-amd64` (`3.5.3` branch, `Dockerfile`)
   * `3.5.3-arm32v7` (`3.5.3` branch, `Dockerfile`)
+* `development` (`master` branch, `Dockerfile`, `amd64` architecture only, not recommended for production)
 
 ## Changelog
 
