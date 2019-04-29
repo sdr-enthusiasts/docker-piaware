@@ -22,7 +22,8 @@ RUN apk update && \
             net-tools \
             python3 \
             python3-dev \
-            lighttpd && \
+            lighttpd \
+            tzdata && \
     mkdir -p /src && \
     mkdir -p /var/cache/lighttpd/compress && \
     chown lighttpd:lighttpd /var/cache/lighttpd/compress
@@ -73,6 +74,7 @@ RUN git clone -b ${BRANCH_PIAWARE} https://github.com/flightaware/piaware.git /s
     touch /etc/piaware.conf && \
     mkdir -p /run/piaware
 
+
 # Install dump1090
 RUN git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
     cd /src/dump1090 && \
@@ -81,9 +83,9 @@ RUN git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
     cp -v faup1090 /usr/lib/piaware/helpers/ && \
     mkdir -p /run/dump1090-fa && \
-    mkdir -p /usr/share/dump1090-fa/html && \
+    mkdir -p /usr/share/dump1090-fa/html && \ 
     cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/
-    
+
 # Install mlat client
 RUN git clone https://github.com/mutability/mlat-client.git /src/mlat-client && \
     cd /src/mlat-client && \
@@ -105,7 +107,7 @@ RUN apk del git \
 
 # Install s6 overlay
 ADD https://github.com/just-containers/s6-overlay/releases/download/${VERSION_S6OVERLAY}/s6-overlay-amd64.tar.gz /tmp/s6-overlay-amd64.tar.gz
-RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
+RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C / 
 
 
 
