@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv sh
+
+set -eo pipefail
+
+/usr/bin/piaware \
+    -plainlog \
+    -statusfile /run/piaware/status.json \
+    2>&1 | awk '{print "[piaware] " $0}'
+
