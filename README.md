@@ -10,6 +10,14 @@ Tested and working on:
  * `armv7l` platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * if you get it running on a different platform (or if you have issues) please raise an issue
 
+## Supported tags and respective Dockerfiles
+* `latest`, `3.6.3`
+  * `latest-amd64`, `3.6.3-amd64` (`3.6.3` branch, `Dockerfile.amd64`)
+  * `latest-arm32v7`, `3.6.3-arm32v7` (`3.6.3` branch, `Dockerfile.armv7l`)
+* `3.5.3`
+  * `3.5.3-amd64` (`3.5.3` branch, `Dockerfile`)
+  * `3.5.3-arm32v7` (`3.5.3` branch, `Dockerfile`)
+
 ## Changelog
 
 ### v3.6.3
@@ -23,7 +31,7 @@ Tested and working on:
  * **Drop support for bladeRF** (for now as I can't get it to compile properly, **if you use bladeRF stay on version 3.5.3 for now**)
 
 ### v3.5.3
- * Original image (including bladeRF support)
+ * Original image (including bladeRF support), based on Debian Jessie
 
 ## Multi Architecture Support
 Currently, this image should pull and run on the following architectures:
