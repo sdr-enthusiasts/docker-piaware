@@ -1,0 +1,41 @@
+#!/usr/bin/with-contenv sh
+
+# Check to make sure the correct command line arguments have been set
+EXITCODE=0
+echo -ne "\e[31m"
+if [ -z "${USERNAME}" ]; then
+  echo "ERROR: USER environment variable not set"
+  EXITCODE=1
+fi
+if [ -z "${PASSWORD}" ]; then
+  echo "ERROR: PASSWORD environment variable not set"
+  EXITCODE=1
+fi
+if [ -z "${LAT}" ]; then
+  echo "ERROR: LAT environment variable not set"
+  EXITCODE=1
+fi
+if [ -z "${LONG}" ]; then
+  echo "ERROR: LONG environment variable not set"
+  EXITCODE=1
+fi
+echo -ne "\e[0m"
+if [ $EXITCODE -ne 0 ]; then
+  exit 1
+fi
+
+# Set up timezone
+if [ -z "${TZ}" ]; then
+  echo -ne "\e[33m"
+  echo "WARNING: TZ environment variable not set"
+  echo -ne "\e[0m"
+else
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+fi
+
+# Set up piaware
+piaware-config flightaware-user ${USERNAME}
+piaware-config flightaware-password ${PASSWORD}
+piaware-config allow-auto-updates no
+piaware-config allow-manual-updates no
+

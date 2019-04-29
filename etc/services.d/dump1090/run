@@ -1,0 +1,19 @@
+#!/usr/bin/with-contenv sh
+
+set -eo pipefail
+
+/usr/local/bin/dump1090 \
+    --net \
+    --gain -10 \
+    --ppm 1 \
+    --lat ${LAT} \
+    --lon ${LONG} \
+    --max-range 400 \
+    --mlat \
+    --fix \
+    --stats-every 3600 \
+    --quiet \
+    --write-json /run/dump1090-fa \
+    --json-location-accuracy 2 \
+    2>&1 | awk '{print "[dump1090-fa] " $0}'
+
