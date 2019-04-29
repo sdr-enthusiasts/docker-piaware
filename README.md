@@ -19,10 +19,10 @@ Tested and working on:
     * The "unoptimised" version of the Dockerfile is available in the source repo for educational/troubleshooting purposes
  * Implement s6-overlay for process supervision
  * Make logging much better
- * Drop support for bladeRF (for now as I can't get it to compile properly, if you use bladeRF stay on version 3.5.3 for now)
+ * **Drop support for bladeRF** (for now as I can't get it to compile properly, **if you use bladeRF stay on version 3.5.3 for now**)
 
 ### v3.5.3
- * Original image (including bladeRG support)
+ * Original image (including bladeRF support)
 
 ## Multi Architecture Support
 Currently, this image should pull and run on the following architectures:
