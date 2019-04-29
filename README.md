@@ -63,6 +63,10 @@ sudo rmmod rtl2832_sdr
 sudo rmmod dvb_usb_rtl28xxu
 sudo rmmod rtl2832
 ```
+## IMPORTANT!
+
+* You need to specify a persistent MAC address for the container, as this is used by FlightAware to track your PiAware instance.
+* Your site ID is housed in the path mapped to `/var/cache/piaware` in the container. **Make sure you map this through to persistent storage or you'll create a new FlightAware site ID every time you launch the container.**
 
 ## Up-and-Running - Non-Privileged Mode
 
@@ -185,9 +189,3 @@ The following ports are used by this container:
 * `dump1090` log file exists at `/var/log/dump1090/current`, with automatic log rotation (should grow no more than ~20MB)
 * `piaware` log file exists at `/var/log/piaware/current`, with automatic log rotation (should grow no more than ~20MB)
 * `lighttpd` is configured to not log (except for a startup message on container start)
-
-
-## IMPORTANT!
-
-* You need to specify a persistent MAC address for the container, as this is used by FlightAware to track your PiAware instance.
-* Your site ID is housed in the path mapped to `/var/cache/piaware` in the container. Make sure you map this through to persistent storage or you'll create a new FlightAware site ID every time you launch the container.
