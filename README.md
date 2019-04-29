@@ -9,12 +9,27 @@ Tested and working on:
  * x86 platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * if you get it running on a different platform (or if you have issues) please raise an issue
 
+## Changelog
+
+### v3.6.3
+ * Update piaware to v3.6.3
+ * Reduction of image size 663MB down to 304MB
+    * Change base image to Alpine v3.9
+    * Reduce build layers
+    * The "unoptimised" version of the Dockerfile is available in the source repo for educational/troubleshooting purposes
+ * Implement s6-overlay for process supervision
+ * Make logging much better
+ * Drop support for bladeRF (for now as I can't get it to compile properly, if you use bladeRF stay on version 3.5.3 for now)
+
+### v3.5.3
+ * Original image (including bladeRG support)
+
 ## Multi Architecture Support
 Currently, this image should pull and run on the following architectures:
  * ```amd64```: Linux x86-64
  * ```arm32v7```, ```armv7l```: ARMv7 32-bit (Odroid HC1/HC2/XU4, RPi 2/3)
  
-ARM support is not as thoroughly tested as x86-64. If you run on ARM, please let me know your results by raising an issue over on the GitHub repository https://github.com/mikenye/docker-piaware by raising an issue!
+ARM support is not as thoroughly tested as x86-64. If you run on ARM, please let me know your results by raising an issue over on the GitHub repository https://github.com/mikenye/docker-piaware !
 
 ## Up-and-Running - Non-Privileged Mode
 
@@ -112,7 +127,7 @@ docker run \
 
 There are a series of available variables you are required to set:
 
-* `TZ` - Your local timezone
+* `TZ` - Your local timezone (optional)
 * `USERNAME` - FlightAware account username
 * `PASSWORD` - FlightAware account password
 * `LAT` - Antenna's latitude
@@ -132,9 +147,14 @@ The following ports are used by this container:
 * `30104` - dump1090 TCP Beast input listen port - optional, recommended to leave unmapped unless explicitly needed
 
 
-## Notes
+## Logging
+* The `dump1090` and `piaware` processes are logged to the container's stdout, and can be viewed with `docker logs [-f] container`.
+* `dump1090` log file exists at `/var/log/dump1090/current`, with automatic log rotation (should grow no more than ~20MB)
+* `piaware` log file exists at `/var/log/piaware/current`, with automatic log rotation (should grow no more than ~20MB)
+* `lighttpd` is configured to not log (except for a startup message on container start)
+
+
+## IMPORTANT!
 
 * You need to specify a persistent MAC address for the container, as this is used by FlightAware to track your PiAware instance.
 * Your site ID is housed in the path mapped to `/var/cache/piaware` in the container. Make sure you map this through to persistent storage or you'll create a new FlightAware site ID every time you launch the container.
-* dump1090's stats can be viewed with "docker logs <container>".
-* piaware's log can be viewed with "docker exec -it <container> tail -F /var/log/piaware"
