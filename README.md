@@ -10,7 +10,7 @@ Tested and working on:
  * `armv7l` platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * if you get it running on a different platform (or if you have issues) please raise an issue
 
-## Supported tags and respective `Dockerfile` links
+## Supported tags and respective Dockerfiles
 * `latest`, `3.6.3`
   * `latest-amd64`, `3.6.3-amd64` (`3.6.3` branch, `Dockerfile.amd64`)
   * `latest-arm32v7`, `3.6.3-arm32v7` (`3.6.3` branch, `Dockerfile.armv7l`)
