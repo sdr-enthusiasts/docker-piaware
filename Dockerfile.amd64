@@ -24,7 +24,8 @@ RUN apk update && \
             net-tools \
             python3 \
             python3-dev \
-            lighttpd && \
+            lighttpd \
+            tzdata && \
     mkdir -p /src && \
     mkdir -p /var/cache/lighttpd/compress && \
     chown lighttpd:lighttpd /var/cache/lighttpd/compress && \
@@ -84,7 +85,6 @@ RUN apk update && \
 
 COPY etc/ /etc/
 
-EXPOSE 30104/tcp 8080/tcp 30001/tcp 30002/tcp 30003/tcp 30004/tcp 30005/tcp
+EXPOSE 8080/tcp 30001-30005/tcp 30104/tcp
 
 ENTRYPOINT [ "/init" ]
-
