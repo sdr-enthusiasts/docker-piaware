@@ -2,10 +2,9 @@ FROM alpine:3.9
 
 ENV BRANCH_PIAWARE=v3.6.3
 ENV BRANCH_TCLLIB=tcllib_1_18_1
-
 ENV VERSION_S6OVERLAY=v1.22.1.0
 ENV ARCH_S6OVERLAY=amd64
-
+ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 
 RUN apk update && \
     apk add git \
@@ -45,11 +44,11 @@ RUN echo "blacklist dvb_usb_rtl28xxu" >> /etc/modprobe.d/no-rtl.conf && \
     echo "blacklist rtl2830" >> /etc/modprobe.d/no-rtl.conf
 
 # Install bladeRF
-#RUN git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
-#    mkdir /src/bladeRF/host/build && \
-#    cmake ../ && \
-#    make -j && \
-#    make -j install
+RUN git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
+    mkdir /src/bladeRF/host/build && \
+    cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
+    make -j && \
+    make -j install
 
 # Install tcllauncher
 RUN git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
@@ -111,7 +110,6 @@ RUN apk del git \
 ADD https://github.com/just-containers/s6-overlay/releases/download/${VERSION_S6OVERLAY}/s6-overlay-${ARCH_S6OVERLAY}.tar.gz /tmp/s6-overlay.tar.gz
 
 RUN tar -xzf /tmp/s6-overlay.tar.gz -C /
-
 
 
 COPY etc/ /etc/
