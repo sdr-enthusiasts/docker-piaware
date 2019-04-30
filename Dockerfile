@@ -45,10 +45,13 @@ RUN echo "blacklist dvb_usb_rtl28xxu" >> /etc/modprobe.d/no-rtl.conf && \
 
 # Install bladeRF
 RUN git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
+    cd /src/bladeRF && \
+    git checkout 2017.12-rc1 && \
     mkdir /src/bladeRF/host/build && \
+    cd /src/bladeRF/host/build && \
     cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
     make -j && \
-    make -j install
+    make -j install && \
 
 # Install tcllauncher
 RUN git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
