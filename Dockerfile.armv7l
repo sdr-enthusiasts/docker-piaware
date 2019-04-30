@@ -40,6 +40,11 @@ RUN apk update && \
     echo "blacklist dvb_usb_rtl28xxu" >> /etc/modprobe.d/no-rtl.conf && \
     echo "blacklist rtl2832" >> /etc/modprobe.d/no-rtl.conf && \
     echo "blacklist rtl2830" >> /etc/modprobe.d/no-rtl.conf && \
+    git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
+    mkdir /src/bladeRF/host/build && \
+    cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
+    make -j && \
+    make -j install && \
     git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
     cd /src/tcllauncher && \
     autoconf && \
