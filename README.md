@@ -1,5 +1,5 @@
 # docker-piaware
-FlightAware's PiAware docker container including support for ~bladeRF,~ RTLSDR. Includes dump1090-fa. Builds and runs on x86_64 and ARMv7 (see below).
+FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa. Builds and runs on x86_64 and ARMv7 (see below).
 
 For more information on what PiAware is, see here: https://flightaware.com/adsb/piaware/
 
@@ -8,7 +8,8 @@ Has the ability to run as privileged mode (for quick and easy), or non-privilege
 Tested and working on:
  * `x86_64` (`amd64`) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * `armv7l` platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
- * if you get it running on a different platform (or if you have issues) please raise an issue
+ * If you run on a different platform (or if you have issues) please raise an issue and let me know!
+ * bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
 
 ## Supported tags and respective Dockerfiles
 * `latest`, `3.6.3`
@@ -29,10 +30,10 @@ Tested and working on:
     * The "unoptimised" version of the Dockerfile is available in the source repo for educational/troubleshooting purposes
  * Implement s6-overlay for process supervision
  * Make logging much better
- * **Drop support for bladeRF** (for now as I can't get it to compile properly, **if you use bladeRF stay on version 3.5.3 for now**)
+ * bladeRF is supported again (my first release of 3.6.3 dropped support for bladeRF, but since then I've overcome the compilation problems and its back in).
 
 ### v3.5.3
- * Original image (including bladeRF support), based on Debian Jessie
+ * Original image, based on Debian Jessie
 
 ## Multi Architecture Support
 Currently, this image should pull and run on the following architectures:
