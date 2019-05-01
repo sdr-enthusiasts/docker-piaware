@@ -1,3 +1,10 @@
+#
+# NOTE: This is the UNOPTIMISED Dockerfile.
+# 
+# Non-development releases of this image will use a docker file with many less layers.
+# See Dockerfile.amd64 and Dockerfile.armv7l in source repo for these.
+#
+
 FROM alpine:3.9
 
 ENV BRANCH_PIAWARE=v3.6.3
