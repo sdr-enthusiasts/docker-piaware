@@ -69,8 +69,8 @@ RUN apk update && \
     mkdir -p /run/piaware && \
     git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
     cd /src/dump1090 && \
-    make -j all BLADERF=no && \
-    make -j faup1090 BLADERF=no && \
+    make -j all && \
+    make -j faup1090 && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
     cp -v faup1090 /usr/lib/piaware/helpers/ && \
     mkdir -p /run/dump1090-fa && \

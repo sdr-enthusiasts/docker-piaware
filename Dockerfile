@@ -82,8 +82,8 @@ RUN git clone -b ${BRANCH_PIAWARE} https://github.com/flightaware/piaware.git /s
 # Install dump1090
 RUN git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
     cd /src/dump1090 && \
-    make -j all BLADERF=no && \
-    make -j faup1090 BLADERF=no && \
+    make -j all && \
+    make -j faup1090 && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
     cp -v faup1090 /usr/lib/piaware/helpers/ && \
     mkdir -p /run/dump1090-fa && \
