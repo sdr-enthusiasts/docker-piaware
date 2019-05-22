@@ -1,5 +1,5 @@
 # docker-piaware
-FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa. Builds and runs on x86_64 and ARMv7 (see below).
+FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa (but not yet dump978, see endnote). Builds and runs on x86_64 and ARMv7 (see below).
 
 For more information on what PiAware is, see here: https://flightaware.com/adsb/piaware/
 
@@ -12,6 +12,9 @@ Tested and working on:
  * bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
 
 ## Supported tags and respective Dockerfiles
+* `latest`, `3.7.1`
+  * `latest-amd64`, `3.7.1-amd64` (`3.7.1` branch, `Dockerfile.amd64`)
+  * `latest-arm32v7`, `3.7.1-arm32v7` (`3.7.1` branch, `Dockerfile.armv7l`)
 * `latest`, `3.6.3`
   * `latest-amd64`, `3.6.3-amd64` (`3.6.3` branch, `Dockerfile.amd64`)
   * `latest-arm32v7`, `3.6.3-arm32v7` (`3.6.3` branch, `Dockerfile.armv7l`)
@@ -21,6 +24,9 @@ Tested and working on:
 * `development` (`master` branch, `Dockerfile`, `amd64` architecture only, not recommended for production)
 
 ## Changelog
+
+### v3.7.1
+ * Update piaware to v3.7.1
 
 ### v3.6.3
  * Update piaware to v3.6.3
@@ -98,14 +104,14 @@ docker run \
  --rm \
  --mac-address xx:xx:xx:xx:xx:xx \
  --name piaware \
- --device /dev/bus/usb/<usb_bus_number>/<usb_device_number> \
- -e TZ="<your_timezone>" \
- -e USERNAME="<your_flightaware_username>" \
- -e PASSWORD="<your_flightaware_password>" \
- -e LAT=<latitude_of_your_antenna> \
- -e LONG=<longitude_of_your_antenna> \
+ --device /dev/bus/usb/USB_BUS_NUMBER/USB_DEVICE_NUMBER \
+ -e TZ="YOUR_TIMEZONE" \
+ -e USERNAME="YOUR_FLIGHTAWARE_USERNAME" \
+ -e PASSWORD="YOUR_FLIGHTAWARE_PASSWORD" \
+ -e LAT=LATITUDE_OF_YOUR_ANTENNA \
+ -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
  -p 8080:8080 \
- -v </path/to/piaware_cache>:/var/cache/piaware \
+ -v /path/to/piaware_cache:/var/cache/piaware \
  mikenye/piaware
 ```
 
@@ -141,13 +147,13 @@ docker run \
  --mac-address xx:xx:xx:xx:xx:xx \
  --name piaware \
  --privileged
- -e TZ="<your_timezone>" \
- -e USERNAME="<your_flightaware_username>" \
- -e PASSWORD="<your_flightaware_password>" \
- -e LAT=<latitude_of_your_antenna> \
- -e LONG=<longitude_of_your_antenna> \
+ -e TZ="YOUR_TIMEZONE" \
+ -e USERNAME="YOUR_FLIGHTAWARE_USERNAME" \
+ -e PASSWORD="YOUR_FLIGHTAWARE_PASSWORD" \
+ -e LAT=LATITUDE_OF_YOUR_ANTENNA \
+ -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
  -p 8080:8080 \
- -v </path/to/piaware_cache>:/var/cache/piaware \
+ -v /path/to/piaware_cache:/var/cache/piaware \
  mikenye/piaware
 ```
 
@@ -199,3 +205,9 @@ The following ports are used by this container:
 * `dump1090` log file exists at `/var/log/dump1090/current`, with automatic log rotation (should grow no more than ~20MB)
 * `piaware` log file exists at `/var/log/piaware/current`, with automatic log rotation (should grow no more than ~20MB)
 * `lighttpd` is configured to not log (except for a startup message on container start)
+
+## Note about dump978
+I can get dump978 to compile in this docker image, however I don't have a suitable RTLSDR radio I can use to test this with. The FlightAware Pro Stick Plus Blue that I own has a 1090MHz bandpass filter built in, so it is basically useless for 978MHz. If someone wants to send me a radio to test with, please get in touch! If you're interested in testing this yourself, see the master branch's unoptimised Dockerfile - the relevant lines are currently commented out. You can uncomment them and dump978 will build.
+
+In future if this image is to support both dump1090 and dump978, I'll need to implement a way for the user to specify which radios are to be used for each. Likely a shell script that runs on container start, that determines which radio to use based on serial numbers passed in via environment variables...
+
