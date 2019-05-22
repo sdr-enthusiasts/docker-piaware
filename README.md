@@ -15,9 +15,9 @@ Tested and working on:
 * `latest`, `3.7.1`
   * `latest-amd64`, `3.7.1-amd64` (`3.7.1` branch, `Dockerfile.amd64`)
   * `latest-arm32v7`, `3.7.1-arm32v7` (`3.7.1` branch, `Dockerfile.armv7l`)
-* `latest`, `3.6.3`
-  * `latest-amd64`, `3.6.3-amd64` (`3.6.3` branch, `Dockerfile.amd64`)
-  * `latest-arm32v7`, `3.6.3-arm32v7` (`3.6.3` branch, `Dockerfile.armv7l`)
+* `3.6.3`
+  * `3.6.3-amd64` (`3.6.3` branch, `Dockerfile.amd64`)
+  * `3.6.3-arm32v7` (`3.6.3` branch, `Dockerfile.armv7l`)
 * `3.5.3`
   * `3.5.3-amd64` (`3.5.3` branch, `Dockerfile`)
   * `3.5.3-arm32v7` (`3.5.3` branch, `Dockerfile`)
