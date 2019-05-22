@@ -96,7 +96,7 @@ RUN apk update && \
             python3 && \
     rm -rf /var/cache/apk/* && \
     rm -rf /src && \
-    tar -xzf /tmp/s6-overlay.tar.gz -C /
+    tar -xzf /tmp/s6-overlay.tar.gz -C / && \
     rm -f /tmp/s6-overlay.tar.gz
 
 COPY etc/ /etc/
