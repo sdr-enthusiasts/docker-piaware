@@ -8,7 +8,7 @@ Has the ability to run as privileged mode (for quick and easy), or non-privilege
 Tested and working on:
  * `x86_64` (`amd64`) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * `armv7l` (`arm32v7`) platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
- * `aarch64` (`arm64v8`) platform (Raspberry Pi 4) running Raspbian 64-bit using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
+ * `aarch64` (`arm64v8`) platform (Raspberry Pi 4) running Raspbian Buster 64-bit using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * If you run on a different platform (or if you have issues) please raise an issue and let me know!
  * bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
 
