@@ -1,3 +1,6 @@
 #!/bin/sh
 
-docker build -f Dockerfile.aarch64 -t mikenye/piaware:3.7.1-arm64v8 .
+VERSION=3.7.1
+IMAGE=mikenye/piaware
+
+docker build -f Dockerfile -t ${IMAGE}:${VERSION} .
