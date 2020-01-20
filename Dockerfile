@@ -1,6 +1,6 @@
 #
 # NOTE: This is the UNOPTIMISED Dockerfile.
-# 
+#
 # Production releases of this image use an optimised Dockerfile with many less layers.
 # See Dockerfile.amd64, Dockerfile.armv7l & Dockerfile.aarch64 in source repo, these are the optimised versions.
 #
@@ -16,7 +16,8 @@ ENV BRANCH_PIAWARE=v3.7.1 \
     BRANCH_TCLLIB=tcllib-1-18-1 \
     VERSION_S6OVERLAY=v1.22.1.0 \
     ARCH_S6OVERLAY=amd64 \
-    S6_BEHAVIOUR_IF_STAGE2_FAILS=2
+    S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
+    GAIN=-10
 #    BRANCH_DUMP978=v3.7.1 \
 #    BRANCH_SOAPYSDR=soapy-sdr-0.5.4 \
 
@@ -81,9 +82,9 @@ RUN git clone -b ${BRANCH_TCLLIB} https://github.com/tcltk/tcllib.git /src/tclli
     autoconf && \
     ./configure && \
     make -j && \
-    make -j install 
+    make -j install
 
-# Install and Patch (https://aur.archlinux.org/packages/piaware-git/) piaware    
+# Install and Patch (https://aur.archlinux.org/packages/piaware-git/) piaware
 RUN git clone -b ${BRANCH_PIAWARE} https://github.com/flightaware/piaware.git /src/piaware && \
     cp -v /src/piaware/programs/piaware/faup.tcl /src/piaware/programs/piaware/faup.tcl.original && \
     sed -i 's/package require Itcl 3.4/package require Itcl/' /src/piaware/programs/piaware/faup.tcl

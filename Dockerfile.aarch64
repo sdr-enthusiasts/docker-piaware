@@ -7,7 +7,8 @@ ENV BRANCH_PIAWARE=v3.7.1 \
     BRANCH_TCLLIB=tcllib-1-18-1 \
     VERSION_S6OVERLAY=v1.22.1.0 \
     ARCH_S6OVERLAY=aarch64 \
-    S6_BEHAVIOUR_IF_STAGE2_FAILS=2
+    S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
+    GAIN=-10
 
 ADD https://github.com/just-containers/s6-overlay/releases/download/${VERSION_S6OVERLAY}/s6-overlay-${ARCH_S6OVERLAY}.tar.gz /tmp/s6-overlay.tar.gz
 
