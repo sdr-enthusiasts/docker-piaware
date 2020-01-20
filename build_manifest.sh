@@ -3,7 +3,7 @@
 # https://github.com/docker-library/official-images/blob/a7ad3081aa5f51584653073424217e461b72670a/bashbrew/go/vendor/src/github.com/docker-library/go-dockerlibrary/architecture/oci-platform.go#L14-L25
 #
 
-VERSION=3.7.1
+VERSION=3.8.0
 IMAGE=mikenye/piaware
 
 docker pull ${IMAGE}:${VERSION}-amd64

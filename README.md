@@ -13,7 +13,15 @@ Tested and working on:
  * bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
 
 ## Supported tags and respective Dockerfiles
-* `latest`, `3.7.1`
+* `latest`, `3.8.0`
+  * `latest-amd64`, `3.8.0-amd64` (`3.8.0` branch, `Dockerfile.amd64`)
+  * `latest-arm32v7`, `3.8.0-arm32v7` (`3.8.0` branch, `Dockerfile.armv7l`)
+  * `latest-arm64v8`, `3.8.0-arm64v8` (`3.8.0` branch, `Dockerfile.aarch64`)
+* `3.7.2`
+  * `latest-amd64`, `3.7.2-amd64` (`3.7.2` branch, `Dockerfile.amd64`)
+  * `latest-arm32v7`, `3.7.2-arm32v7` (`3.7.2` branch, `Dockerfile.armv7l`)
+  * `latest-arm64v8`, `3.7.2-arm64v8` (`3.7.2` branch, `Dockerfile.aarch64`)
+* `3.7.1`
   * `latest-amd64`, `3.7.1-amd64` (`3.7.1` branch, `Dockerfile.amd64`)
   * `latest-arm32v7`, `3.7.1-arm32v7` (`3.7.1` branch, `Dockerfile.armv7l`)
   * `latest-arm64v8`, `3.7.1-arm64v8` (`3.7.1` branch, `Dockerfile.aarch64`)
@@ -27,9 +35,22 @@ Tested and working on:
 
 ## Changelog
 
+### v3.8.0
+ * Update piaware to v3.8.0
+ * Update tcllauncer to v1.10
+ * Update mlatclient to v0.2.11
+ * Update tcllib to v1.20
+ * Removed deprecated flightaware user/password options
+ * Added FEEDER_ID parameter to be able to run without persistant storage
+
+### v3.7.2
+ * Update piaware to v3.7.2
+ * Add support for `arm64v8` / `aarch64` architecture
+
 ### v3.7.1
  * Update piaware to v3.7.1
  * Add support for `arm64v8` / `aarch64` architecture
+ * Add support for GAIN optimalization
 
 ### v3.6.3
  * Update piaware to v3.6.3
@@ -110,8 +131,6 @@ docker run \
  --name piaware \
  --device /dev/bus/usb/USB_BUS_NUMBER/USB_DEVICE_NUMBER \
  -e TZ="YOUR_TIMEZONE" \
- -e USERNAME="YOUR_FLIGHTAWARE_USERNAME" \
- -e PASSWORD="YOUR_FLIGHTAWARE_PASSWORD" \
  -e LAT=LATITUDE_OF_YOUR_ANTENNA \
  -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
  -p 8080:8080 \
@@ -129,8 +148,6 @@ docker run \
  --name piaware \
  --device /dev/bus/usb/001/004 \
  -e TZ="Australia/Perth" \
- -e USERNAME="pointyfergusson" \
- -e PASSWORD="password1234" \
  -e LAT=-30.657 \
  -e LONG=116.543 \
  -p 8080:8080 \
@@ -152,8 +169,6 @@ docker run \
  --name piaware \
  --privileged
  -e TZ="YOUR_TIMEZONE" \
- -e USERNAME="YOUR_FLIGHTAWARE_USERNAME" \
- -e PASSWORD="YOUR_FLIGHTAWARE_PASSWORD" \
  -e LAT=LATITUDE_OF_YOUR_ANTENNA \
  -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
  -p 8080:8080 \
@@ -171,8 +186,6 @@ docker run \
  --name piaware \
  --privileged
  -e TZ="Australia/Perth" \
- -e USERNAME="pointyfergusson" \
- -e PASSWORD="password1234" \
  -e LAT=-30.657 \
  -e LONG=116.543 \
  -p 8080:8080 \
@@ -186,8 +199,6 @@ There are a series of available variables you are required to set:
 
 * `TZ` - Your local timezone (optional)
 * `GAIN` - Optimizing gain which defaults to -10 https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 (optional)
-* `USERNAME` - FlightAware account username
-* `PASSWORD` - FlightAware account password
 * `LAT` - Antenna's latitude
 * `LONG` - Antenna's longitude
 
@@ -204,6 +215,11 @@ The following ports are used by this container:
 * `30005` - dump1090 TCP Beast output listen port - optional, recommended to leave unmapped unless explicitly needed
 * `30104` - dump1090 TCP Beast input listen port - optional, recommended to leave unmapped unless explicitly needed
 
+## Claiming
+
+Since version 3.8.0 the “flightaware-user” and “flightaware-password” configuration options are no longer used; please use the normal site-claiming mechanisms to associate sites with a FlightAware account.
+
+https://flightaware.com/adsb/piaware/claim
 
 ## Logging
 * The `dump1090` and `piaware` processes are logged to the container's stdout, and can be viewed with `docker logs [-f] container`.
