@@ -49,7 +49,7 @@ Currently, this image should pull and run on the following architectures:
  * ```amd64```: Linux x86-64
  * ```arm32v7```, ```armv7l```: ARMv7 32-bit (Odroid HC1/HC2/XU4, RPi 2/3)
  * ```arm64v8```, ```aarch64```: ARMv8 64-bit (RPi 3B+/4)
- 
+
 ## Prerequisites
 
 Before this container will work properly, you must blacklist the kernel modules for the RTL-SDR USB device from the host's kernel.
@@ -72,7 +72,7 @@ Failure to do this will result in the error below being spammed to the container
 2019-04-29 21:14:31.642500500  [dump1090-fa] Kernel driver is active, or device is claimed by second instance of librtlsdr.
 2019-04-29 21:14:31.642635500  [dump1090-fa] In the first case, please either detach or blacklist the kernel module
 2019-04-29 21:14:31.642663500  [dump1090-fa] (dvb_usb_rtl28xxu), or enable automatic detaching at compile time.
-2019-04-29 21:14:31.642677500  [dump1090-fa] 
+2019-04-29 21:14:31.642677500  [dump1090-fa]
 2019-04-29 21:14:31.642690500  [dump1090-fa] usb_claim_interface error -6
 ```
 
@@ -185,6 +185,7 @@ docker run \
 There are a series of available variables you are required to set:
 
 * `TZ` - Your local timezone (optional)
+* `GAIN` - Optimizing gain which defaults to -10 https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 (optional)
 * `USERNAME` - FlightAware account username
 * `PASSWORD` - FlightAware account password
 * `LAT` - Antenna's latitude
