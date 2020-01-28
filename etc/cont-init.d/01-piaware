@@ -34,6 +34,9 @@ else
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 fi
 
+# Print version information
+echo "piaware version `piaware -v`"
+
 # Set up piaware
 piaware-config rtlsdr-gain ${GAIN}
 piaware-config allow-auto-updates no
