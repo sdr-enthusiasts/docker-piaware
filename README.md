@@ -13,7 +13,11 @@ Tested and working on:
  * bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
 
 ## Supported tags and respective Dockerfiles
-* `latest`, `3.7.1`
+* `latest`, `3.7.2`
+  * `latest-amd64`, `3.7.2-amd64` (`3.7.2` branch, `Dockerfile.amd64`)
+  * `latest-arm32v7`, `3.7.2-arm32v7` (`3.7.2` branch, `Dockerfile.armv7l`)
+  * `latest-arm64v8`, `3.7.2-arm64v8` (`3.7.2` branch, `Dockerfile.aarch64`)
+* `3.7.1`
   * `latest-amd64`, `3.7.1-amd64` (`3.7.1` branch, `Dockerfile.amd64`)
   * `latest-arm32v7`, `3.7.1-arm32v7` (`3.7.1` branch, `Dockerfile.armv7l`)
   * `latest-arm64v8`, `3.7.1-arm64v8` (`3.7.1` branch, `Dockerfile.aarch64`)
@@ -26,6 +30,9 @@ Tested and working on:
 * `development` (`master` branch, `Dockerfile`, `amd64` architecture only, not recommended for production)
 
 ## Changelog
+
+### v3.7.2
+ * Update piaware to v3.7.2
 
 ### v3.7.1
  * Update piaware to v3.7.1
