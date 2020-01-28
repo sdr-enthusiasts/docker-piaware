@@ -52,7 +52,7 @@ Tested and working on:
 ### v3.7.1
  * Update piaware to v3.7.1
  * Add support for `arm64v8` / `aarch64` architecture
- * Add support for GAIN optimalization (thanks [Jan Collijs](https://github.com/visibilityspots)!) 
+ * Add support for gain optimisation (thanks [Jan Collijs](https://github.com/visibilityspots)!) 
 
 ### v3.6.3
  * Update piaware to v3.6.3
@@ -192,6 +192,7 @@ services:
       - 30003:30003
       - 30005:30005
     environment:
+      - TZ="Australia/Perth"
       - LAT=-32.463873
       - LONG=113.458482
     volumes:
@@ -209,7 +210,12 @@ There are a series of available environment variables:
 | `LAT`                | Antenna's latitude (required)   |         |
 | `LONG`               | Antenna's longitude (required)  |         |
 | `TZ`                 | Your local timezone (optional)  | GMT     |
-| `GAIN`               | Optimizing gain. <br> See https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 (optional) | -10 |
+| `ALLOW_MLAT`         | Used for setting `piaware-config` variable `allow-mlat` (optional) | yes |
+| `ALLOW_MODEAC`       | Used for setting `piaware-config` variable `allow-modead` (optional) | yes |
+| `RTLSDR_PPM`         | Used for setting `piaware-config` variable `rtlsdr-ppm` (optional) | 0 |
+| `RTLSDR_GAIN`        | Optimizing gain (optional) <br> See https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 | -10 <br> (auto-gain)|
+
+For an explanation of `piaware-config` variables, see https://flightaware.com/adsb/piaware/advanced_configuration.
 
 
 ## Ports

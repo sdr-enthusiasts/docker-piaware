@@ -11,9 +11,6 @@ if [ -z "${LONG}" ]; then
   echo "ERROR: LONG environment variable not set"
   EXITCODE=1
 fi
-if [ -z "${GAIN}" ]; then
-  echo "INFO: GAIN will be set to default max; -10"
-fi
 if [ -z "${FEEDER_ID}" ]; then
   echo "INFO: no specific FEEDER_ID set, falling back to dynamic generated (/var/cache/piaware)"
   unset FEEDER_ID
@@ -34,11 +31,11 @@ else
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 fi
 
-# Print version information
-echo "piaware version `piaware -v`"
-
 # Set up piaware
-piaware-config rtlsdr-gain ${GAIN}
+piaware-config rtlsdr-gain ${RTLSDR_GAIN}
+piaware-config rtlsdr-ppm ${RTLSDR_PPM}
+piaware-config allow-mlat ${ALLOW_MLAT}
+piaware-config allow-modeac ${ALLOW_MODEAC}
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
 
