@@ -19,6 +19,9 @@ if [ -z "${LONG}" ]; then
   echo "ERROR: LONG environment variable not set"
   EXITCODE=1
 fi
+if [ -z "${GAIN}" ]; then
+  echo "INFO: GAIN will be set to default max; -10"
+fi
 echo -ne "\e[0m"
 if [ $EXITCODE -ne 0 ]; then
   exit 1
@@ -36,6 +39,7 @@ fi
 # Set up piaware
 piaware-config flightaware-user ${USERNAME}
 piaware-config flightaware-password ${PASSWORD}
+piaware-config rtlsdr-gain ${GAIN}
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
 
