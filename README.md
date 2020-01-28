@@ -109,9 +109,13 @@ sudo rmmod rtl2832
 ## IMPORTANT!
 
 * You need to specify a persistent MAC address for the container, as this is used by FlightAware to track your PiAware instance.
-* Your site ID is housed in the path mapped to `/var/cache/piaware` in the container. **Make sure you map this through to persistent storage or you'll create a new FlightAware site ID every time you launch the container.**
+* With regards to your FlightAware Site ID:
+  * Your site ID is housed in the path mapped to `/var/cache/piaware` in the container; OR
+  * A site ID may be specified via the `FEEDER_ID` environment variable.
+ 
+**Make sure you map `/var/cache/piaware` through to persistent storage OR set your feeder ID via the `FEEDER_ID` environment variable. Failure to do this will cause a new FlightAware site ID to be generated every time you launch the container.**
 
-## Up-and-Running - Non-Privileged Mode
+## Up-and-Running with `docker run`
 
 Firstly, plug in your USB radio.
 
@@ -157,52 +161,55 @@ docker run \
  mikenye/piaware
 ```
 
-## Up-and-Running - Privileged Mode
+## Up-and-Running with Docker Compose
 
 Firstly, plug in your USB radio.
 
-Start the docker container:
+Run the command `lsusb` and find your radio. It'll look something like this:
 
 ```
-docker run \
- -d \
- --rm \
- --mac-address xx:xx:xx:xx:xx:xx \
- --name piaware \
- --privileged
- -e TZ="YOUR_TIMEZONE" \
- -e LAT=LATITUDE_OF_YOUR_ANTENNA \
- -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
- -p 8080:8080 \
- -v /path/to/piaware_cache:/var/cache/piaware \
- mikenye/piaware
+Bus 001 Device 004: ID 0bda:2832 Realtek Semiconductor Corp. RTL2832U DVB-T
 ```
 
-For example:
+Take note of the bus number, and device number. In the output above, its 001 and 004 respectively. This is used in the `devices:` section of the `docker-compose.xml`. Change these in your environment as required.
+
+An example `docker-compose.xml` file is below:
 
 ```
-docker run \
- -d \
- --rm \
- --mac-address de:ad:be:ef:13:37 \
- --name piaware \
- --privileged
- -e TZ="Australia/Perth" \
- -e LAT=-30.657 \
- -e LONG=116.543 \
- -p 8080:8080 \
- -v /opt/piaware/piaware_cache:/var/cache/piaware \
- mikenye/piaware
+version: '2.0'
+
+services:
+  piaware:
+    image: mikenye/piaware:latest
+    tty: true
+    container_name: piaware
+    mac_address: de:ad:be:ef:13:37
+    restart: always
+    devices:
+      - /dev/bus/usb/001/004:/dev/bus/usb/001/004
+    ports:
+      - 8080:8080
+      - 30003:30003
+      - 30005:30005
+    environment:
+      - LAT=-32.463873
+      - LONG=113.458482
+    volumes:
+      - /var/cache/piaware:/var/cache/piaware
 ```
 
-## Runtime Configuration Options
 
-There are a series of available variables you are required to set:
 
-* `TZ` - Your local timezone (optional)
-* `GAIN` - Optimizing gain which defaults to -10 https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 (optional)
-* `LAT` - Antenna's latitude
-* `LONG` - Antenna's longitude
+## Runtime Environment Variables
+
+There are a series of available environment variables:
+
+| Environment Variable | Purpose                         | Default |
+| -------------------- | ------------------------------- | ------- |
+| `LAT`                | Antenna's latitude (required)   |         |
+| `LONG`               | Antenna's longitude (required)  |         |
+| `TZ`                 | Your local timezone (optional)  | GMT     |
+| `GAIN`               | Optimizing gain. <br> See https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 (optional) | -10 |
 
 
 ## Ports
@@ -219,7 +226,7 @@ The following ports are used by this container:
 
 ## Claiming
 
-Since version 3.8.0 the “flightaware-user” and “flightaware-password” configuration options are no longer used; please use the normal site-claiming mechanisms to associate sites with a FlightAware account.
+Since version 3.8.0 the `flightaware-user` and `flightaware-password` configuration options are no longer used; please use the normal site-claiming mechanisms to associate sites with a FlightAware account.
 
 https://flightaware.com/adsb/piaware/claim
 
