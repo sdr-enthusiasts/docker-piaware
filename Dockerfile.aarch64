@@ -105,6 +105,7 @@ RUN apk update && \
     rm -f /tmp/s6-overlay.tar.gz
 
 COPY etc/ /etc/
+COPY ./percentage_strong_messages.sh /usr/local/bin/percentage_strong_messages.sh
 
 EXPOSE 30104/tcp 8080/tcp 30001/tcp 30002/tcp 30003/tcp 30004/tcp 30005/tcp
 

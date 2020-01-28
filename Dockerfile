@@ -160,8 +160,8 @@ ADD https://github.com/just-containers/s6-overlay/releases/download/${VERSION_S6
 
 RUN tar -xzf /tmp/s6-overlay.tar.gz -C /
 
-
 COPY etc/ /etc/
+COPY ./percentage_strong_messages.sh /usr/local/bin/percentage_strong_messages.sh
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 
