@@ -33,10 +33,13 @@ Tested and working on:
   * `3.5.3-arm32v7` (`3.5.3` branch, `Dockerfile`)
 * `development` (`master` branch, `Dockerfile`, `amd64` architecture only, not recommended for production)
 
+## Contributors
+ * Thanks to [Jan Collijs](https://github.com/visibilityspots) for contributing to the 3.7.1, 3.7.2 and 3.8.0 releases.
+
 ## Changelog
 
 ### v3.8.0
- * Update piaware to v3.8.0
+ * Update piaware to v3.8.0 
  * Update tcllauncer to v1.10
  * Update mlatclient to v0.2.11
  * Update tcllib to v1.20
@@ -45,12 +48,11 @@ Tested and working on:
 
 ### v3.7.2
  * Update piaware to v3.7.2
- * Add support for `arm64v8` / `aarch64` architecture
 
 ### v3.7.1
  * Update piaware to v3.7.1
  * Add support for `arm64v8` / `aarch64` architecture
- * Add support for GAIN optimalization
+ * Add support for GAIN optimalization (thanks [Jan Collijs](https://github.com/visibilityspots)!) 
 
 ### v3.6.3
  * Update piaware to v3.6.3
