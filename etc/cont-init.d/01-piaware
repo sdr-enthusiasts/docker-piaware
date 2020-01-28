@@ -3,14 +3,6 @@
 # Check to make sure the correct command line arguments have been set
 EXITCODE=0
 echo -ne "\e[31m"
-if [ -z "${USERNAME}" ]; then
-  echo "ERROR: USER environment variable not set"
-  EXITCODE=1
-fi
-if [ -z "${PASSWORD}" ]; then
-  echo "ERROR: PASSWORD environment variable not set"
-  EXITCODE=1
-fi
 if [ -z "${LAT}" ]; then
   echo "ERROR: LAT environment variable not set"
   EXITCODE=1
@@ -21,6 +13,12 @@ if [ -z "${LONG}" ]; then
 fi
 if [ -z "${GAIN}" ]; then
   echo "INFO: GAIN will be set to default max; -10"
+fi
+if [ -z "${FEEDER_ID}" ]; then
+  echo "INFO: no specific feeder-id passed through, falling back to dynamic generated one"
+  unset FEEDER_ID
+else
+  piaware-config feeder-id ${FEEDER_ID}
 fi
 echo -ne "\e[0m"
 if [ $EXITCODE -ne 0 ]; then
@@ -37,8 +35,6 @@ else
 fi
 
 # Set up piaware
-piaware-config flightaware-user ${USERNAME}
-piaware-config flightaware-password ${PASSWORD}
 piaware-config rtlsdr-gain ${GAIN}
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
