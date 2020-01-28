@@ -15,7 +15,7 @@ if [ -z "${GAIN}" ]; then
   echo "INFO: GAIN will be set to default max; -10"
 fi
 if [ -z "${FEEDER_ID}" ]; then
-  echo "INFO: no specific feeder-id passed through, falling back to dynamic generated one"
+  echo "INFO: no specific FEEDER_ID set, falling back to dynamic generated (/var/cache/piaware)"
   unset FEEDER_ID
 else
   piaware-config feeder-id ${FEEDER_ID}
