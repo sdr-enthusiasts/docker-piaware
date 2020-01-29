@@ -15,12 +15,12 @@ Tested and working on:
 ## Supported tags and respective Dockerfiles
 * `latest`, `3.8.0`
   * `latest-amd64`, `3.8.0-amd64` (`3.8.0` branch, `Dockerfile.amd64`)
-  * `latest-arm32v7`, `3.8.0-arm32v7` (`3.8.0` branch, `Dockerfile.armv7l`)
-  * `latest-arm64v8`, `3.8.0-arm64v8` (`3.8.0` branch, `Dockerfile.aarch64`)
+  * `latest-arm32v7`, `3.8.0-arm32v7` (`3.8.0` branch, `Dockerfile.arm32v7`)
+  * `latest-arm64v8`, `3.8.0-arm64v8` (`3.8.0` branch, `Dockerfile.arm64v8`)
 * `3.7.2`
-  * `latest-amd64`, `3.7.2-amd64` (`3.7.2` branch, `Dockerfile.amd64`)
-  * `latest-arm32v7`, `3.7.2-arm32v7` (`3.7.2` branch, `Dockerfile.armv7l`)
-  * `latest-arm64v8`, `3.7.2-arm64v8` (`3.7.2` branch, `Dockerfile.aarch64`)
+  * `3.7.2-amd64` (`3.7.2` branch, `Dockerfile.amd64`)
+  * `3.7.2-arm32v7` (`3.7.2` branch, `Dockerfile.arm32v7`)
+  * `3.7.2-arm64v8` (`3.7.2` branch, `Dockerfile.arm64v8`)
 * `3.7.1`
   * `latest-amd64`, `3.7.1-amd64` (`3.7.1` branch, `Dockerfile.amd64`)
   * `latest-arm32v7`, `3.7.1-arm32v7` (`3.7.1` branch, `Dockerfile.armv7l`)
