@@ -2,7 +2,7 @@
 # NOTE: This is the UNOPTIMISED Dockerfile.
 #
 # Production releases of this image use an optimised Dockerfile with many less layers.
-# See Dockerfile.amd64, Dockerfile.armv7l & Dockerfile.aarch64 in source repo, these are the optimised versions.
+# See Dockerfile.amd64, Dockerfile.arm32v7 & Dockerfile.arm64v8 in source repo, these are the optimised versions.
 #
 # This unoptimised version is here for learning and ease of development.
 #
