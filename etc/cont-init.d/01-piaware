@@ -11,6 +11,12 @@ if [ -z "${LONG}" ]; then
   echo "ERROR: LONG environment variable not set"
   EXITCODE=1
 fi
+if ! [ -z "${USERNAME+x}" ]; then
+  echo "WARNING: USERNAME environment variable is DEPRECATED and does nothing"
+fi
+if ! [ -z "${PASSWORD+x}" ]; then
+  echo "WARNING: PASSWORD environment variable is DEPRECATED and does nothing"
+fi
 if [ -z "${FEEDER_ID}" ]; then
   echo "INFO: no specific FEEDER_ID set, falling back to dynamic generated (/var/cache/piaware)"
   unset FEEDER_ID

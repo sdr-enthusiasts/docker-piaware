@@ -3,12 +3,20 @@
 # https://github.com/docker-library/official-images/blob/a7ad3081aa5f51584653073424217e461b72670a/bashbrew/go/vendor/src/github.com/docker-library/go-dockerlibrary/architecture/oci-platform.go#L14-L25
 #
 
-VERSION=3.8.0
+VERSION=3.7.2
 IMAGE=mikenye/piaware
 
 docker pull ${IMAGE}:${VERSION}-amd64
 docker pull ${IMAGE}:${VERSION}-arm32v7
 docker pull ${IMAGE}:${VERSION}-arm64v8
+
+docker tag ${IMAGE}:${VERSION}-amd64 ${IMAGE}:latest-amd64
+docker tag ${IMAGE}:${VERSION}-arm32v7 ${IMAGE}:latest-arm32v7
+docker tag ${IMAGE}:${VERSION}-arm64v8 ${IMAGE}:latest-arm64v8
+
+docker push ${IMAGE}:latest-amd64
+docker push ${IMAGE}:latest-arm32v7
+docker push ${IMAGE}:latest-arm64v8
 
 docker manifest create --amend ${IMAGE}:${VERSION} ${IMAGE}:${VERSION}-amd64 ${IMAGE}:${VERSION}-arm32v7 ${IMAGE}:${VERSION}-arm64v8
 docker manifest annotate ${IMAGE}:${VERSION} ${IMAGE}:${VERSION}-amd64 --os linux --arch amd64
