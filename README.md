@@ -22,9 +22,9 @@ Tested and working on:
   * `3.7.2-arm32v7` (`3.7.2` branch, `Dockerfile.arm32v7`)
   * `3.7.2-arm64v8` (`3.7.2` branch, `Dockerfile.arm64v8`)
 * `3.7.1`
-  * `latest-amd64`, `3.7.1-amd64` (`3.7.1` branch, `Dockerfile.amd64`)
-  * `latest-arm32v7`, `3.7.1-arm32v7` (`3.7.1` branch, `Dockerfile.armv7l`)
-  * `latest-arm64v8`, `3.7.1-arm64v8` (`3.7.1` branch, `Dockerfile.aarch64`)
+  * `3.7.1-amd64` (`3.7.1` branch, `Dockerfile.amd64`)
+  * `3.7.1-arm32v7` (`3.7.1` branch, `Dockerfile.armv7l`)
+  * `3.7.1-arm64v8` (`3.7.1` branch, `Dockerfile.aarch64`)
 * `3.6.3`
   * `3.6.3-amd64` (`3.6.3` branch, `Dockerfile.amd64`)
   * `3.6.3-arm32v7` (`3.6.3` branch, `Dockerfile.armv7l`)
