@@ -40,7 +40,7 @@ Tested and working on:
 
 ### v3.8.0
  * Update piaware to v3.8.0 
- * Update tcllauncer to v1.10
+ * Update tcllauncher to v1.10
  * Update mlatclient to v0.2.11
  * Update tcllib to v1.20
  * Removed deprecated flightaware user/password options
