@@ -236,6 +236,10 @@ Since version 3.8.0 the `flightaware-user` and `flightaware-password` configurat
 
 https://flightaware.com/adsb/piaware/claim
 
+## Sending data to Flightradar24?
+
+Check out the image `mikenye/fr24feed` which is designed to run in tandem with this image!
+
 ## Logging
 * The `dump1090` and `piaware` processes are logged to the container's stdout, and can be viewed with `docker logs [-f] container`.
 * `dump1090` log file exists at `/var/log/dump1090/current`, with automatic log rotation (should grow no more than ~20MB)
