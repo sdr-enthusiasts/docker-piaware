@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=3.8.0
+VERSION=3.8.0_1
 ARCH=`uname -m`
 IMAGE=mikenye/piaware
 

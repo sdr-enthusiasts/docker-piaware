@@ -21,7 +21,8 @@ ENV BRANCH_PIAWARE=v3.8.0 \
     ALLOW_MODEAC=yes \
     ALLOW_MLAT=yes \
     RTLSDR_GAIN=-10 \
-    RTLSDR_PPM=0
+    RTLSDR_PPM=0 \
+    BEASTPORT=30005
 #    BRANCH_DUMP978=v3.7.1 \
 #    BRANCH_SOAPYSDR=soapy-sdr-0.5.4 \
 
@@ -43,7 +44,8 @@ RUN apk update && \
             python3 \
             python3-dev \
             lighttpd \
-            tzdata && \
+            tzdata \
+            socat && \
     mkdir -p /src && \
     mkdir -p /var/cache/lighttpd/compress && \
     chown lighttpd:lighttpd /var/cache/lighttpd/compress

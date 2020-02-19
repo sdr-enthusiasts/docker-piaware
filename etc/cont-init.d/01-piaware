@@ -2,7 +2,6 @@
 
 # Check to make sure the correct command line arguments have been set
 EXITCODE=0
-echo -ne "\e[31m"
 if [ -z "${LAT}" ]; then
   echo "ERROR: LAT environment variable not set"
   EXITCODE=1
@@ -23,23 +22,18 @@ if [ -z "${FEEDER_ID}" ]; then
 else
   piaware-config feeder-id ${FEEDER_ID}
 fi
-echo -ne "\e[0m"
 if [ $EXITCODE -ne 0 ]; then
   exit 1
 fi
 
 # Set up timezone
 if [ -z "${TZ}" ]; then
-  echo -ne "\e[33m"
   echo "WARNING: TZ environment variable not set"
-  echo -ne "\e[0m"
 else
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 fi
 
 # Set up piaware
-piaware-config rtlsdr-gain ${RTLSDR_GAIN}
-piaware-config rtlsdr-ppm ${RTLSDR_PPM}
 piaware-config allow-mlat ${ALLOW_MLAT}
 piaware-config allow-modeac ${ALLOW_MODEAC}
 piaware-config allow-auto-updates no
