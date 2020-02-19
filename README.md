@@ -14,9 +14,9 @@ Tested and working on:
 
 ## Supported tags and respective Dockerfiles
 * `latest`, `3.8.0_1`
-  * `latest-amd64`, `3.8.0_1-amd64` (`3.8.0` branch, `Dockerfile.amd64`)
-  * `latest-arm32v7`, `3.8.0_1-arm32v7` (`3.8.0` branch, `Dockerfile.arm32v7`)
-  * `latest-arm64v8`, `3.8.0_1-arm64v8` (`3.8.0` branch, `Dockerfile.arm64v8`)
+  * `latest-amd64`, `3.8.0_1-amd64` (`3.8.0_1` branch, `Dockerfile.amd64`)
+  * `latest-arm32v7`, `3.8.0_1-arm32v7` (`3.8.0_1` branch, `Dockerfile.arm32v7`)
+  * `latest-arm64v8`, `3.8.0_1-arm64v8` (`3.8.0_1` branch, `Dockerfile.arm64v8`)
 * `3.8.0`
   * `3.8.0-amd64` (`3.8.0` branch, `Dockerfile.amd64`)
   * `3.8.0-arm32v7` (`3.8.0` branch, `Dockerfile.arm32v7`)
