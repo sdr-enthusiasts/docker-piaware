@@ -117,12 +117,20 @@ sudo rmmod rtl2832
 
 * You need to specify a persistent MAC address for the container, as this is used by FlightAware to track your PiAware instance.
 * With regards to your FlightAware Site ID:
-  * Your site ID is housed in the path mapped to `/var/cache/piaware` in the container; OR
-  * A site ID may be specified via the `FEEDER_ID` environment variable.
+  * A site ID may be specified via the `FEEDER_ID` environment variable; OR
+  * DEPRECATED: Your site ID is housed in the path mapped to `/var/cache/piaware` in the container
  
-**Make sure you map `/var/cache/piaware` through to persistent storage OR set your feeder ID via the `FEEDER_ID` environment variable. Failure to do this will cause a new FlightAware site ID to be generated every time you launch the container.**
+On first run, your feeder ID will be printed to the container log. You can retrieve it with:
 
-## Up-and-Running with `docker run`
+```
+docker logs piaware | grep -i 'my feeder id'
+```
+
+You should then re-create your container and/or update your `docker-compose.yml` file to set the `FEEDER_ID` environment variable to this feeder ID.
+
+**Make sure you set your feeder ID via the `FEEDER_ID` environment variable. Failure to do this will cause a new FlightAware site ID to be generated every time you launch the container.**
+
+## Up-and-Running with `docker run` with RTLSDR USB
 
 Firstly, plug in your USB radio.
 
@@ -147,7 +155,6 @@ docker run \
  -e LAT=LATITUDE_OF_YOUR_ANTENNA \
  -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
  -p 8080:8080 \
- -v /path/to/piaware_cache:/var/cache/piaware \
  mikenye/piaware
 ```
 
@@ -164,11 +171,41 @@ docker run \
  -e LAT=-30.657 \
  -e LONG=116.543 \
  -p 8080:8080 \
- -v /opt/piaware/piaware_cache:/var/cache/piaware \
  mikenye/piaware
 ```
 
-## Up-and-Running with Docker Compose
+After running for the first time, it is strongly suggested to get your feeded ID from the container logs, and re-create the container with the `FEEDER_ID` environment variable set.
+
+For example:
+
+```
+docker logs piaware | grep -i 'my feeder id'
+```
+
+...should return something like:
+
+```
+2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
+```
+
+You would then re-create your container:
+
+```
+docker run \
+ -d \
+ --rm \
+ --mac-address de:ad:be:ef:13:37 \
+ --name piaware \
+ --device /dev/bus/usb/001/004 \
+ -e TZ="Australia/Perth" \
+ -e LAT=-30.657 \
+ -e LONG=116.543 \
+ -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
+ -p 8080:8080 \
+ mikenye/piaware
+```
+
+## Up-and-Running with Docker Compose with RTLSDR USB
 
 Firstly, plug in your USB radio.
 
@@ -202,10 +239,171 @@ services:
       - TZ="Australia/Perth"
       - LAT=-32.463873
       - LONG=113.458482
-    volumes:
-      - /var/cache/piaware:/var/cache/piaware
+    
 ```
 
+After running for the first time, it is strongly suggested to get your feeded ID from the container logs, and re-create the container with the `FEEDER_ID` environment variable set.
+
+For example:
+
+```
+docker logs piaware | grep -i 'my feeder id'
+```
+
+...should return something like:
+
+```
+2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
+```
+
+You would then update your `docker-compose.yml` file:
+
+```
+version: '2.0'
+
+services:
+  piaware:
+    image: mikenye/piaware:latest
+    tty: true
+    container_name: piaware
+    mac_address: de:ad:be:ef:13:37
+    restart: always
+    devices:
+      - /dev/bus/usb/001/004:/dev/bus/usb/001/004
+    ports:
+      - 8080:8080
+      - 30003:30003
+      - 30005:30005
+    environment:
+      - TZ="Australia/Perth"
+      - LAT=-32.463873
+      - LONG=113.458482
+      - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
+```
+
+... and issue a `docker-compose up -d` to re-create the container.
+
+## Up-and-Running with `docker run` with external Mode-S/BEAST provider
+
+Start the docker container, passing the hostname (and port if not using 30005) of the external Mode-S/BEAST provider as environment variables:
+
+```
+docker run \
+ -d \
+ --rm \
+ --mac-address xx:xx:xx:xx:xx:xx \
+ --name piaware \
+ -e TZ="YOUR_TIMEZONE" \
+ -e LAT=LATITUDE_OF_YOUR_ANTENNA \
+ -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
+ -e BEASTHOST=beasthost \
+ mikenye/piaware
+```
+
+For example, based on the `lsusb` output above:
+
+```
+docker run \
+ -d \
+ --rm \
+ --mac-address de:ad:be:ef:13:37 \
+ --name piaware \
+ -e TZ="Australia/Perth" \
+ -e LAT=-30.657 \
+ -e LONG=116.543 \
+ -e BEASTHOST=beasthost \
+ mikenye/piaware
+```
+
+After running for the first time, it is strongly suggested to get your feeded ID from the container logs, and re-create the container with the `FEEDER_ID` environment variable set.
+
+For example:
+
+```
+docker logs piaware | grep -i 'my feeder id'
+```
+
+...should return something like:
+
+```
+2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
+```
+
+You would then re-create your container:
+
+```
+docker run \
+ -d \
+ --rm \
+ --mac-address de:ad:be:ef:13:37 \
+ --name piaware \
+ -e TZ="Australia/Perth" \
+ -e LAT=-30.657 \
+ -e LONG=116.543 \
+ -e BEASTHOST=beasthost \
+ -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
+ mikenye/piaware
+```
+
+## Up-and-Running with Docker Compose with external Mode-S/BEAST provider
+
+Pass the hostname (and port if not using 30005) of the external Mode-S/BEAST provider as environment variables:
+
+An example `docker-compose.xml` file is below:
+
+```
+version: '2.0'
+
+services:
+  piaware:
+    image: mikenye/piaware:latest
+    tty: true
+    container_name: piaware
+    mac_address: de:ad:be:ef:13:37
+    restart: always
+    environment:
+      - TZ="Australia/Perth"
+      - LAT=-32.463873
+      - LONG=113.458482
+      - BEASTHOST=beasthost
+    
+```
+
+After running for the first time, it is strongly suggested to get your feeded ID from the container logs, and re-create the container with the `FEEDER_ID` environment variable set.
+
+For example:
+
+```
+docker logs piaware | grep -i 'my feeder id'
+```
+
+...should return something like:
+
+```
+2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
+```
+
+You would then update your `docker-compose.yml` file:
+
+```
+version: '2.0'
+
+services:
+  piaware:
+    image: mikenye/piaware:latest
+    tty: true
+    container_name: piaware
+    mac_address: de:ad:be:ef:13:37
+    restart: always
+    environment:
+      - TZ="Australia/Perth"
+      - LAT=-32.463873
+      - LONG=113.458482
+      - BEASTHOST=beasthost
+      - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
+```
+
+... and issue a `docker-compose up -d` to re-create the container.
 
 
 ## Runtime Environment Variables
@@ -223,6 +421,7 @@ There are a series of available environment variables:
 | `RTLSDR_GAIN`        | Optimizing gain (optional) <br> See https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 | -10 <br> (max)|
 | `BEASTHOST`          | Optional. IP/Hostname of a Mode-S/BEAST provider (dump1090/readsb). If given, no USB device needs to be passed through to the container. | |
 | `BEASTPORT`          | Optional. TCP port number of Mode-S/BEAST provider (dump1090/readsb). | 30005 |
+| `FEEDER_ID`          | Your FlightAware feeder ID (required) | |
 
 For an explanation of `piaware-config` variables, see https://flightaware.com/adsb/piaware/advanced_configuration.
 
