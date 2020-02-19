@@ -4,6 +4,6 @@
 if [ -z "${BEASTHOST}" ]; then
   sleep 3600  
 else
-  socat -d -d TCP-LISTEN:30005,fork TCP:${BEASTHOST}:${BEASTPORT} 2>&1 | awk -W interactive '{print "[beastrelay] " $0}'
+  socat -d -d TCP-LISTEN:30005,fork TCP:${BEASTHOST}:${BEASTPORT} 2>&1 | awk '{print "[beastrelay] " $0}'
 fi
 
