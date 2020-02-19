@@ -1,9 +1,9 @@
 # docker-piaware
 FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa (but not yet dump978, see endnote). Builds and runs on x86_64, arm32v7 and arm64v8 (see below).
 
-For more information on what PiAware is, see here: https://flightaware.com/adsb/piaware/
+Can optionally pull Mode-S/BEAST data from another host/container running `readsb`/`dump1090`.
 
-Has the ability to run as privileged mode (for quick and easy), or non-privileged mode (not as quick and easy, but more secure).
+For more information on what PiAware is, see here: https://flightaware.com/adsb/piaware/
 
 Tested and working on:
  * `x86_64` (`amd64`) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
@@ -13,10 +13,14 @@ Tested and working on:
  * bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
 
 ## Supported tags and respective Dockerfiles
-* `latest`, `3.8.0`
-  * `latest-amd64`, `3.8.0-amd64` (`3.8.0` branch, `Dockerfile.amd64`)
-  * `latest-arm32v7`, `3.8.0-arm32v7` (`3.8.0` branch, `Dockerfile.arm32v7`)
-  * `latest-arm64v8`, `3.8.0-arm64v8` (`3.8.0` branch, `Dockerfile.arm64v8`)
+* `latest`, `3.8.0_1`
+  * `latest-amd64`, `3.8.0_1-amd64` (`3.8.0` branch, `Dockerfile.amd64`)
+  * `latest-arm32v7`, `3.8.0_1-arm32v7` (`3.8.0` branch, `Dockerfile.arm32v7`)
+  * `latest-arm64v8`, `3.8.0_1-arm64v8` (`3.8.0` branch, `Dockerfile.arm64v8`)
+* `3.8.0`
+  * `3.8.0-amd64` (`3.8.0` branch, `Dockerfile.amd64`)
+  * `3.8.0-arm32v7` (`3.8.0` branch, `Dockerfile.arm32v7`)
+  * `3.8.0-arm64v8` (`3.8.0` branch, `Dockerfile.arm64v8`)
 * `3.7.2`
   * `3.7.2-amd64` (`3.7.2` branch, `Dockerfile.amd64`)
   * `3.7.2-arm32v7` (`3.7.2` branch, `Dockerfile.arm32v7`)
@@ -37,6 +41,9 @@ Tested and working on:
  * Thanks to [Jan Collijs](https://github.com/visibilityspots) for contributing to the 3.7.1, 3.7.2 and 3.8.0 releases.
 
 ## Changelog
+
+### v3.8.0_1
+ * Added `BEASTHOST` and `BEASTPORT` variables to allow pulling of ModeS/BEAST data from another host/container (for example `mikenye/readsb`). If given, there is no need to pass the RTLSDR USB device through to the container.
 
 ### v3.8.0
  * Update piaware to v3.8.0 
@@ -213,10 +220,11 @@ There are a series of available environment variables:
 | `ALLOW_MLAT`         | Used for setting `piaware-config` variable `allow-mlat` (optional) | yes |
 | `ALLOW_MODEAC`       | Used for setting `piaware-config` variable `allow-modead` (optional) | yes |
 | `RTLSDR_PPM`         | Used for setting `piaware-config` variable `rtlsdr-ppm` (optional) | 0 |
-| `RTLSDR_GAIN`        | Optimizing gain (optional) <br> See https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 | -10 <br> (auto-gain)|
+| `RTLSDR_GAIN`        | Optimizing gain (optional) <br> See https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2 | -10 <br> (max)|
+| `BEASTHOST`          | Optional. IP/Hostname of a Mode-S/BEAST provider (dump1090/readsb). If given, no USB device needs to be passed through to the container. | |
+| `BEASTPORT`          | Optional. TCP port number of Mode-S/BEAST provider (dump1090/readsb). | 30005 |
 
 For an explanation of `piaware-config` variables, see https://flightaware.com/adsb/piaware/advanced_configuration.
-
 
 ## Ports
 
