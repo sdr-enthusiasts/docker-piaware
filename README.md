@@ -443,9 +443,11 @@ Since version 3.8.0 the `flightaware-user` and `flightaware-password` configurat
 
 https://flightaware.com/adsb/piaware/claim
 
-## Sending data to Flightradar24?
+## Feed to other services!
 
-Check out the image `mikenye/fr24feed` which is designed to run in tandem with this image!
+Check out the images:
+* [mikenye/adsbexchange](https://hub.docker.com/r/mikenye/adsbexchange)
+* [mikenye/fr24feed](https://hub.docker.com/r/mikenye/fr24feed)
 
 ## Logging
 * The `dump1090` and `piaware` processes are logged to the container's stdout, and can be viewed with `docker logs [-f] container`.
