@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=3.8.0_1
+VERSION=`git rev-parse --abbrev-ref HEAD`
 ARCH=`uname -m`
 IMAGE=mikenye/piaware
 
@@ -15,12 +15,7 @@ if [ ${ARCH} = "armv7l" ]; then
     ARCH="arm32v7"
 fi
 
-# Check if target dockerfile exists
-if [ -f "Dockerfile.${ARCH}" ]; then
-    # Build
-    echo Building from Dockerfile.${ARCH}
-    docker build -f Dockerfile.${ARCH} -t ${IMAGE}:${VERSION}-${ARCH} .
-else
-    echo Target file Dockerfile.${ARCH} does not exist!
-fi
+# Build
+echo Building from Dockerfile
+docker build -f Dockerfile -t ${IMAGE}:${VERSION}-${ARCH} .
 
