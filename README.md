@@ -1,4 +1,4 @@
-# docker-piaware
+# mikenye/piaware
 FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa (but not yet dump978, see endnote). Builds and runs on x86_64, arm32v7 and arm64v8 (see below).
 
 Can optionally pull Mode-S/BEAST data from another host/container running `readsb`/`dump1090`.
