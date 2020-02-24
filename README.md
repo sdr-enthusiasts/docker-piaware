@@ -1,42 +1,42 @@
 # mikenye/piaware
-FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa (but not yet dump978, see endnote). Builds and runs on x86_64, arm32v7 and arm64v8 (see below).
+FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa (but not yet dump978, see endnote). Builds and runs on `linux/amd64`, `linux/arm/v7` and `linux/arm64` (see below).
 
 Can optionally pull Mode-S/BEAST data from another host/container running `readsb`/`dump1090`.
 
 For more information on what PiAware is, see here: https://flightaware.com/adsb/piaware/
 
 Tested and working on:
- * `x86_64` (`amd64`) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
- * `armv7l` (`arm32v7`) platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
- * `aarch64` (`arm64v8`) platform (Raspberry Pi 4) running Raspbian Buster 64-bit using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
+ * `linux/amd64` (`x86_64`) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
+ * `linux/arm/v7` (`armv7l`, `armhf`, `arm32v7`) platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
+ * `linux/arm64` (`aarch64`, `arm64v8`) platform (Raspberry Pi 4) running Raspbian Buster 64-bit using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
  * If you run on a different platform (or if you have issues) please raise an issue and let me know!
  * bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
 
 ## Supported tags and respective Dockerfiles
-* `latest`, `3.8.0_2` (`3.8.0_2` branch, `Dockerfile`)
-* `3.8.0_1`
-  * `3.8.0_1-amd64` (`3.8.0_1` branch, `Dockerfile.amd64`)
-  * `3.8.0_1-arm32v7` (`3.8.0_1` branch, `Dockerfile.arm32v7`)
-  * `3.8.0_1-arm64v8` (`3.8.0_1` branch, `Dockerfile.arm64v8`)
-* `3.8.0`
-  * `3.8.0-amd64` (`3.8.0` branch, `Dockerfile.amd64`)
-  * `3.8.0-arm32v7` (`3.8.0` branch, `Dockerfile.arm32v7`)
-  * `3.8.0-arm64v8` (`3.8.0` branch, `Dockerfile.arm64v8`)
-* `3.7.2`
-  * `3.7.2-amd64` (`3.7.2` branch, `Dockerfile.amd64`)
-  * `3.7.2-arm32v7` (`3.7.2` branch, `Dockerfile.arm32v7`)
-  * `3.7.2-arm64v8` (`3.7.2` branch, `Dockerfile.arm64v8`)
-* `3.7.1`
-  * `3.7.1-amd64` (`3.7.1` branch, `Dockerfile.amd64`)
-  * `3.7.1-arm32v7` (`3.7.1` branch, `Dockerfile.armv7l`)
-  * `3.7.1-arm64v8` (`3.7.1` branch, `Dockerfile.aarch64`)
-* `3.6.3`
-  * `3.6.3-amd64` (`3.6.3` branch, `Dockerfile.amd64`)
-  * `3.6.3-arm32v7` (`3.6.3` branch, `Dockerfile.armv7l`)
-* `3.5.3`
-  * `3.5.3-amd64` (`3.5.3` branch, `Dockerfile`)
-  * `3.5.3-arm32v7` (`3.5.3` branch, `Dockerfile`)
-* `development` (`master` branch, `Dockerfile`, `amd64` architecture only, not recommended for production)
+* `latest`, [`3.8.0_2`](https://hub.docker.com/layers/mikenye/piaware/3.8.0_2/images/sha256-01b68b80057fdac1d650b50223487ff203e23ab792f52740013430e8b2b42e95?context=repo) ([`3.8.0_2` branch](https://github.com/mikenye/docker-piaware/tree/3.8.0_2), [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/3.8.0_2/Dockerfile))
+* [`3.8.0_1`](https://hub.docker.com/layers/mikenye/piaware/3.8.0_1/images/sha256-7bb8c44b1b49594774c7670ce6d16b5079f9d9d12fc9fceb81519ac8ba822b42?context=repo)
+  * [`3.8.0_1-amd64`](https://hub.docker.com/layers/mikenye/piaware/3.8.0_1-amd64/images/sha256-c39282f8be04b3effe1c8c2884f68566f2f30ba8b52c7a6ff2d7720c182815cc?context=repo) ([`3.8.0_1` branch](https://github.com/mikenye/docker-piaware/tree/3.8.0_1), [`Dockerfile.amd64`](https://github.com/mikenye/docker-piaware/blob/3.8.0_1/Dockerfile.amd64))
+  * [`3.8.0_1-arm32v7`](https://hub.docker.com/layers/mikenye/piaware/3.8.0_1-arm32v7/images/sha256-a43dfc1b4239cd3e50ccf85c1df3e1e8a15b5d1ad7d52405e6f3eef739d942b5?context=repo) ([`3.8.0_1` branch](https://github.com/mikenye/docker-piaware/tree/3.8.0_1), [`Dockerfile.arm32v7`](https://github.com/mikenye/docker-piaware/blob/3.8.0_1/Dockerfile.arm32v7))
+  * [`3.8.0_1-arm64v8`](https://hub.docker.com/layers/mikenye/piaware/3.8.0_1-arm64v8/images/sha256-7bb8c44b1b49594774c7670ce6d16b5079f9d9d12fc9fceb81519ac8ba822b42?context=repo) ([`3.8.0_1` branch](https://github.com/mikenye/docker-piaware/tree/3.8.0_1), [`Dockerfile.arm64v8`](https://github.com/mikenye/docker-piaware/blob/3.8.0_1/Dockerfile.arm64v8))
+* [`3.8.0`](https://hub.docker.com/layers/mikenye/piaware/3.8.0/images/sha256-dc3f0fad33c142b70456baf148589d25915572e05aa5876071f8456e932e31a3?context=repo)
+  * [`3.8.0-amd64`](https://hub.docker.com/layers/mikenye/piaware/3.8.0-amd64/images/sha256-e76164988dacbf7d18782e72d450bf21e3469c6b8c2cfe8f3b0506974e713461?context=repo) ([`3.8.0` branch](https://github.com/mikenye/docker-piaware/tree/3.8.0), [`Dockerfile.amd64`](https://github.com/mikenye/docker-piaware/blob/3.8.0/Dockerfile.amd64))
+  * [`3.8.0-arm32v7`](https://hub.docker.com/layers/mikenye/piaware/3.8.0-arm32v7/images/sha256-3e361dd39d1024f357fe9f252bd45949c6d68e0f6ec497d37ba2e9989c70f330?context=repo) ([`3.8.0` branch](https://github.com/mikenye/docker-piaware/tree/3.8.0), [`Dockerfile.arm32v7`](https://github.com/mikenye/docker-piaware/blob/3.8.0/Dockerfile.arm32v7))
+  * [`3.8.0-arm64v8`](https://hub.docker.com/layers/mikenye/piaware/3.8.0-arm64v8/images/sha256-dc3f0fad33c142b70456baf148589d25915572e05aa5876071f8456e932e31a3?context=repo) ([`3.8.0` branch](https://github.com/mikenye/docker-piaware/tree/3.8.0), [`Dockerfile.arm64v8`](https://github.com/mikenye/docker-piaware/blob/3.8.0/Dockerfile.arm64v8))
+* [`3.7.2`](https://hub.docker.com/layers/mikenye/piaware/3.7.2/images/sha256-c3547060d0962450ab3596482432a8b383203fb5734ab947e1c3c89913d69491?context=repo)
+  * [`3.7.2-amd64`](https://hub.docker.com/layers/mikenye/piaware/3.7.2-amd64/images/sha256-8226a9ea332677c646f27be9a04e72d81e920477158e010139c86d12995530f5?context=repo) ([`3.7.2` branch](https://github.com/mikenye/docker-piaware/tree/3.7.2), [`Dockerfile.amd64`](https://github.com/mikenye/docker-piaware/blob/3.7.2/Dockerfile.amd64))
+  * [`3.7.2-arm32v7`](https://hub.docker.com/layers/mikenye/piaware/3.7.2-arm32v7/images/sha256-c3547060d0962450ab3596482432a8b383203fb5734ab947e1c3c89913d69491?context=repo) ([`3.7.2` branch](https://github.com/mikenye/docker-piaware/tree/3.7.2), [`Dockerfile.arm32v7`](https://github.com/mikenye/docker-piaware/blob/3.7.2/Dockerfile.arm32v7))
+  * [`3.7.2-arm64v8`](https://hub.docker.com/layers/mikenye/piaware/3.7.2-arm64v8/images/sha256-bac1329c41878b67c2200be14ce47654b13f05d6ca92b2b9c1172f568a6e29b1?context=repo) ([`3.7.2` branch](https://github.com/mikenye/docker-piaware/tree/3.7.2), [`Dockerfile.arm64v8`](https://github.com/mikenye/docker-piaware/blob/3.7.2/Dockerfile.arm64v8))
+* [`3.7.1`](https://hub.docker.com/layers/mikenye/piaware/3.7.1/images/sha256-fc121cc3747766c61defe821eaab1ce6ebdf1afddb4b120f198c53875952baca?context=repo)
+  * [`3.7.1-amd64`](https://hub.docker.com/layers/mikenye/piaware/3.7.1-amd64/images/sha256-964e36e6a616fa7e83d5157149f04e397dc19d59f82dacb76abb71612bb017a8?context=repo) ([`3.7.1` branch](https://github.com/mikenye/docker-piaware/tree/3.7.1), [`Dockerfile.amd64`](https://github.com/mikenye/docker-piaware/blob/3.7.1/Dockerfile.amd64))
+  * [`3.7.1-arm32v7`](https://hub.docker.com/layers/mikenye/piaware/3.7.1-arm32v7/images/sha256-fc121cc3747766c61defe821eaab1ce6ebdf1afddb4b120f198c53875952baca?context=repo) ([`3.7.1` branch](https://github.com/mikenye/docker-piaware/tree/3.7.1), [`Dockerfile.armv7l`](https://github.com/mikenye/docker-piaware/blob/3.7.1/Dockerfile.armv7l))
+  * [`3.7.1-arm64v8`](https://hub.docker.com/layers/mikenye/piaware/3.7.1-arm64v8/images/sha256-c99d175e27e6908e735832777631b3c0b523e6595b4e26797c1c61311765802e?context=repo) ([`3.7.1` branch](https://github.com/mikenye/docker-piaware/tree/3.7.1), [`Dockerfile.aarch64`](https://github.com/mikenye/docker-piaware/blob/3.7.1/Dockerfile.aarch64))
+* [`3.6.3`](https://hub.docker.com/layers/mikenye/piaware/3.6.3/images/sha256-e2f68f95237d6aa465c5f34beaee40fbe518d456e6563cd8b770605311d6c0d3?context=repo)
+  * [`3.6.3-amd64`](https://hub.docker.com/layers/mikenye/piaware/3.6.3-amd64/images/sha256-e2f68f95237d6aa465c5f34beaee40fbe518d456e6563cd8b770605311d6c0d3?context=repo) ([`3.6.3` branch](https://github.com/mikenye/docker-piaware/tree/3.6.3), [`Dockerfile.amd64`](https://github.com/mikenye/docker-piaware/blob/3.6.3/Dockerfile.amd64))
+  * [`3.6.3-arm32v7`](https://hub.docker.com/layers/mikenye/piaware/3.6.3-arm32v7/images/sha256-efcfc443e5d38ef40b67208113760b646ae4022f4e40dec52bdb384bbb37df51?context=repo) ([`3.6.3` branch](https://github.com/mikenye/docker-piaware/tree/3.6.3), [`Dockerfile.armv7l`](https://github.com/mikenye/docker-piaware/blob/3.6.3/Dockerfile.armv7l))
+* [`3.5.3`](https://hub.docker.com/layers/mikenye/piaware/3.5.3/images/sha256-0e100a74e7fc0f68cad50cfb8f06d50ac39788bf0f71a9c1c5da40eb57abdf1b?context=repo)
+  * [`3.5.3-amd64`](https://hub.docker.com/layers/mikenye/piaware/3.5.3-amd64/images/sha256-828ab34110d21458e4e24992506b20de5e9f820968f03ac681c230802cd213c3?context=repo) ([`3.5.3` branch](https://github.com/mikenye/docker-piaware/tree/3.5.3), [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/3.5.3/Dockerfile))
+  * [`3.5.3-arm32v7`](https://hub.docker.com/layers/mikenye/piaware/3.5.3-arm32v7/images/sha256-0e100a74e7fc0f68cad50cfb8f06d50ac39788bf0f71a9c1c5da40eb57abdf1b?context=repo) ([`3.5.3` branch](https://github.com/mikenye/docker-piaware/tree/3.5.3), [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/3.5.3/Dockerfile))
+* `development` ([`master` branch](https://github.com/mikenye/docker-piaware/tree/master), [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile), `amd64` architecture only, not recommended for production)
 
 ## Contributors
  * Thanks to [Jan Collijs](https://github.com/visibilityspots) for contributing to the 3.7.1, 3.7.2 and 3.8.0 releases.
@@ -84,9 +84,9 @@ Tested and working on:
 
 ## Multi Architecture Support
 Currently, this image should pull and run on the following architectures:
- * ```amd64```: Linux x86-64
- * ```arm32v7```, ```armv7l```: ARMv7 32-bit (Odroid HC1/HC2/XU4, RPi 2/3)
- * ```arm64v8```, ```aarch64```: ARMv8 64-bit (RPi 3B+/4)
+ * `linux/amd64` (`x86_64`): Built on Linux x86-64
+ * `linux/arm/v7` (`armv7l`, `armhf`, `arm32v7`): Built on Odroid HC2 running ARMv7 32-bit
+ * `linux/arm64` (`aarch64`, `arm64v8`): Built on a Raspberry Pi 4 Model B running ARMv8 64-bit
 
 ## Prerequisites
 
@@ -456,6 +456,7 @@ https://flightaware.com/adsb/piaware/claim
 Check out the images:
 * [mikenye/adsbexchange](https://hub.docker.com/r/mikenye/adsbexchange)
 * [mikenye/fr24feed](https://hub.docker.com/r/mikenye/fr24feed)
+* [mikenye/docker-readsb](https://github.com/mikenye/docker-readsb)
 
 ## Logging
 * The `dump1090` and `piaware` processes are logged to the container's stdout, and can be viewed with `docker logs [-f] container`.
@@ -465,3 +466,6 @@ Check out the images:
 
 ## Note about dump978
 I can get dump978 to compile in this docker image, however I don't have a suitable RTLSDR radio I can use to test this with. The FlightAware Pro Stick Plus Blue that I own has a 1090MHz bandpass filter built in, so it is basically useless for 978MHz. Furthermore, 978MHz is not yet used by aircraft in Australia. If anyone lives where 978MHz is used and wants to work on this project to include support for dump978, please get in touch! If you're interested in testing this yourself, see the master branch's unoptimised Dockerfile - the relevant lines are currently commented out. You can uncomment them and dump978 will build.
+
+## Getting help
+Please feel free to [open an issue on the project's GitHub](https://github.com/mikenye/docker-piaware/issues).
