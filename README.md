@@ -123,20 +123,56 @@ sudo rmmod rtl2832
 ```
 ## IMPORTANT!
 
-* You need to specify a persistent MAC address for the container, as this is used by FlightAware to track your PiAware instance.
-* With regards to your FlightAware Site ID:
-  * A site ID may be specified via the `FEEDER_ID` environment variable; OR
-  * DEPRECATED: Your site ID is housed in the path mapped to `/var/cache/piaware` in the container
+* You need to specify a feeder-id for the container, as this is used by FlightAware to track your PiAware instance.
  
-On first run, your feeder ID will be printed to the container log. You can retrieve it with:
-
-```
-docker logs piaware | grep -i 'my feeder id'
-```
-
-You should then re-create your container and/or update your `docker-compose.yml` file to set the `FEEDER_ID` environment variable to this feeder ID.
-
 **Make sure you set your feeder ID via the `FEEDER_ID` environment variable. Failure to do this will cause a new FlightAware site ID to be generated every time you launch the container.**
+
+See below for more info.
+
+## Already running PiAware?
+
+You'll need your *feeder-id* from your existing feeder.
+
+To get your *feeder-id*, log onto your feeder and issue the command:
+
+```
+piaware-config -show feeder-id
+```
+
+## New to PiAware?
+
+You'll need a *feeder-id*. To get one, you can temporarily run the container, to allow it to communicate with the FlightAware servers and get a new feeder ID.
+
+Run the command:
+
+```
+timeout 30 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE mikenye/piaware:latest | grep "my feeder ID"
+```
+
+Be sure to change the following:
+* Replace `YOURLATITUDE` with the latitude of your antenna (xx.xxxxx)
+* Replace `YOURLONGITUDE` with the longitude of your antenna (xx.xxxxx)
+
+The command will run the container for 30 seconds, which should be ample time for the container to receive a feeder-id.
+
+For example:
+
+```
+$ timeout 30 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 mikenye/piaware:latest | grep "my feeder ID"
+Set allow-mlat to yes in /etc/piaware.conf:1
+Set allow-modeac to yes in /etc/piaware.conf:2
+Set allow-auto-updates to no in /etc/piaware.conf:3
+Set allow-manual-updates to no in /etc/piaware.conf:4
+2020-03-06 06:16:11.860212500  [piaware] my feeder ID is acbf1f88-09a4-3a47-a4a0-10ae138d0c1g
+write /dev/stdout: broken pipe
+Terminated
+```
+
+As you can see from the output above, the feeder-id given to us from FlightAware is `acbf1f88-09a4-3a47-a4a0-10ae138d0c1g`.
+
+You'll now want to "claim" this feeder.
+
+To do this, go to: https://flightaware.com/adsb/piaware/claim and follow the instructions there.
 
 ## Up-and-Running with `docker run` with RTLSDR USB
 
@@ -156,7 +192,6 @@ Start the docker container, passing through the USB device:
 docker run \
  -d \
  --rm \
- --mac-address xx:xx:xx:xx:xx:xx \
  --name piaware \
  --device /dev/bus/usb/USB_BUS_NUMBER/USB_DEVICE_NUMBER \
  -e TZ="YOUR_TIMEZONE" \
@@ -172,12 +207,11 @@ For example, based on the `lsusb` output above:
 docker run \
  -d \
  --rm \
- --mac-address de:ad:be:ef:13:37 \
  --name piaware \
  --device /dev/bus/usb/001/004 \
  -e TZ="Australia/Perth" \
- -e LAT=-30.657 \
- -e LONG=116.543 \
+ -e LAT=-33.33333 \
+ -e LONG=111.11111 \
  -p 8080:8080 \
  mikenye/piaware
 ```
@@ -202,12 +236,11 @@ You would then re-create your container:
 docker run \
  -d \
  --rm \
- --mac-address de:ad:be:ef:13:37 \
  --name piaware \
  --device /dev/bus/usb/001/004 \
  -e TZ="Australia/Perth" \
- -e LAT=-30.657 \
- -e LONG=116.543 \
+ -e LAT=-33.33333 \
+ -e LONG=111.11111 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  -p 8080:8080 \
  mikenye/piaware
@@ -235,7 +268,6 @@ services:
     image: mikenye/piaware:latest
     tty: true
     container_name: piaware
-    mac_address: de:ad:be:ef:13:37
     restart: always
     devices:
       - /dev/bus/usb/001/004:/dev/bus/usb/001/004
@@ -245,8 +277,8 @@ services:
       - 30005:30005
     environment:
       - TZ="Australia/Perth"
-      - LAT=-32.463873
-      - LONG=113.458482
+      - LAT=-33.33333
+      - LONG=111.11111
     
 ```
 
@@ -274,7 +306,6 @@ services:
     image: mikenye/piaware:latest
     tty: true
     container_name: piaware
-    mac_address: de:ad:be:ef:13:37
     restart: always
     devices:
       - /dev/bus/usb/001/004:/dev/bus/usb/001/004
@@ -284,8 +315,8 @@ services:
       - 30005:30005
     environment:
       - TZ="Australia/Perth"
-      - LAT=-32.463873
-      - LONG=113.458482
+      - LAT=-33.33333
+      - LONG=111.11111
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
 ```
 
@@ -299,7 +330,6 @@ Start the docker container, passing the hostname (and port if not using 30005) o
 docker run \
  -d \
  --rm \
- --mac-address xx:xx:xx:xx:xx:xx \
  --name piaware \
  -e TZ="YOUR_TIMEZONE" \
  -e LAT=LATITUDE_OF_YOUR_ANTENNA \
@@ -314,11 +344,10 @@ For example, based on the `lsusb` output above:
 docker run \
  -d \
  --rm \
- --mac-address de:ad:be:ef:13:37 \
  --name piaware \
  -e TZ="Australia/Perth" \
- -e LAT=-30.657 \
- -e LONG=116.543 \
+ -e LAT=-33.33333 \
+ -e LONG=111.11111 \
  -e BEASTHOST=beasthost \
  mikenye/piaware
 ```
@@ -343,11 +372,10 @@ You would then re-create your container:
 docker run \
  -d \
  --rm \
- --mac-address de:ad:be:ef:13:37 \
  --name piaware \
  -e TZ="Australia/Perth" \
- -e LAT=-30.657 \
- -e LONG=116.543 \
+ -e LAT=-33.33333 \
+ -e LONG=111.11111 \
  -e BEASTHOST=beasthost \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  mikenye/piaware
@@ -367,12 +395,11 @@ services:
     image: mikenye/piaware:latest
     tty: true
     container_name: piaware
-    mac_address: de:ad:be:ef:13:37
     restart: always
     environment:
       - TZ="Australia/Perth"
-      - LAT=-32.463873
-      - LONG=113.458482
+      - LAT=-33.33333
+      - LONG=111.11111
       - BEASTHOST=beasthost
     
 ```
@@ -401,12 +428,11 @@ services:
     image: mikenye/piaware:latest
     tty: true
     container_name: piaware
-    mac_address: de:ad:be:ef:13:37
     restart: always
     environment:
       - TZ="Australia/Perth"
-      - LAT=-32.463873
-      - LONG=113.458482
+      - LAT=-33.33333
+      - LONG=111.11111
       - BEASTHOST=beasthost
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
 ```
