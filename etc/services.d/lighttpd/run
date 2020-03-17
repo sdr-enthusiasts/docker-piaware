@@ -1,9 +1,0 @@
-#!/usr/bin/with-contenv sh
-
-set -eo pipefail
-
-/usr/sbin/lighttpd \
-    -f /etc/lighttpd/piaware.lighttpd.conf \
-    -D \
-    2>&1 | awk '{print "[httpd] " $0}'
-
