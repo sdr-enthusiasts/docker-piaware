@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# "dummy" SysV-style init script, to allow piaware to restart dump978.
+# piaware calls SysV init script to restart dump978 (package/fa_services.tcl invoke_service_action).
+# this script allows that, while still using s6-supervise.
+# pkilling dump978 causes s6-supervise to restart it.
+
+
+case "$1" in
+    restart)
+    pkill /usr/local/bin/dump978-fa
+    ;;
+    *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+
+exit 0

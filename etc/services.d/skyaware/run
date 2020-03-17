@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv sh
+
+set -eo pipefail
+
+/usr/sbin/lighttpd \
+    -f /etc/lighttpd/skyaware.lighttpd.conf \
+    -D \
+    2>&1 | awk '{print "[skyaware] " $0}'
