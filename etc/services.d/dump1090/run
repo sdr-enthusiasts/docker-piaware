@@ -2,40 +2,38 @@
 # shellcheck shell=bash
 
 # Build the dump1090 command line based on piaware options
-DUMP1090_CMD="/usr/local/bin/dump1090"
-DUMP1090_CMD="$DUMP1090_CMD --net"
+DUMP1090_BIN="/usr/local/bin/dump1090"
+DUMP1090_CMD=(--net)
 
 if [ -z "${BEASTHOST}" ]; then
-  DUMP1090_CMD="$DUMP1090_CMD --gain ${RTLSDR_GAIN}"
+  DUMP1090_CMD+=(--gain "${RTLSDR_GAIN}")
   RTLSDR_PPM=$(piaware-config -show rtlsdr-ppm)
 
 else
-  DUMP1090_CMD="$DUMP1090_CMD --net-only"
-  DUMP1090_CMD="$DUMP1090_CMD --net-bo-port 0"
+  DUMP1090_CMD+=(--net-only --net-bo-port 0)
 fi
 
-DUMP1090_CMD="$DUMP1090_CMD --ppm ${RTLSDR_PPM}"
+DUMP1090_CMD+=(--ppm "${RTLSDR_PPM}")
 ALLOW_MODEAC=$(piaware-config -show allow-modeac | tr '[:upper:]' '[:lower:]')
 if [ "$ALLOW_MODEAC" = "yes" ]; then
-  DUMP1090_CMD="$DUMP1090_CMD --modeac"
+  DUMP1090_CMD+=(--modeac)
 fi
-DUMP1090_CMD="$DUMP1090_CMD --lat ${LAT}"
-DUMP1090_CMD="$DUMP1090_CMD --lon ${LONG}"
-DUMP1090_CMD="$DUMP1090_CMD --fix"
+DUMP1090_CMD+=(--lat "${LAT}")
+DUMP1090_CMD+=(--lon "${LONG}")
+DUMP1090_CMD+=(--fix)
 ALLOW_MLAT=$(piaware-config -show allow-mlat | tr '[:upper:]' '[:lower:]')
 if [ "$ALLOW_MLAT" = "yes" ]; then
-  DUMP1090_CMD="$DUMP1090_CMD --mlat"
+  DUMP1090_CMD+=(--mlat)
 fi
-DUMP1090_CMD="$DUMP1090_CMD --max-range ${DUMP1090_MAX_RANGE}"
-DUMP1090_CMD="$DUMP1090_CMD --quiet"
+DUMP1090_CMD+=(--max-range "${DUMP1090_MAX_RANGE}")
+DUMP1090_CMD+=(--quiet)
 if [ -z "${BEASTHOST}" ]; then
-  DUMP1090_CMD="$DUMP1090_CMD --stats-every 3600"
-  DUMP1090_CMD="$DUMP1090_CMD --write-json /run/dump1090-fa"
-  DUMP1090_CMD="$DUMP1090_CMD --json-location-accuracy 2"
+  DUMP1090_CMD+=(--stats-every 3600)
+  DUMP1090_CMD+=(--write-json /run/dump1090-fa)
+  DUMP1090_CMD+=(--json-location-accuracy 2)
 fi
 
 # Run dump1090 command line
 set -eo pipefail
 exec \
-"$DUMP1090_CMD" 2>&1 | awk '{print "[dump1090-fa] " $0}'
-
+  "${DUMP1090_BIN}" "${DUMP1090_CMD[@]}" 2>&1 | awk '{print "[dump1090-fa] " $0}'
