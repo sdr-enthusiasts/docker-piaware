@@ -27,6 +27,9 @@ Tested and working on:
 
 ## Changelog
 
+### 20200319
+* Include changes and tidy-up from ShoGinn [pull request #13](https://github.com/mikenye/docker-piaware/pull/13)
+
 ### 20200317
 
 * Include build of `SoapySDR` and `dump978` in base image (however, `dump978` service and `skyaware978` are not yet run as a service)
