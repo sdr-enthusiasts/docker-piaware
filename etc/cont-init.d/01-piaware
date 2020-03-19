@@ -1,4 +1,5 @@
 #!/usr/bin/with-contenv sh
+# shellcheck shell=sh
 
 # Check to make sure the correct command line arguments have been set
 EXITCODE=0
@@ -10,17 +11,17 @@ if [ -z "${LONG}" ]; then
   echo "ERROR: LONG environment variable not set"
   EXITCODE=1
 fi
-if ! [ -z "${USERNAME+x}" ]; then
+if [ -n "${USERNAME+x}" ]; then
   echo "WARNING: USERNAME environment variable is DEPRECATED and does nothing"
 fi
-if ! [ -z "${PASSWORD+x}" ]; then
+if [ -n "${PASSWORD+x}" ]; then
   echo "WARNING: PASSWORD environment variable is DEPRECATED and does nothing"
 fi
 if [ -z "${FEEDER_ID}" ]; then
   echo "INFO: no specific FEEDER_ID set, falling back to dynamic generated (/var/cache/piaware)"
   unset FEEDER_ID
 else
-  piaware-config feeder-id ${FEEDER_ID}
+  piaware-config feeder-id "${FEEDER_ID}"
 fi
 if [ $EXITCODE -ne 0 ]; then
   exit 1
@@ -30,12 +31,11 @@ fi
 if [ -z "${TZ}" ]; then
   echo "WARNING: TZ environment variable not set"
 else
-  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+  ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" >/etc/timezone
 fi
 
 # Set up piaware
-piaware-config allow-mlat ${ALLOW_MLAT}
-piaware-config allow-modeac ${ALLOW_MODEAC}
+piaware-config allow-mlat "${ALLOW_MLAT}"
+piaware-config allow-modeac "${ALLOW_MODEAC}"
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
-

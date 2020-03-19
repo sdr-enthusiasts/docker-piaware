@@ -1,9 +1,10 @@
-#!/usr/bin/with-contenv sh
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
 
 # Build the dump1090 command line based on piaware options
 if [ -z "${BEASTHOST}" ]; then
-  sleep 3600  
+  sleep 3600
 else
-  socat -d -d TCP-LISTEN:30005,fork TCP:${BEASTHOST}:${BEASTPORT} 2>&1 | awk '{print "[beastrelay] " $0}'
+  exec \
+    socat -d -d TCP-LISTEN:30005,fork TCP:"${BEASTHOST}:${BEASTPORT}" 2>&1 | awk '{print "[beastrelay] " $0}'
 fi
-

@@ -9,29 +9,32 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 
 RUN set -x && \
     apk update && \
-    apk add git \
-            make \
-            tcl \
-            gcc \
-            musl-dev \
-            autoconf \
-            tcl-dev \
-            tclx \
-            tcl-tls \
-            cmake \
-            libusb-dev \
-            ncurses-dev \
-            g++ \
-            net-tools \
-            python3 \
-            python3-dev \
-            lighttpd \
-            tzdata \
-            socat \
-            swig \
-            py3-numpy \
-            boost-dev \
-            gnupg && \
+    apk add \
+    autoconf \
+    bash \
+    boost-dev \
+    cmake \
+    g++ \
+    gcc \
+    git \
+    gnupg \
+    libusb-dev \
+    lighttpd \
+    make \
+    musl-dev \
+    ncurses-dev \
+    net-tools \
+    py3-numpy \
+    python3 \
+    python3-dev \
+    socat \
+    swig \
+    tcl \
+    tcl-dev \
+    tcl-tls \
+    tclx \
+    tzdata \
+    && \
     git config --global advice.detachedHead false && \
     mkdir -p /src && \
     mkdir -p /var/cache/lighttpd/compress && \
@@ -142,17 +145,19 @@ RUN set -x && \
     echo "========== Install s6-overlay ==========" && \
     wget -q -O - https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
     echo "========== Clean up build environment ==========" && \
-    apk del g++ \
-            git \
-            make \
-            gcc \
-            musl-dev \
-            autoconf \
-            tcl-dev \
-            cmake \
-            ncurses-dev \
-            python3 \
-            gnupg && \
+    apk del \
+    autoconf \
+    cmake \
+    g++ \
+    gcc \
+    git \
+    gnupg \
+    make \
+    musl-dev \
+    ncurses-dev \
+    python3 \
+    tcl-dev \
+    && \
     rm -rf /var/cache/apk/* && \
     rm -rf /src && \
     echo "========== Done! =========="
