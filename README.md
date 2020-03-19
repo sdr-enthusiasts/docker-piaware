@@ -23,6 +23,7 @@ Tested and working on:
 ## Contributors
 
 * Thanks to [Jan Collijs](https://github.com/visibilityspots) for contributing to the 3.7.1, 3.7.2 and 3.8.0 releases.
+* Thanks to [ShoGinn](https://github.com/ShoGinn) for many contributions to the 3.8.0 release and tidy up of code & readme.
 
 ## Changelog
 
