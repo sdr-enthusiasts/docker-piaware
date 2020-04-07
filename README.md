@@ -27,7 +27,12 @@ Tested and working on:
 
 ## Changelog
 
+### 20200407
+
+* When using an external Beast provider, remove the need to map `dump1090`/`readsb` JSON data into the container for SkyAware to function
+
 ### 20200319
+
 * Include changes and tidy-up from ShoGinn [pull request #13](https://github.com/mikenye/docker-piaware/pull/13)
 
 ### 20200317
