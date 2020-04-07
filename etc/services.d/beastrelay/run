@@ -1,0 +1,13 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+# When running with an external beast provider, we push the beast traffic
+# into the local dump1090 instance. This allows JSON data to be written, 
+# and SkyAware to function normally.
+
+if [ -z "${BEASTHOST}" ]; then
+  sleep 3600
+else
+  exec \
+    socat -d -d TCP:"${BEASTHOST}:${BEASTPORT}" TCP:localhost:30004 2>&1 | awk '{print "[beastrelay] " $0}'
+fi

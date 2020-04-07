@@ -18,12 +18,21 @@ if [ -z "${BEASTHOST}" ]; then
   DUMP1090_CMD+=(--gain "${RTLSDR_GAIN}")
   RTLSDR_PPM=$(piaware-config -show rtlsdr-ppm)
   DUMP1090_CMD+=(--ppm "${RTLSDR_PPM}")
-  DUMP1090_CMD+=(--stats-every 3600)
-  DUMP1090_CMD+=(--write-json /run/dump1090-fa)
-  DUMP1090_CMD+=(--json-location-accuracy 2)
 else
-  DUMP1090_CMD+=(--net-only --net-bo-port 0)
+
+  # If an external beast provider is used, then operate in net-only mode.
+  # Also, don't provide beast on port 30005 (net-bo-port), as socat will do this.
+  # Also, listen for beast in on ports 30004,30104, so socat an inject beast data.
+
+  DUMP1090_CMD+=(--net-only)
+  DUMP1090_CMD+=(--net-bo-port 0)
+  DUMP1090_CMD+=(--net-bi-port 30004,30104)
+  
 fi
+
+DUMP1090_CMD+=(--stats-every 3600)
+DUMP1090_CMD+=(--write-json /run/dump1090-fa)
+DUMP1090_CMD+=(--json-location-accuracy 2)
 
 if [ "$ALLOW_MODEAC" = "yes" ]; then
   DUMP1090_CMD+=(--modeac)
