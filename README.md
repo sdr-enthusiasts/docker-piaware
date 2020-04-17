@@ -17,8 +17,20 @@ Tested and working on:
 ## Supported tags and respective Dockerfiles
 
 * `latest` should always contain the latest released versions of `rtl-sdr`, `bladeRF`, `tcllauncher`, `tcllib`, `piaware`, `dump1090`, `mlat-client`, `SoapySDR` and `dump978`. This image is built nightly from the [`master` branch](https://github.com/mikenye/docker-piaware/tree/master) [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile) for all supported architectures.
-* `development` ([`master` branch](https://github.com/mikenye/docker-piaware/tree/master), [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile), `amd64` architecture only, built on commit, not recommended for production)
+* `development` ([`dev` branch](https://github.com/mikenye/docker-piaware/tree/master), [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile), `amd64` architecture only, built on commit, not recommended for production)
 * Specific version and architecture tags are available if required, however these are not regularly updated. It is generally recommended to run `latest`.
+
+### Tags & Versions
+
+| tag                | `piaware` | `rtl-sdr` | `dump1090-fa` | `bladeRF`          | `mlat-client` | `SoapySDR` | `dump978` | Base Image    |
+|--------------------|-----------|-----------|---------------|--------------------|---------------|------------|-----------|---------------|
+| `latest`,<br> `v3.8.1` | 3.8.1     | 0.6.0     | 3.8.1         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.1     | Alpine 3.11.5 |
+| `latest-rtlsdr-v0.5.3`,<br>`v3.8.1-rtlsdr-v0.5.3` | 3.8.1     | 0.5.3     | 3.8.1         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.1     | Alpine 3.11.5 |
+| `v3.8.0` | 3.8.0     | 0.6.0     | 3.8.0         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.0     | Alpine 3.11.3 |
+| `3.7.2`  | 3.7.2     | 0.6       | 3.7.2         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.4  |
+| `3.7.1`  | 3.7.1     | 0.6       | 3.7.1         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.3  |
+| `3.6.3`  | 3.6.3     | 0.6       | 3.6.3         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.3  |
+| `3.5.3`  | 3.5.3     | 0.5.3     | 3.5.3         | 1.5.1-git-821f879  | 0.2.10        | N/A        | N/A       | Debian 8.10   |
 
 ## Contributors
 
@@ -26,6 +38,10 @@ Tested and working on:
 * Thanks to [ShoGinn](https://github.com/ShoGinn) for many contributions to the 3.8.0 release and tidy up of code & readme.
 
 ## Changelog
+
+### 20200417
+
+* Add specific tags for `rtl-sdr` version 0.5.3 to support `RTL2838UHIDIR`, see [issue #15](https://github.com/mikenye/docker-piaware/issues/15)
 
 ### 20200407
 
