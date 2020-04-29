@@ -68,17 +68,17 @@ RUN set -x && \
     echo "blacklist dvb_usb_rtl28xxu" >> /etc/modprobe.d/no-rtl.conf && \
     echo "blacklist rtl2832" >> /etc/modprobe.d/no-rtl.conf && \
     echo "blacklist rtl2830" >> /etc/modprobe.d/no-rtl.conf && \
-    echo "========== Install bladeRF ==========" && \
-    git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
-    cd /src/bladeRF && \
-    export BRANCH_BLADERF=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_BLADERF} && \
-    echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
-    mkdir /src/bladeRF/host/build && \
-    cd /src/bladeRF/host/build && \
-    cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
-    make && \
-    make install && \
+    # echo "========== Install bladeRF ==========" && \
+    # git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
+    # cd /src/bladeRF && \
+    # export BRANCH_BLADERF=$(git tag --sort="-creatordate" | head -1) && \
+    # git checkout ${BRANCH_BLADERF} && \
+    # echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
+    # mkdir /src/bladeRF/host/build && \
+    # cd /src/bladeRF/host/build && \
+    # cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
+    # make && \
+    # make install && \
     echo "========== Install tcllauncher ==========" && \
     git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
     export BRANCH_TCLLAUNCHER=$(git tag --sort="-creatordate" | head -1) && \
@@ -178,6 +178,8 @@ RUN set -x && \
         && \
     rm -rf /var/cache/apk/* && \
     rm -rf /src && \
+    echo "========== Testing ==========" && \
+
     echo "========== Done! =========="
 
 COPY etc/ /etc/
