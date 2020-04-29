@@ -54,6 +54,13 @@ RUN set -x && \
     mkdir -p /src/rtl-sdr/build && \
     cd /src/rtl-sdr/build && \
     cmake ../ -DINSTALL_UDEV_RULES=ON -Wno-dev && \
+    # Fix broken pkg-config file...
+    export LIBRTLSDR_PKGCONF_FILE="/src/rtl-sdr/build/librtlsdr.pc" && \
+    sed -i "/^prefix=/c\prefix=/usr/local" "${LIBRTLSDR_PKGCONF_FILE}" && \
+    sed -i "/^exec_prefix=/c\exec_prefix=\${prefix}" "${LIBRTLSDR_PKGCONF_FILE}" && \
+    sed -i "/^libdir=/c\libdir=\${exec_prefix}/lib" "${LIBRTLSDR_PKGCONF_FILE}" && \
+    sed -i "/^includedir=/c\includedir=\${prefix}/include" "${LIBRTLSDR_PKGCONF_FILE}" && \
+    # =======
     make -Wstringop-truncation && \
     make -Wstringop-truncation install && \
     cp -v /src/rtl-sdr/rtl-sdr.rules /etc/udev/rules.d/ && \
@@ -102,13 +109,16 @@ RUN set -x && \
     make install && \
     cp -v /src/piaware/package/ca/*.pem /etc/ssl/ && \
     touch /etc/piaware.conf && \
-    mkdir -p /run/piaware  && \
+    mkdir -p /run/piaware && \
     echo "========== Install dump1090 ==========" && \
     git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
     cd /src/dump1090 && \
     export BRANCH_DUMP1090=$(git tag --sort="-creatordate" | head -1) && \
     git checkout ${BRANCH_DUMP1090} && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
+    export LIBBLADERF_PKGCONF_DIR=$(dirname $(find / -type f -name libbladeRF.pc | grep -E "^/usr" | head -1)) && \
+    export LIBRTLSDR_PKGCONF_DIR=$(dirname $(find / -type f -name librtlsdr.pc | grep -E "^/usr" | head -1)) && \
+    export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$LIBBLADERF_PKGCONF_DIR:$LIBRTLSDR_PKGCONF_DIR" && \
     make all && \
     make faup1090 && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
