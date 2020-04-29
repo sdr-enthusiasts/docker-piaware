@@ -25,7 +25,6 @@ Tested and working on:
 | tag                | `piaware` | `rtl-sdr` | `dump1090-fa` | `bladeRF`          | `mlat-client` | `SoapySDR` | `dump978` | Base Image    |
 |--------------------|-----------|-----------|---------------|--------------------|---------------|------------|-----------|---------------|
 | `latest`,<br> `v3.8.1` | 3.8.1     | 0.6.0     | 3.8.1         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.1     | Alpine 3.11.5 |
-| `latest-rtlsdr-v0.5.3`,<br>`v3.8.1-rtlsdr-v0.5.3` | 3.8.1     | 0.5.3     | 3.8.1         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.1     | Alpine 3.11.5 |
 | `v3.8.0` | 3.8.0     | 0.6.0     | 3.8.0         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.0     | Alpine 3.11.3 |
 | `3.7.2`  | 3.7.2     | 0.6       | 3.7.2         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.4  |
 | `3.7.1`  | 3.7.1     | 0.6       | 3.7.1         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.3  |
@@ -38,6 +37,10 @@ Tested and working on:
 * Thanks to [ShoGinn](https://github.com/ShoGinn) for many contributions to the 3.8.0 release and tidy up of code & readme.
 
 ## Changelog
+
+### 20200429
+
+* Change version of `rtl-sdr` to address incompatibility with `RTL2838UHIDIR` hardware. Thanks to Ryan Guzy for troubleshooting. This negates the needed for specific tags for `rtl-sdr` version 0.5.3 - these have now been deprecated.
 
 ### 20200417
 
