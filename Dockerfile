@@ -66,6 +66,7 @@ RUN set -x && \
     cmake ../ -DINSTALL_UDEV_RULES=ON -Wno-dev && \
     make -Wstringop-truncation && \
     make -Wstringop-truncation install && \
+    ldconfig && \
     echo "========== Install bladeRF ==========" && \
     git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
     cd /src/bladeRF && \
@@ -77,6 +78,7 @@ RUN set -x && \
     cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
     make && \
     make install && \
+    ldconfig && \
     echo "========== Install tcllauncher ==========" && \
     git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
     cd /src/tcllauncher && \
@@ -87,6 +89,7 @@ RUN set -x && \
     ./configure --prefix=/opt/tcl && \
     make && \
     make install && \
+    ldconfig && \
     echo "========== Install tcllib ==========" && \
     git clone https://github.com/tcltk/tcllib.git /src/tcllib && \
     cd /src/tcllib && \
@@ -97,6 +100,7 @@ RUN set -x && \
     ./configure && \
     make && \
     make install && \
+    ldconfig && \
     echo "========== Install piaware ==========" && \
     git clone https://github.com/flightaware/piaware.git /src/piaware && \
     cd /src/piaware && \
@@ -108,6 +112,7 @@ RUN set -x && \
     cp -v /src/piaware/package/ca/*.pem /etc/ssl/ && \
     touch /etc/piaware.conf && \
     mkdir -p /run/piaware && \
+    ldconfig && \
     echo "========== Install dump1090 ==========" && \
     git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
     cd /src/dump1090 && \
@@ -121,6 +126,7 @@ RUN set -x && \
     mkdir -p /run/dump1090-fa && \
     mkdir -p /usr/share/dump1090-fa/html && \
     cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
+    ldconfig && \
     echo "========== Install mlat-client ==========" && \
     git clone https://github.com/mutability/mlat-client.git /src/mlat-client && \
     cd /src/mlat-client && \
@@ -129,6 +135,7 @@ RUN set -x && \
     echo "mlat-client ${BRANCH_MLATCLIENT}" >> /VERSIONS && \
     ./setup.py install && \
     ln -s /usr/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
+    ldconfig && \
     echo "========== Install SoapySDR ==========" && \
     git clone https://github.com/pothosware/SoapySDR.git /src/SoapySDR && \
     cd /src/SoapySDR && \
@@ -140,6 +147,7 @@ RUN set -x && \
     cmake -Wno-dev .. && \
     make && \
     make install && \
+    ldconfig && \
     echo "========== Install dump978 ==========" && \
     git clone https://github.com/flightaware/dump978.git /src/dump978 && \
     cd /src/dump978 && \
@@ -153,6 +161,7 @@ RUN set -x && \
     cp -v faup978 /usr/lib/piaware/helpers/ && \
     mkdir -p /usr/share/dump978-fa/html && \
     cp -a /src/dump978/skyaware/* /usr/share/dump978-fa/html/ && \
+    ldconfig && \
     echo "========== Install s6-overlay ==========" && \
     wget -q -O - https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
     echo "========== Clean up build environment ==========" && \
@@ -177,15 +186,17 @@ RUN set -x && \
         tcl-dev \
         wget \
         && \
-    rm -rf /var/cache/apk/* && \
-    rm -rf /src && \
+    apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /src /tmp/* /var/lib/apt/lists/* && \
     echo "========== Testing ==========" && \
+    ldconfig && \
     bladeRF-cli --version > /dev/null 2>&1 && \
     dump1090 --help > /dev/null 2>&1 && \
     mlat-client --help > /dev/null 2>&1 && \
     piaware -v > /dev/null 2>&1 && \
     SoapySDRUtil --info > /dev/null 2>&1 && \
-    dump978-fa --version > /dev/null 2>&1 && \
+    # dump978-fa --version > /dev/null 2>&1 && \
     echo "========== Done! =========="
 
 COPY etc/ /etc/
