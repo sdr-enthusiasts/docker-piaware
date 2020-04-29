@@ -22,14 +22,14 @@ Tested and working on:
 
 ### Tags & Versions
 
-| tag                | `piaware` | `rtl-sdr` | `dump1090-fa` | `bladeRF`          | `mlat-client` | `SoapySDR` | `dump978` | Base Image    |
-|--------------------|-----------|-----------|---------------|--------------------|---------------|------------|-----------|---------------|
-| `latest`,<br> `v3.8.1` | 3.8.1     | 0.6.0     | 3.8.1         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.1     | Alpine 3.11.5 |
-| `v3.8.0` | 3.8.0     | 0.6.0     | 3.8.0         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.0     | Alpine 3.11.3 |
-| `3.7.2`  | 3.7.2     | 0.6       | 3.7.2         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.4  |
-| `3.7.1`  | 3.7.1     | 0.6       | 3.7.1         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.3  |
-| `3.6.3`  | 3.6.3     | 0.6       | 3.6.3         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.3  |
-| `3.5.3`  | 3.5.3     | 0.5.3     | 3.5.3         | 1.5.1-git-821f879  | 0.2.10        | N/A        | N/A       | Debian 8.10   |
+| tag                    | `piaware` | `rtl-sdr`          | `dump1090-fa` | `bladeRF`          | `mlat-client` | `SoapySDR` | `dump978` | Base Image    |
+|------------------------|-----------|--------------------|---------------|--------------------|---------------|------------|-----------|---------------|
+| `latest`,<br> `v3.8.1` | 3.8.1     | 0.6.0<br>(d794155) | 3.8.1         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.1     | Debian 10.3   |
+| `v3.8.0`               | 3.8.0     | 0.6.0              | 3.8.0         | 1.8.0-git-991bba2f | 0.2.11        | 0.7.2      | 3.8.0     | Alpine 3.11.3 |
+| `3.7.2`                | 3.7.2     | 0.6                | 3.7.2         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.4  |
+| `3.7.1`                | 3.7.1     | 0.6                | 3.7.1         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.3  |
+| `3.6.3`                | 3.6.3     | 0.6                | 3.6.3         | 1.5.1-git-0f84cc76 | 0.2.10        | N/A        | N/A       | Alpine 3.9.3  |
+| `3.5.3`                | 3.5.3     | 0.5.3              | 3.5.3         | 1.5.1-git-821f879  | 0.2.10        | N/A        | N/A       | Debian 8.10   |
 
 ## Contributors
 
@@ -40,7 +40,8 @@ Tested and working on:
 
 ### 20200429
 
-* Change version of `rtl-sdr` to address incompatibility with `RTL2838UHIDIR` hardware. Thanks to Ryan Guzy for troubleshooting. This negates the needed for specific tags for `rtl-sdr` version 0.5.3 - these have now been deprecated.
+* Change version of `rtl-sdr` to address incompatibility with `RTL2838UHIDIR` hardware. Thanks to Ryan Guzy for troubleshooting. This negates the requirement for specific tags for `rtl-sdr` version 0.5.3 - these have now been deprecated.
+* Move to `debian:stable-slim` for base image so we have proper `libc` instead of `musl`.
 
 ### 20200417
 
