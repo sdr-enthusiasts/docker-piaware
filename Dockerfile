@@ -15,31 +15,31 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 RUN set -x && \
     apk update && \
     apk add \
-    autoconf \
-    bash \
-    boost-dev \
-    cmake \
-    g++ \
-    gcc \
-    git \
-    gnupg \
-    libusb-dev \
-    lighttpd \
-    make \
-    musl-dev \
-    ncurses-dev \
-    net-tools \
-    py3-numpy \
-    python3 \
-    python3-dev \
-    socat \
-    swig \
-    tcl \
-    tcl-dev \
-    tcl-tls \
-    tclx \
-    tzdata \
-    && \
+        autoconf \
+        bash \
+        boost-dev \
+        cmake \
+        g++ \
+        gcc \
+        git \
+        gnupg \
+        libusb-dev \
+        lighttpd \
+        make \
+        musl-dev \
+        ncurses-dev \
+        net-tools \
+        py3-numpy \
+        python3 \
+        python3-dev \
+        socat \
+        swig \
+        tcl \
+        tcl-dev \
+        tcl-tls \
+        tclx \
+        tzdata \
+        && \
     git config --global advice.detachedHead false && \
     mkdir -p /src && \
     mkdir -p /var/cache/lighttpd/compress && \
@@ -116,9 +116,11 @@ RUN set -x && \
     export BRANCH_DUMP1090=$(git tag --sort="-creatordate" | head -1) && \
     git checkout ${BRANCH_DUMP1090} && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
+    # Fix dump1090 install linker errors
     export LIBBLADERF_PKGCONF_DIR=$(dirname $(find / -type f -name libbladeRF.pc | grep -E "^/usr" | head -1)) && \
     export LIBRTLSDR_PKGCONF_DIR=$(dirname $(find / -type f -name librtlsdr.pc | grep -E "^/usr" | head -1)) && \
     export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$LIBBLADERF_PKGCONF_DIR:$LIBRTLSDR_PKGCONF_DIR" && \
+    # =======
     make all && \
     make faup1090 && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
@@ -162,18 +164,18 @@ RUN set -x && \
     wget -q -O - https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
     echo "========== Clean up build environment ==========" && \
     apk del \
-    autoconf \
-    cmake \
-    g++ \
-    gcc \
-    git \
-    gnupg \
-    make \
-    musl-dev \
-    ncurses-dev \
-    python3 \
-    tcl-dev \
-    && \
+        autoconf \
+        cmake \
+        g++ \
+        gcc \
+        git \
+        gnupg \
+        make \
+        musl-dev \
+        ncurses-dev \
+        python3 \
+        tcl-dev \
+        && \
     rm -rf /var/cache/apk/* && \
     rm -rf /src && \
     echo "========== Done! =========="
