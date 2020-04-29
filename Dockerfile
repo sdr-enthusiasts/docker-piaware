@@ -5,7 +5,12 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     ALLOW_MLAT=yes \
     RTLSDR_GAIN=-10 \
     RTLSDR_PPM=0 \
-    BEASTPORT=30005
+    BEASTPORT=30005 \
+    BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320"
+
+# Note, the specific commit of rtlsdr is to address issue #15
+# See: https://github.com/mikenye/docker-piaware/issues/15
+# This should be revisited in future when rtlsdr 0.6.1 or newer is released
 
 RUN set -x && \
     apk update && \
@@ -42,8 +47,9 @@ RUN set -x && \
     echo "========== Install RTL-SDR ==========" && \
     git clone git://git.osmocom.org/rtl-sdr.git /src/rtl-sdr && \
     cd /src/rtl-sdr && \
-    export BRANCH_RTLSDR=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout tags/${BRANCH_RTLSDR} && \
+    #export BRANCH_RTLSDR=$(git tag --sort="-creatordate" | head -1) && \
+    #git checkout tags/${BRANCH_RTLSDR} && \
+    git checkout "${BRANCH_RTLSDR}" && \
     echo "rtl-sdr ${BRANCH_RTLSDR}" >> /VERSIONS && \
     mkdir -p /src/rtl-sdr/build && \
     cd /src/rtl-sdr/build && \
