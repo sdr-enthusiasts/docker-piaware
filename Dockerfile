@@ -1,4 +1,4 @@
-FROM alpine:3.11.5
+FROM debian:stable-slim
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     DUMP1090_MAX_RANGE=400 \
     ALLOW_MODEAC=yes \
@@ -13,25 +13,37 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 # This should be revisited in future when rtlsdr 0.6.1 or newer is released
 
 RUN set -x && \
-    apk update && \
-    apk add \
+    apt-get update -y && \
+    apt-get install --no-install-recommends -y \
         autoconf \
         bash \
-        boost-dev \
+        ca-certificates \
         cmake \
         g++ \
         gcc \
         git \
         gnupg \
-        libusb-dev \
+        itcl3 \
+        libboost-dev \
+        libboost-filesystem1.67.0 \
+        libboost-filesystem-dev \
+        libboost-program-options1.67.0 \
+        libboost-program-options-dev \
+        libboost-regex1.67.0 \
+        libboost-regex-dev \
+        libboost-system1.67.0 \
+        libboost-system-dev \
+        libc-dev \
+        libusb-1.0-0 \ 
+        libusb-1.0-0-dev \
         lighttpd \
         make \
-        musl-dev \
         ncurses-dev \
         net-tools \
-        py3-numpy \
+        pkg-config \
         python3 \
         python3-dev \
+        python3-numpy \
         socat \
         swig \
         tcl \
@@ -39,11 +51,9 @@ RUN set -x && \
         tcl-tls \
         tclx \
         tzdata \
+        wget \
         && \
     git config --global advice.detachedHead false && \
-    mkdir -p /src && \
-    mkdir -p /var/cache/lighttpd/compress && \
-    chown lighttpd:lighttpd /var/cache/lighttpd/compress && \
     echo "========== Install RTL-SDR ==========" && \
     git clone git://git.osmocom.org/rtl-sdr.git /src/rtl-sdr && \
     cd /src/rtl-sdr && \
@@ -54,37 +64,25 @@ RUN set -x && \
     mkdir -p /src/rtl-sdr/build && \
     cd /src/rtl-sdr/build && \
     cmake ../ -DINSTALL_UDEV_RULES=ON -Wno-dev && \
-    # Fix broken pkg-config file...
-    export LIBRTLSDR_PKGCONF_FILE="/src/rtl-sdr/build/librtlsdr.pc" && \
-    sed -i "/^prefix=/c\prefix=/usr/local" "${LIBRTLSDR_PKGCONF_FILE}" && \
-    sed -i "/^exec_prefix=/c\exec_prefix=\${prefix}" "${LIBRTLSDR_PKGCONF_FILE}" && \
-    sed -i "/^libdir=/c\libdir=\${exec_prefix}/lib" "${LIBRTLSDR_PKGCONF_FILE}" && \
-    sed -i "/^includedir=/c\includedir=\${prefix}/include" "${LIBRTLSDR_PKGCONF_FILE}" && \
-    # =======
     make -Wstringop-truncation && \
     make -Wstringop-truncation install && \
-    cp -v /src/rtl-sdr/rtl-sdr.rules /etc/udev/rules.d/ && \
-    echo "========== Blacklist RTL-SDR dongle ==========" && \
-    echo "blacklist dvb_usb_rtl28xxu" >> /etc/modprobe.d/no-rtl.conf && \
-    echo "blacklist rtl2832" >> /etc/modprobe.d/no-rtl.conf && \
-    echo "blacklist rtl2830" >> /etc/modprobe.d/no-rtl.conf && \
-    # echo "========== Install bladeRF ==========" && \
-    # git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
-    # cd /src/bladeRF && \
-    # export BRANCH_BLADERF=$(git tag --sort="-creatordate" | head -1) && \
-    # git checkout ${BRANCH_BLADERF} && \
-    # echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
-    # mkdir /src/bladeRF/host/build && \
-    # cd /src/bladeRF/host/build && \
-    # cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
-    # make && \
-    # make install && \
+    echo "========== Install bladeRF ==========" && \
+    git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
+    cd /src/bladeRF && \
+    export BRANCH_BLADERF=$(git tag --sort="-creatordate" | head -1) && \
+    git checkout ${BRANCH_BLADERF} && \
+    echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
+    mkdir /src/bladeRF/host/build && \
+    cd /src/bladeRF/host/build && \
+    cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
+    make && \
+    make install && \
     echo "========== Install tcllauncher ==========" && \
     git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
+    cd /src/tcllauncher && \
     export BRANCH_TCLLAUNCHER=$(git tag --sort="-creatordate" | head -1) && \
     git checkout ${BRANCH_TCLLAUNCHER} && \
     echo "tcllauncher ${BRANCH_TCLLAUNCHER}" >> /VERSIONS && \
-    cd /src/tcllauncher && \
     autoconf && \
     ./configure --prefix=/opt/tcl && \
     make && \
@@ -116,11 +114,6 @@ RUN set -x && \
     export BRANCH_DUMP1090=$(git tag --sort="-creatordate" | head -1) && \
     git checkout ${BRANCH_DUMP1090} && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
-    # Fix dump1090 install linker errors
-    export LIBBLADERF_PKGCONF_DIR=$(dirname $(find / -type f -name libbladeRF.pc | grep -E "^/usr" | head -1)) && \
-    export LIBRTLSDR_PKGCONF_DIR=$(dirname $(find / -type f -name librtlsdr.pc | grep -E "^/usr" | head -1)) && \
-    export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$LIBBLADERF_PKGCONF_DIR:$LIBRTLSDR_PKGCONF_DIR" && \
-    # =======
     make all && \
     make faup1090 && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
@@ -163,23 +156,36 @@ RUN set -x && \
     echo "========== Install s6-overlay ==========" && \
     wget -q -O - https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
     echo "========== Clean up build environment ==========" && \
-    apk del \
+    apt-get remove -y \
         autoconf \
         cmake \
         g++ \
         gcc \
         git \
         gnupg \
+        libboost-dev \
+        libboost-filesystem-dev \
+        libboost-program-options-dev \
+        libboost-regex-dev \
+        libboost-system-dev \
+        libc-dev \
+        libusb-1.0-0-dev \
         make \
-        musl-dev \
         ncurses-dev \
-        python3 \
+        pkg-config \
+        python3-dev \
         tcl-dev \
+        wget \
         && \
     rm -rf /var/cache/apk/* && \
     rm -rf /src && \
     echo "========== Testing ==========" && \
-
+    bladeRF-cli --version > /dev/null 2>&1 && \
+    dump1090 --help > /dev/null 2>&1 && \
+    mlat-client --help > /dev/null 2>&1 && \
+    piaware -v > /dev/null 2>&1 && \
+    SoapySDRUtil --info > /dev/null 2>&1 && \
+    dump978-fa --version > /dev/null 2>&1 && \
     echo "========== Done! =========="
 
 COPY etc/ /etc/
