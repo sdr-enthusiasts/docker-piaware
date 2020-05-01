@@ -19,6 +19,7 @@ RUN set -x && \
         bash \
         ca-certificates \
         cmake \
+        curl \
         g++ \
         gcc \
         git \
@@ -79,6 +80,17 @@ RUN set -x && \
     make && \
     make install && \
     ldconfig && \
+    echo "========== Downloading bladeRF FPGA Images ==========" && \
+    BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" && \
+    mkdir -p "$BLADERF_RBF_PATH" && \
+    curl -o $BLADERF_RBF_PATH/hostedxA4.rbf https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
+    curl -o $BLADERF_RBF_PATH/hostedxA9.rbf https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
+    curl -o $BLADERF_RBF_PATH/hostedx40.rbf https://www.nuand.com/fpga/hostedx40-latest.rbf && \
+    curl -o $BLADERF_RBF_PATH/hostedx115.rbf https://www.nuand.com/fpga/hostedx115-latest.rbf && \
+    curl -o $BLADERF_RBF_PATH/adsbxA4.rbf https://www.nuand.com/fpga/adsbxA4.rbf && \
+    curl -o $BLADERF_RBF_PATH/adsbxA9.rbf https://www.nuand.com/fpga/adsbxA9.rbf && \
+    curl -o $BLADERF_RBF_PATH/adsbx40.rbf https://www.nuand.com/fpga/adsbx40.rbf && \
+    curl -o $BLADERF_RBF_PATH/adsbx115.rbf https://www.nuand.com/fpga/adsbx115.rbf && \
     echo "========== Install tcllauncher ==========" && \
     git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
     cd /src/tcllauncher && \
@@ -168,6 +180,7 @@ RUN set -x && \
     apt-get remove -y \
         autoconf \
         cmake \
+        curl \
         g++ \
         gcc \
         git \
