@@ -19,6 +19,7 @@ RUN set -x && \
         bash \
         ca-certificates \
         cmake \
+        curl \
         g++ \
         gcc \
         git \
@@ -179,6 +180,7 @@ RUN set -x && \
     apt-get remove -y \
         autoconf \
         cmake \
+        curl \
         g++ \
         gcc \
         git \
