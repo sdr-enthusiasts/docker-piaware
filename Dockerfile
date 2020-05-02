@@ -76,7 +76,11 @@ RUN set -x && \
     echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
     mkdir /src/bladeRF/host/build && \
     cd /src/bladeRF/host/build && \
-    cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
+    cmake \
+        -DTREAT_WARNINGS_AS_ERRORS=OFF \
+        -DCMAKE_BUILD_TYPE=Release \
+        ../ \
+        && \
     make && \
     make install && \
     ldconfig && \
