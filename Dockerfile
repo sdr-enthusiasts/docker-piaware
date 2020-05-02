@@ -42,6 +42,7 @@ RUN set -x && \
         ncurses-dev \
         net-tools \
         pkg-config \
+        procps \
         python3 \
         python3-dev \
         python3-numpy \
@@ -76,7 +77,11 @@ RUN set -x && \
     echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
     mkdir /src/bladeRF/host/build && \
     cd /src/bladeRF/host/build && \
-    cmake -DTREAT_WARNINGS_AS_ERRORS=OFF ../ && \
+    cmake \
+        -DTREAT_WARNINGS_AS_ERRORS=OFF \
+        -DCMAKE_BUILD_TYPE=Release \
+        ../ \
+        && \
     make && \
     make install && \
     ldconfig && \
@@ -146,7 +151,7 @@ RUN set -x && \
     git checkout ${BRANCH_MLATCLIENT} && \
     echo "mlat-client ${BRANCH_MLATCLIENT}" >> /VERSIONS && \
     ./setup.py install && \
-    ln -s /usr/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
+    ln -s /usr/local/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
     ldconfig && \
     echo "========== Install SoapySDR ==========" && \
     git clone https://github.com/pothosware/SoapySDR.git /src/SoapySDR && \
