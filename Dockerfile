@@ -42,6 +42,7 @@ RUN set -x && \
         ncurses-dev \
         net-tools \
         pkg-config \
+        procps \
         python3 \
         python3-dev \
         python3-numpy \
