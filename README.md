@@ -36,84 +36,6 @@ Tested and working on:
 * Thanks to [Jan Collijs](https://github.com/visibilityspots) for contributing to the 3.7.1, 3.7.2 and 3.8.0 releases.
 * Thanks to [ShoGinn](https://github.com/ShoGinn) for many contributions to the 3.8.0 release and tidy up of code & readme.
 
-## Changelog
-
-### 20200501
-
-* Add bladeRF FPGA images
-
-### 20200429
-
-* Change version of `rtl-sdr` to address incompatibility with `RTL2838UHIDIR` hardware. Thanks to Ryan Guzy for troubleshooting. This negates the requirement for specific tags for `rtl-sdr` version 0.5.3 - these have now been deprecated.
-* Move to `debian:stable-slim` for base image so we have proper `libc` instead of `musl`.
-
-### 20200417
-
-* Add specific tags for `rtl-sdr` version 0.5.3 to support `RTL2838UHIDIR`, see [issue #15](https://github.com/mikenye/docker-piaware/issues/15)
-
-### 20200407
-
-* When using an external Beast provider, remove the need to map `dump1090`/`readsb` JSON data into the container for SkyAware to function
-
-### 20200319
-
-* Include changes and tidy-up from ShoGinn [pull request #13](https://github.com/mikenye/docker-piaware/pull/13)
-
-### 20200317
-
-* Include build of `SoapySDR` and `dump978` in base image (however, `dump978` service and `skyaware978` are not yet run as a service)
-* Change `rtl-sdr`, `bladeRF`, `tcllauncher`, `tcllib`, `piaware`, `dump1090`, `mlat-client`, `SoapySDR` and `dump978` to build from latest released github tag. Versions of each component can be viewed with the command `docker run --rm -it --entrypoint cat mikenye/piaware:latest /VERSIONS`
-* Include `gpg` verification of `s6-overlay`
-* Removal of service log files within the container and instead just rely on container logs
-* Increase verbosity of docker build output
-* Change build process to use `docker buildx`
-
-### 20200224
-
-* Update Alpine Linux image to 3.11
-* Update bladeRF version to 2019.07
-* Change to single, multi-architecture `Dockerfile`
-* Change to `docker buildx` for release building
-* Use [mikenye/deploy-s6-overlay](https://github.com/mikenye/deploy-s6-overlay) to deploy s6-overlay
-
-### 20200219
-
-* Added `BEASTHOST` and `BEASTPORT` variables to allow pulling of ModeS/BEAST data from another host/container (for example `mikenye/readsb`). If given, there is no need to pass the RTLSDR USB device through to the container.
-
-### 20200129@1135
-
-* Update piaware to v3.8.0
-* Update tcllauncher to v1.10
-* Update mlatclient to v0.2.11
-* Update tcllib to v1.20
-* Removed deprecated flightaware user/password options
-* Added FEEDER_ID parameter to be able to run without persistant storage
-
-### 20200129@1033
-
-* Update piaware to v3.7.2
-
-### 20190911
-
-* Update piaware to v3.7.1
-* Add support for `arm64v8` / `aarch64` architecture
-* Add support for gain optimisation (thanks [Jan Collijs](https://github.com/visibilityspots)!)
-
-### 20190105
-
-* Update piaware to v3.6.3
-* Reduction of image size 663MB down to 304MB
-  * Change base image to Alpine v3.9
-  * Reduce build layers
-  * The "unoptimised" version of the Dockerfile is available in the source repo for educational/troubleshooting purposes
-* Implement s6-overlay for process supervision
-* Make logging much better
-* bladeRF is supported again (my first release of 3.6.3 dropped support for bladeRF, but since then I've overcome the compilation problems and its back in).
-
-### 20180607
-
-* Original image, based on Debian Jessie
-
 ## Multi Architecture Support
 
 Currently, this image should pull and run on the following architectures:
@@ -536,3 +458,85 @@ Check out the images:
 ## Getting help
 
 Please feel free to [open an issue on the project's GitHub](https://github.com/mikenye/docker-piaware/issues).
+
+## Changelog
+
+### 20200502
+
+* Fix issue with `fa-mlat-client` not working and add `procps` package, see [issue #21](https://github.com/mikenye/docker-piaware/issues/21)
+
+### 20200501
+
+* Add bladeRF FPGA images
+
+### 20200429
+
+* Change version of `rtl-sdr` to address incompatibility with `RTL2838UHIDIR` hardware. Thanks to Ryan Guzy for troubleshooting. This negates the requirement for specific tags for `rtl-sdr` version 0.5.3 - these have now been deprecated.
+* Move to `debian:stable-slim` for base image so we have proper `libc` instead of `musl`.
+
+### 20200417
+
+* Add specific tags for `rtl-sdr` version 0.5.3 to support `RTL2838UHIDIR`, see [issue #15](https://github.com/mikenye/docker-piaware/issues/15)
+
+### 20200407
+
+* When using an external Beast provider, remove the need to map `dump1090`/`readsb` JSON data into the container for SkyAware to function
+
+### 20200319
+
+* Include changes and tidy-up from ShoGinn [pull request #13](https://github.com/mikenye/docker-piaware/pull/13)
+
+### 20200317
+
+* Include build of `SoapySDR` and `dump978` in base image (however, `dump978` service and `skyaware978` are not yet run as a service)
+* Change `rtl-sdr`, `bladeRF`, `tcllauncher`, `tcllib`, `piaware`, `dump1090`, `mlat-client`, `SoapySDR` and `dump978` to build from latest released github tag. Versions of each component can be viewed with the command `docker run --rm -it --entrypoint cat mikenye/piaware:latest /VERSIONS`
+* Include `gpg` verification of `s6-overlay`
+* Removal of service log files within the container and instead just rely on container logs
+* Increase verbosity of docker build output
+* Change build process to use `docker buildx`
+
+### 20200224
+
+* Update Alpine Linux image to 3.11
+* Update bladeRF version to 2019.07
+* Change to single, multi-architecture `Dockerfile`
+* Change to `docker buildx` for release building
+* Use [mikenye/deploy-s6-overlay](https://github.com/mikenye/deploy-s6-overlay) to deploy s6-overlay
+
+### 20200219
+
+* Added `BEASTHOST` and `BEASTPORT` variables to allow pulling of ModeS/BEAST data from another host/container (for example `mikenye/readsb`). If given, there is no need to pass the RTLSDR USB device through to the container.
+
+### 20200129@1135
+
+* Update piaware to v3.8.0
+* Update tcllauncher to v1.10
+* Update mlatclient to v0.2.11
+* Update tcllib to v1.20
+* Removed deprecated flightaware user/password options
+* Added FEEDER_ID parameter to be able to run without persistant storage
+
+### 20200129@1033
+
+* Update piaware to v3.7.2
+
+### 20190911
+
+* Update piaware to v3.7.1
+* Add support for `arm64v8` / `aarch64` architecture
+* Add support for gain optimisation (thanks [Jan Collijs](https://github.com/visibilityspots)!)
+
+### 20190105
+
+* Update piaware to v3.6.3
+* Reduction of image size 663MB down to 304MB
+  * Change base image to Alpine v3.9
+  * Reduce build layers
+  * The "unoptimised" version of the Dockerfile is available in the source repo for educational/troubleshooting purposes
+* Implement s6-overlay for process supervision
+* Make logging much better
+* bladeRF is supported again (my first release of 3.6.3 dropped support for bladeRF, but since then I've overcome the compilation problems and its back in).
+
+### 20180607
+
+* Original image, based on Debian Jessie
