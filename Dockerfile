@@ -146,7 +146,7 @@ RUN set -x && \
     git checkout ${BRANCH_MLATCLIENT} && \
     echo "mlat-client ${BRANCH_MLATCLIENT}" >> /VERSIONS && \
     ./setup.py install && \
-    ln -s /usr/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
+    ln -s /usr/local/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
     ldconfig && \
     echo "========== Install SoapySDR ==========" && \
     git clone https://github.com/pothosware/SoapySDR.git /src/SoapySDR && \
