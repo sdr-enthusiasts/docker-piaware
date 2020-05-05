@@ -461,6 +461,14 @@ Please feel free to [open an issue on the project's GitHub](https://github.com/m
 
 ## Changelog
 
+### 20200505
+
+* Implement suggestion in [issue #24](https://github.com/mikenye/docker-piaware/issues/24#issue-612402611). Once `piaware` connects to FlightAware's servers and retrieves a personal stats URL, the FlightAware logo in SkyAware will be modified to link to the feeder's personal stats URL. You'll see an entry in the log such as:
+
+```
+[statsurlupdater] Updating SkyAware link to: https://flightaware.com/adsb/stats/user/xxxxxxx#stats-xxxxx
+```
+
 ### 20200502
 
 * Fix issue with `fa-mlat-client` not working and add `procps` package, see [issue #21](https://github.com/mikenye/docker-piaware/issues/21)

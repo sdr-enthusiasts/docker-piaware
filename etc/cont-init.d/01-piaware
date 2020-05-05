@@ -39,3 +39,7 @@ piaware-config allow-mlat "${ALLOW_MLAT}"
 piaware-config allow-modeac "${ALLOW_MODEAC}"
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
+
+# Create log dir for piaware
+mkdir -p /var/log/piaware
+chown nobody:nogroup /var/log/piaware
