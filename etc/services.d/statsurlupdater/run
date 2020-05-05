@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#shellcheck shell=bash
+
+sleep 10
+
+# Check to see if we've already updated the stats url
+if [ -f "/.statsurlupdated" ]; then
+    # do nothing, sleep forever
+    sleep 3600
+
+else
+    # attempt to update the url
+
+    # check to see if our site statistics url has made it to the log yet
+    grep "site statistics URL:" /var/log/piaware/current > /dev/null
+    if [ $? -ne 0 ]; then
+        # site statistics url not yet found, exit and try again
+        exit 0
+    fi
+
+    STATSURL=$(grep "site statistics URL:" /var/log/piaware/current | cut -d "]" -f 2 | tr -d " " | cut -d ":" -f 2-)
+
+    echo "[statsurlupdater] Updating SkyAware link to: ${STATSURL}"
+
+    OLDURL="http://flightaware.com/"
+
+    sed -i 's,'"${OLDURL}"','"${STATSURL}"',' /usr/share/dump1090-fa/html/index.html
+
+    # touch a state file so this script knows not to process again
+    touch /.statsurlupdated
+    
+fi
