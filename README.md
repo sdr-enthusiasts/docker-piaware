@@ -413,6 +413,7 @@ There are a series of available environment variables:
 | `BEASTHOST`          | Optional. IP/Hostname of a Mode-S/BEAST provider (dump1090/readsb). If given, no USB device needs to be passed through to the container. | |
 | `BEASTPORT`          | Optional. TCP port number of Mode-S/BEAST provider (dump1090/readsb). | 30005 |
 | `FEEDER_ID`          | Your FlightAware feeder ID (required) | |
+| `BINGMAPSAPIKEY`     | Optional. Bing Maps API Key. If set, it is configured in `dump1090`'s `config.js`. | |
 
 For an explanation of `piaware-config` variables, see [FlightAware PiAware Advanced Configuration](https://flightaware.com/adsb/piaware/advanced_configuration).
 
@@ -460,6 +461,10 @@ Check out the images:
 Please feel free to [open an issue on the project's GitHub](https://github.com/mikenye/docker-piaware/issues).
 
 ## Changelog
+
+### 20200506
+
+* Implement suggestion in [issue #24](https://github.com/mikenye/docker-piaware/issues/24#issue-612402611). `BINGMAPSAPIKEY` environment variable can be set. If set, it is configured in `dump1090`'s `config.js`.
 
 ### 20200505
 
