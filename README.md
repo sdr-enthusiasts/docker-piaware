@@ -1,18 +1,12 @@
 # mikenye/piaware
 
-FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa (but not yet dump978, see endnote). Builds and runs on `linux/amd64`, `linux/arm/v7` and `linux/arm64` (see below).
+FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa (but not yet dump978, see endnote). Builds and runs on `linux/amd64`, `linux/arm/v6`, `linux/arm/v7` and `linux/arm64` (see below).
 
-Can optionally pull Mode-S/BEAST data from another host/container running `readsb`/`dump1090`.
+Can optionally operate in "net only" mode and pull ADS-B data from another host/container running `readsb`/`dump1090`.
 
 For more information on what PiAware is, see here: [FlightAware - PiAware](https://flightaware.com/adsb/piaware/)
 
-Tested and working on:
-
-* `linux/amd64` (`x86_64`) platform running Ubuntu 16.04.4 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
-* `linux/arm/v7` (`armv7l`, `armhf`, `arm32v7`) platform (Odroid HC1) running Ubuntu 18.04.1 LTS using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
-* `linux/arm64` (`aarch64`, `arm64v8`) platform (Raspberry Pi 4) running Raspbian Buster 64-bit using an RTL2832U radio (FlightAware Pro Stick Plus Blue)
-* If you run on a different platform (or if you have issues) please raise an issue and let me know!
-* bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
+*Note:* bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
 
 ## Supported tags and respective Dockerfiles
 
@@ -40,9 +34,10 @@ Tested and working on:
 
 Currently, this image should pull and run on the following architectures:
 
-* `linux/amd64` (`x86_64`): Built on Linux x86-64
-* `linux/arm/v7` (`armv7l`, `armhf`, `arm32v7`): Built on Odroid HC2 running ARMv7 32-bit
-* `linux/arm64` (`aarch64`, `arm64v8`): Built on a Raspberry Pi 4 Model B running ARMv8 64-bit
+* `linux/amd64`: Built on Linux x86-64
+* `linux/arm/v6`: Built on Odroid HC2 running ARMv7 32-bit
+* `linux/arm/v7`: Built on Odroid HC2 running ARMv7 32-bit
+* `linux/arm64`: Built on a Raspberry Pi 4 Model B running ARMv8 64-bit
 
 ## Prerequisites
 
@@ -461,6 +456,10 @@ Check out the images:
 Please feel free to [open an issue on the project's GitHub](https://github.com/mikenye/docker-piaware/issues).
 
 ## Changelog
+
+### 20200508
+
+* Add `linux/arm/v6` architecture support.
 
 ### 20200506
 
