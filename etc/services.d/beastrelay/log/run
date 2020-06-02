@@ -1,0 +1,7 @@
+#!/usr/bin/execlineb
+#shellcheck shell=sh
+
+s6-envuidgid nobody
+s6-applyuidgid -U
+
+s6-log -bp 1 n5 s1000000 S10000000 T /var/log/beastrelay
