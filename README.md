@@ -457,6 +457,10 @@ Please feel free to [open an issue on the project's GitHub](https://github.com/m
 
 ## Changelog
 
+### 20200603
+
+* Add [`HEALTHCHECK`](https://docs.docker.com/engine/reference/builder/#healthcheck) to `Dockerfile` and healthcheck script.
+
 ### 20200508
 
 * Add `linux/arm/v6` architecture support.
