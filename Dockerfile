@@ -20,6 +20,7 @@ RUN set -x && \
         ca-certificates \
         cmake \
         curl \
+        file \
         g++ \
         gcc \
         git \
@@ -55,6 +56,7 @@ RUN set -x && \
         tzdata \
         wget \
         && \
+    file -L /bin/cp && \
     git config --global advice.detachedHead false && \
     echo "========== Install RTL-SDR ==========" && \
     git clone git://git.osmocom.org/rtl-sdr.git /src/rtl-sdr && \
@@ -186,6 +188,7 @@ RUN set -x && \
         autoconf \
         cmake \
         curl \
+        file \
         g++ \
         gcc \
         git \
