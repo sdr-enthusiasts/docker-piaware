@@ -25,6 +25,7 @@ RUN set -x && \
         gcc \
         git \
         gnupg \
+        iproute2 \
         itcl3 \
         libboost-dev \
         libboost-filesystem1.67.0 \
@@ -42,7 +43,6 @@ RUN set -x && \
         make \
         ncurses-dev \
         net-tools \
-        iproute2 \
         pkg-config \
         procps \
         python3 \
