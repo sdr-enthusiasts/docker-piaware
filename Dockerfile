@@ -42,6 +42,7 @@ RUN set -x && \
         make \
         ncurses-dev \
         net-tools \
+        iproute2 \
         pkg-config \
         procps \
         python3 \
