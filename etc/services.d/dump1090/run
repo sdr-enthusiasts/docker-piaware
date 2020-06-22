@@ -45,4 +45,5 @@ fi
 # Run dump1090 command line
 set -eo pipefail
 exec \
-  "${DUMP1090_BIN}" "${DUMP1090_CMD[@]}" 2>&1 | awk -W Interactive '{print "[dump1090-fa] " $0}'
+  "${DUMP1090_BIN}" "${DUMP1090_CMD[@]}" \
+  2>&1 | awk '{print "[dump1090-fa] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'

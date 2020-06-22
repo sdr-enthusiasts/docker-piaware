@@ -21,6 +21,7 @@ RUN set -x && \
         cmake \
         curl \
         file \
+        gawk \
         g++ \
         gcc \
         git \

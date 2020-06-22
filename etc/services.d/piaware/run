@@ -6,4 +6,4 @@ exec \
     /usr/bin/piaware \
     -plainlog \
     -statusfile /run/piaware/status.json \
-    2>&1 | awk -W Interactive '{print "[piaware] " $0}'
+    2>&1 | awk '{print "[piaware] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
