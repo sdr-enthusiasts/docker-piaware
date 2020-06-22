@@ -10,5 +10,5 @@ if [ -z "${BEASTHOST}" ]; then
 else
   exec \
     socat -d -d TCP:"${BEASTHOST}:${BEASTPORT}" TCP:localhost:30004 \
-    2>&1 | awk '{print "[beastrelay] " $0}'
+    2>&1 | stdbuf -o0 awk '{print "[beastrelay] " $0}'
 fi

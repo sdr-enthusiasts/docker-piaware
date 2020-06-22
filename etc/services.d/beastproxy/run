@@ -9,5 +9,5 @@ if [ -z "${BEASTHOST}" ]; then
 else
   exec \
     socat -d -d TCP-LISTEN:30005,fork TCP:"${BEASTHOST}:${BEASTPORT}" \
-    2>&1 | awk '{print "[beastproxy] " $0}'
+    2>&1 | stdbuf -o0 awk '{print "[beastproxy] " $0}'
 fi
