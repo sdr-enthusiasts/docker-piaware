@@ -191,6 +191,7 @@ RUN set -x && \
         curl \
         file \
         g++ \
+        gawk \
         gcc \
         git \
         gnupg \
