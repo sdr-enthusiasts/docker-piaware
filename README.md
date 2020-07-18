@@ -95,10 +95,11 @@ piaware-config -show feeder-id
 
 You'll need a *feeder-id*. To get one, you can temporarily run the container, to allow it to communicate with the FlightAware servers and get a new feeder ID.
 
-Run the command:
+Run the commands:
 
 ```shell
-timeout 30 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE mikenye/piaware:latest | grep "my feeder ID"
+docker pull mikenye/piaware:latest
+timeout 60 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE mikenye/piaware:latest | grep "my feeder ID"
 ```
 
 Be sure to change the following:
