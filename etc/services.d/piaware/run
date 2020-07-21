@@ -2,6 +2,8 @@
 # shellcheck shell=bash
 set -eo pipefail
 
+# Depends on beastproxy (only if an external beasthost is used) and dump1090
+
 PIAWARE_BIN="/usr/bin/piaware"
 PIAWARE_CMD=(-plainlog)
 PIAWARE_CMD+=(-statusfile /run/piaware/status.json)

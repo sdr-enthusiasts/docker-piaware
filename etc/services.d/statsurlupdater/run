@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #shellcheck shell=bash
 
+# Depends on piaware
+
 sleep 10
 
 # Check to see if we've already updated the stats url

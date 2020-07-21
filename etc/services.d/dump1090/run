@@ -1,6 +1,8 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+# Depends on beastproxy (only if an external beasthost is used)
+
 # Build the dump1090 command line based on piaware options
 DUMP1090_BIN="/usr/local/bin/dump1090"
 DUMP1090_CMD=(--net)
