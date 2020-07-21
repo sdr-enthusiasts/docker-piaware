@@ -30,7 +30,10 @@ else
   
 fi
 
-DUMP1090_CMD+=(--stats-every 3600)
+if [ "$VERBOSE_LOGGING" = "true" ]; then
+  DUMP1090_CMD+=(--stats-every 3600)
+fi
+
 DUMP1090_CMD+=(--write-json /run/dump1090-fa)
 DUMP1090_CMD+=(--json-location-accuracy 2)
 

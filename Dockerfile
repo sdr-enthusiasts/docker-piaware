@@ -6,7 +6,8 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     RTLSDR_GAIN=-10 \
     RTLSDR_PPM=0 \
     BEASTPORT=30005 \
-    BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320"
+    BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320" \
+    VERBOSE_LOGGING="false"
 
 # Note, the specific commit of rtlsdr is to address issue #15
 # See: https://github.com/mikenye/docker-piaware/issues/15
