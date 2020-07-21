@@ -5,16 +5,20 @@
 # into the local dump1090 instance. This allows JSON data to be written, 
 # and SkyAware to function normally.
 
-EXTRA_SOCAT_ARGS=""
+SOCAT_BIN="$(which socat)"
+SOCAT_CMD=(-ls)
 
 if [ "$VERBOSE_LOGGING" = "true" ]; then
-  EXTRA_SOCAT_ARGS+="-d -d"
+  SOCAT_CMD+="-d -d"
 fi
+
+SOCAT_CMD+=("TCP:${BEASTHOST}:${BEASTPORT}")
+SOCAT_CMD+=("TCP:localhost:30004")
 
 if [ -z "${BEASTHOST}" ]; then
   sleep 3600
 else
   # shellcheck disable=SC2016
-  socat "$EXTRA_SOCAT_ARGS" TCP:"${BEASTHOST}:${BEASTPORT}" TCP:localhost:30004 \
+  "${SOCAT_BIN}" "${SOCAT_CMD[@]}" \ \
     2>&1 | stdbuf -o0 awk '{print "[beastrelay] " $0}'
 fi

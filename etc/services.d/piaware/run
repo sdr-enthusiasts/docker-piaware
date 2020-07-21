@@ -2,15 +2,14 @@
 # shellcheck shell=bash
 set -eo pipefail
 
-PIAWARE_EXTRA_ARGS=""
+PIAWARE_BIN="/usr/bin/piaware"
+PIAWARE_CMD=(-plainlog)
+PIAWARE_CMD+=(-statusfile /run/piaware/status.json)
 
 if [ "$VERBOSE_LOGGING" = "true" ]; then
-  PIAWARE_EXTRA_ARGS+="-debug"
+  PIAWARE_CMD+=(-debug)
 fi
 
 # shellcheck disable=SC2016
-/usr/bin/piaware \
-  -plainlog \
-  "$PIAWARE_EXTRA_ARGS" \
-  -statusfile /run/piaware/status.json \
+"${PIAWARE_BIN}" "${PIAWARE_CMD[@]}" \
   2>&1 | stdbuf -o0 awk '{print "[piaware] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
