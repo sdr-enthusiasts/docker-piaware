@@ -5,6 +5,8 @@
 # into the local dump1090 instance. This allows JSON data to be written, 
 # and SkyAware to function normally.
 
+set -x
+
 SOCAT_BIN="$(which socat)"
 SOCAT_CMD=(-ls)
 
