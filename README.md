@@ -410,6 +410,7 @@ There are a series of available environment variables:
 | `BEASTPORT`          | Optional. TCP port number of Mode-S/BEAST provider (dump1090/readsb). | 30005 |
 | `FEEDER_ID`          | Your FlightAware feeder ID (required) | |
 | `BINGMAPSAPIKEY`     | Optional. Bing Maps API Key. If set, it is configured in `dump1090`'s `config.js`. | |
+| `VERBOSE_LOGGING`    | Optional. Set to `true` for more verbose logs. | |
 
 For an explanation of `piaware-config` variables, see [FlightAware PiAware Advanced Configuration](https://flightaware.com/adsb/piaware/advanced_configuration).
 

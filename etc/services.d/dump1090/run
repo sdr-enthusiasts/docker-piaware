@@ -1,6 +1,8 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+# Depends on beastproxy (only if an external beasthost is used)
+
 # Build the dump1090 command line based on piaware options
 DUMP1090_BIN="/usr/local/bin/dump1090"
 DUMP1090_CMD=(--net)
@@ -11,26 +13,29 @@ DUMP1090_CMD+=(--lat "${LAT}")
 DUMP1090_CMD+=(--lon "${LONG}")
 DUMP1090_CMD+=(--fix)
 
-ALLOW_MODEAC=$(piaware-config -show allow-modeac | tr '[:upper:]' '[:lower:]')
-ALLOW_MLAT=$(piaware-config -show allow-mlat | tr '[:upper:]' '[:lower:]')
+ALLOW_MODEAC="$(piaware-config -show allow-modeac | tr '[:upper:]' '[:lower:]')"
+ALLOW_MLAT="$(piaware-config -show allow-mlat | tr '[:upper:]' '[:lower:]')"
 
 if [ -z "${BEASTHOST}" ]; then
   DUMP1090_CMD+=(--gain "${RTLSDR_GAIN}")
-  RTLSDR_PPM=$(piaware-config -show rtlsdr-ppm)
+  RTLSDR_PPM="$(piaware-config -show rtlsdr-ppm)"
   DUMP1090_CMD+=(--ppm "${RTLSDR_PPM}")
 else
 
   # If an external beast provider is used, then operate in net-only mode.
   # Also, don't provide beast on port 30005 (net-bo-port), as socat will do this.
-  # Also, listen for beast in on ports 30004,30104, so socat an inject beast data.
+  # Also, listen for beast in on ports 30004,30104, so socat can inject beast data.
 
   DUMP1090_CMD+=(--net-only)
   DUMP1090_CMD+=(--net-bo-port 0)
-  DUMP1090_CMD+=(--net-bi-port 30004,30104)
+  DUMP1090_CMD+=(--net-bi-port "30004,30104")
   
 fi
 
-DUMP1090_CMD+=(--stats-every 3600)
+if [ "$VERBOSE_LOGGING" = "true" ]; then
+  DUMP1090_CMD+=(--stats-every 3600)
+fi
+
 DUMP1090_CMD+=(--write-json /run/dump1090-fa)
 DUMP1090_CMD+=(--json-location-accuracy 2)
 
@@ -44,6 +49,6 @@ fi
 
 # Run dump1090 command line
 set -eo pipefail
-exec \
-  "${DUMP1090_BIN}" "${DUMP1090_CMD[@]}" \
+# shellcheck disable=SC2016
+"${DUMP1090_BIN}" "${DUMP1090_CMD[@]}" \
   2>&1 | stdbuf -o0 awk '{print "[dump1090-fa] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'

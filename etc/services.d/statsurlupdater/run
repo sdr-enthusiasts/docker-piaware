@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #shellcheck shell=bash
 
+# Depends on piaware
+
 sleep 10
 
 # Check to see if we've already updated the stats url
@@ -12,8 +14,7 @@ else
     # attempt to update the url
 
     # check to see if our site statistics url has made it to the log yet
-    grep "site statistics URL:" /var/log/piaware/current > /dev/null
-    if [ $? -ne 0 ]; then
+    if grep "site statistics URL:" /var/log/piaware/current > /dev/null; then
         # site statistics url not yet found, exit and try again
         exit 0
     fi
