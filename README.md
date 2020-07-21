@@ -461,6 +461,11 @@ I also have a [Discord channel](https://discord.gg/sTf9uYF), feel free to [join]
 
 ## Changelog
 
+### 20200721
+
+* Improvements to logging. Implement `VERBOSE_LOGGING` environment variable.
+* Linting and tidy up of scripts.
+
 ### 20200603
 
 * Add [`HEALTHCHECK`](https://docs.docker.com/engine/reference/builder/#healthcheck) to `Dockerfile` and healthcheck script.
