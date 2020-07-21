@@ -28,7 +28,7 @@ if [ $EXITCODE -ne 0 ]; then
 fi
 
 # If BINGMAPSAPIKEY is set, modify dump1090's config.js to include it
-if [ ! -z "${BINGMAPSAPIKEY}" ]; then
+if [ -n "${BINGMAPSAPIKEY}" ]; then
   echo "INFO: setting BINGMAPSAPIKEY in /usr/share/dump1090-fa/html/config.js"
   
   sed \

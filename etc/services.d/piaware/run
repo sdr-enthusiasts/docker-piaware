@@ -8,9 +8,9 @@ if [ "$VERBOSE_LOGGING" = "true" ]; then
   PIAWARE_EXTRA_ARGS+="-debug"
 fi
 
-exec \
-    /usr/bin/piaware \
-    -plainlog \
-    "$PIAWARE_EXTRA_ARGS" \
-    -statusfile /run/piaware/status.json \
-    2>&1 | stdbuf -o0 awk '{print "[piaware] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+# shellcheck disable=SC2016
+/usr/bin/piaware \
+  -plainlog \
+  "$PIAWARE_EXTRA_ARGS" \
+  -statusfile /run/piaware/status.json \
+  2>&1 | stdbuf -o0 awk '{print "[piaware] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'

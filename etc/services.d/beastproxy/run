@@ -13,7 +13,7 @@ fi
 if [ -z "${BEASTHOST}" ]; then
   sleep 3600
 else
-  exec \
-    socat "$EXTRA_SOCAT_ARGS" TCP-LISTEN:30005,fork TCP:"${BEASTHOST}:${BEASTPORT}" \
+  # shellcheck disable=SC2016
+  socat "$EXTRA_SOCAT_ARGS" TCP-LISTEN:30005,fork TCP:"${BEASTHOST}:${BEASTPORT}" \
     2>&1 | stdbuf -o0 awk '{print "[beastproxy] " $0}'
 fi
