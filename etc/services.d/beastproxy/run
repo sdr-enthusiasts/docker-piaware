@@ -4,8 +4,6 @@
 # When running with an external beast provider, we map the external beast
 # provider on localhost:30005, to mimic dump1090 doing this.
 
-set -x
-
 SOCAT_BIN="$(which socat)"
 SOCAT_CMD=(-ls)
 
@@ -20,6 +18,6 @@ if [ -z "${BEASTHOST}" ]; then
   sleep 3600
 else
   # shellcheck disable=SC2016
-  "${SOCAT_BIN}" "${SOCAT_CMD[@]}" \ \
+  "${SOCAT_BIN}" "${SOCAT_CMD[@]}" \
     2>&1 | stdbuf -o0 awk '{print "[beastproxy] " $0}'
 fi
