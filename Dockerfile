@@ -228,6 +228,7 @@ RUN set -x && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
+    find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
     echo "========== Testing ==========" && \
     ldconfig && \
     bladeRF-cli --version > /dev/null 2>&1 && \
