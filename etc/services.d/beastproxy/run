@@ -4,11 +4,13 @@
 # When running with an external beast provider, we map the external beast
 # provider on localhost:30005, to mimic dump1090 doing this.
 
+# No dependencies
+
 SOCAT_BIN="$(which socat)"
 SOCAT_CMD=(-ls)
 
 if [ "$VERBOSE_LOGGING" = "true" ]; then
-  SOCAT_CMD+="-d -d"
+  SOCAT_CMD+=("-d -d")
 fi
 
 SOCAT_CMD+=("TCP-LISTEN:30005,fork")

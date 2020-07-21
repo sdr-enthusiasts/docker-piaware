@@ -5,11 +5,13 @@
 # into the local dump1090 instance. This allows JSON data to be written, 
 # and SkyAware to function normally.
 
+# Depends on beastproxy and dump1090
+
 SOCAT_BIN="$(which socat)"
 SOCAT_CMD=(-ls)
 
 if [ "$VERBOSE_LOGGING" = "true" ]; then
-  SOCAT_CMD+="-d -d"
+  SOCAT_CMD+=("-d -d")
 fi
 
 SOCAT_CMD+=("TCP:${BEASTHOST}:${BEASTPORT}")
