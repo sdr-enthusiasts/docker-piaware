@@ -9,6 +9,8 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320" \
     VERBOSE_LOGGING="false"
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Note, the specific commit of rtlsdr is to address issue #15
 # See: https://github.com/mikenye/docker-piaware/issues/15
 # This should be revisited in future when rtlsdr 0.6.1 or newer is released
@@ -63,25 +65,28 @@ RUN set -x && \
     git config --global advice.detachedHead false && \
     echo "========== Install RTL-SDR ==========" && \
     git clone git://git.osmocom.org/rtl-sdr.git /src/rtl-sdr && \
-    cd /src/rtl-sdr && \
-    #export BRANCH_RTLSDR=$(git tag --sort="-creatordate" | head -1) && \
+    pushd /src/rtl-sdr && \
+    #BRANCH_RTLSDR=$(git tag --sort="-creatordate" | head -1) && \
     #git checkout tags/${BRANCH_RTLSDR} && \
     git checkout "${BRANCH_RTLSDR}" && \
     echo "rtl-sdr ${BRANCH_RTLSDR}" >> /VERSIONS && \
     mkdir -p /src/rtl-sdr/build && \
-    cd /src/rtl-sdr/build && \
+    popd && \
+    pushd /src/rtl-sdr/build && \
     cmake ../ -DINSTALL_UDEV_RULES=ON -Wno-dev && \
     make -Wstringop-truncation && \
     make -Wstringop-truncation install && \
     ldconfig && \
+    popd && \
     echo "========== Install bladeRF ==========" && \
     git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
-    cd /src/bladeRF && \
-    export BRANCH_BLADERF=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_BLADERF} && \
+    pushd /src/bladeRF && \
+    BRANCH_BLADERF="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_BLADERF}" && \
     echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
     mkdir /src/bladeRF/host/build && \
-    cd /src/bladeRF/host/build && \
+    popd && \
+    pushd /src/bladeRF/host/build && \
     cmake \
         -DTREAT_WARNINGS_AS_ERRORS=OFF \
         -DCMAKE_BUILD_TYPE=Release \
@@ -90,44 +95,47 @@ RUN set -x && \
     make && \
     make install && \
     ldconfig && \
+    popd && \
     echo "========== Downloading bladeRF FPGA Images ==========" && \
     BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" && \
     mkdir -p "$BLADERF_RBF_PATH" && \
-    curl -o $BLADERF_RBF_PATH/hostedxA4.rbf https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
-    curl -o $BLADERF_RBF_PATH/hostedxA9.rbf https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
-    curl -o $BLADERF_RBF_PATH/hostedx40.rbf https://www.nuand.com/fpga/hostedx40-latest.rbf && \
-    curl -o $BLADERF_RBF_PATH/hostedx115.rbf https://www.nuand.com/fpga/hostedx115-latest.rbf && \
-    curl -o $BLADERF_RBF_PATH/adsbxA4.rbf https://www.nuand.com/fpga/adsbxA4.rbf && \
-    curl -o $BLADERF_RBF_PATH/adsbxA9.rbf https://www.nuand.com/fpga/adsbxA9.rbf && \
-    curl -o $BLADERF_RBF_PATH/adsbx40.rbf https://www.nuand.com/fpga/adsbx40.rbf && \
-    curl -o $BLADERF_RBF_PATH/adsbx115.rbf https://www.nuand.com/fpga/adsbx115.rbf && \
+    curl -o "$BLADERF_RBF_PATH/hostedxA4.rbf" https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
+    curl -o "$BLADERF_RBF_PATH/hostedxA9.rbf" https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
+    curl -o "$BLADERF_RBF_PATH/hostedx40.rbf" https://www.nuand.com/fpga/hostedx40-latest.rbf && \
+    curl -o "$BLADERF_RBF_PATH/hostedx115.rbf" https://www.nuand.com/fpga/hostedx115-latest.rbf && \
+    curl -o "$BLADERF_RBF_PATH/adsbxA4.rbf" https://www.nuand.com/fpga/adsbxA4.rbf && \
+    curl -o "$BLADERF_RBF_PATH/adsbxA9.rbf" https://www.nuand.com/fpga/adsbxA9.rbf && \
+    curl -o "$BLADERF_RBF_PATH/adsbx40.rbf" https://www.nuand.com/fpga/adsbx40.rbf && \
+    curl -o "$BLADERF_RBF_PATH/adsbx115.rbf" https://www.nuand.com/fpga/adsbx115.rbf && \
     echo "========== Install tcllauncher ==========" && \
     git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
-    cd /src/tcllauncher && \
-    export BRANCH_TCLLAUNCHER=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_TCLLAUNCHER} && \
+    pushd /src/tcllauncher && \
+    BRANCH_TCLLAUNCHER="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_TCLLAUNCHER}" && \
     echo "tcllauncher ${BRANCH_TCLLAUNCHER}" >> /VERSIONS && \
     autoconf && \
     ./configure --prefix=/opt/tcl && \
     make && \
     make install && \
     ldconfig && \
+    popd && \
     echo "========== Install tcllib ==========" && \
     git clone https://github.com/tcltk/tcllib.git /src/tcllib && \
-    cd /src/tcllib && \
-    export BRANCH_TCLLIB=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_TCLLIB} && \
+    pushd /src/tcllib && \
+    BRANCH_TCLLIB="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_TCLLIB}" && \
     echo "tcllib ${BRANCH_TCLLIB}" >> /VERSIONS && \
     autoconf && \
     ./configure && \
     make && \
     make install && \
     ldconfig && \
+    popd && \
     echo "========== Install piaware ==========" && \
     git clone https://github.com/flightaware/piaware.git /src/piaware && \
-    cd /src/piaware && \
-    export BRANCH_PIAWARE=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_PIAWARE} && \
+    pushd /src/piaware && \
+    BRANCH_PIAWARE="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_PIAWARE}" && \
     echo "piaware ${BRANCH_PIAWARE}" >> /VERSIONS && \
     make && \
     make install && \
@@ -135,11 +143,12 @@ RUN set -x && \
     touch /etc/piaware.conf && \
     mkdir -p /run/piaware && \
     ldconfig && \
+    popd && \
     echo "========== Install dump1090 ==========" && \
     git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
-    cd /src/dump1090 && \
-    export BRANCH_DUMP1090=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_DUMP1090} && \
+    pushd /src/dump1090 && \
+    BRANCH_DUMP1090="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_DUMP1090}" && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
     make all && \
     make faup1090 && \
@@ -149,34 +158,39 @@ RUN set -x && \
     mkdir -p /usr/share/dump1090-fa/html && \
     cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
     ldconfig && \
+    popd && \
     echo "========== Install mlat-client ==========" && \
     git clone https://github.com/mutability/mlat-client.git /src/mlat-client && \
-    cd /src/mlat-client && \
-    export BRANCH_MLATCLIENT=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_MLATCLIENT} && \
+    pushd /src/mlat-client && \
+    BRANCH_MLATCLIENT="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_MLATCLIENT}" && \
     echo "mlat-client ${BRANCH_MLATCLIENT}" >> /VERSIONS && \
     ./setup.py install && \
     ln -s /usr/local/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
     ldconfig && \
+    popd && \
     echo "========== Install SoapySDR ==========" && \
     git clone https://github.com/pothosware/SoapySDR.git /src/SoapySDR && \
-    cd /src/SoapySDR && \
-    export BRANCH_SOAPYSDR=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_SOAPYSDR} && \
+    pushd /src/SoapySDR && \
+    BRANCH_SOAPYSDR="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_SOAPYSDR}" && \
     echo "SoapySDR ${BRANCH_SOAPYSDR}" >> /VERSIONS && \
     mkdir -p /src/SoapySDR/build && \
-    cd /src/SoapySDR/build && \
+    popd && \
+    pushd /src/SoapySDR/build && \
     cmake -Wno-dev .. && \
     make && \
     make install && \
     ldconfig && \
+    popd && \
     echo "========== Install dump978 ==========" && \
     git clone https://github.com/flightaware/dump978.git /src/dump978 && \
-    cd /src/dump978 && \
-    export BRANCH_DUMP978=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout ${BRANCH_DUMP978} && \
+    pushd /src/dump978 && \
+    BRANCH_DUMP978="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_DUMP978}" && \
     echo "dump978 ${BRANCH_DUMP978}" >> /VERSIONS && \
-    cd /src/dump978 && \
+    popd && \
+    pushd /src/dump978 && \
     make all && \
     make faup978 && \
     cp -v dump978-fa skyaware978 /usr/local/bin/ && \
@@ -184,8 +198,9 @@ RUN set -x && \
     mkdir -p /usr/share/dump978-fa/html && \
     cp -a /src/dump978/skyaware/* /usr/share/dump978-fa/html/ && \
     ldconfig && \
+    popd && \
     echo "========== Install s6-overlay ==========" && \
-    wget -q -O - https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
+    curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
     echo "========== Clean up build environment ==========" && \
     apt-get remove -y \
         autoconf \
@@ -231,8 +246,3 @@ EXPOSE 30104/tcp 8080/tcp 30001/tcp 30002/tcp 30003/tcp 30004/tcp 30005/tcp
 ENTRYPOINT [ "/init" ]
 
 HEALTHCHECK --start-period=30s CMD /healthcheck.py
-
-# dump978 modifications to Makefile - not needed
-#cp -v /src/dump978/Makefile /src/dump978/Makefile.original && \
-#sed -i 's/CXXFLAGS+=-std=c++11 -Wall -Wno-psabi -Werror -O2 -g -Ilibs/CXXFLAGS+=-std=c++11 -Wall -Wno-psabi -Wno-error -O2 -g -Ilibs/' /src/dump978/Makefile && \
-#sed -i 's/CFLAGS+=-Wall -Werror -O2 -g -Ilibs/CFLAGS+=-Wall -Wno-error -O2 -g -Ilibs/' /src/dump978/Makefile && \
