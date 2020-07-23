@@ -246,4 +246,4 @@ EXPOSE 30104/tcp 8080/tcp 30001/tcp 30002/tcp 30003/tcp 30004/tcp 30005/tcp
 
 ENTRYPOINT [ "/init" ]
 
-# HEALTHCHECK --start-period=30s --interval=300s CMD /healthcheck.sh
+HEALTHCHECK --start-period=300s --interval=300s CMD /healthcheck.sh
