@@ -9,17 +9,22 @@ STR_UNHEALTHY="UNHEALTHY"
 EXITCODE=0
 
 function check_service_deathtally () {
-    local service_name=${1}
+    local service_name
+    service_name=${1}
 
     # build service path
-    local service_path="${S6_SERVICE_ROOT%/}/${service_name}"
+    local service_path
+    service_path="${S6_SERVICE_ROOT%/}/${service_name}"
 
     # ensure service path exists
     if [[ -d "$service_path" ]]; then
 
-        # get service death tally & clear death tally
-        local service_deathtally=$(s6-svdt "${service_path}" | wc -l)
-        local service_deathtally_clear=$(s6-svdt-clear "${service_path}")
+        # get service death tally since last check
+        local service_deathtally
+        service_deathtally=$(s6-svdt "${service_path}" | wc -l)
+
+        # clear death tally
+        s6-svdt-clear "${service_path}"
 
         # print the first part of the text
         echo -n "\"${service_name}\" death tally since last check: ${service_deathtally}"
