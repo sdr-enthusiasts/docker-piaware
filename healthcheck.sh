@@ -50,6 +50,29 @@ check_service_deathtally 'dump1090'
 check_service_deathtally 'piaware'
 check_service_deathtally 'skyaware'
 
+# run piaware-status and store output
+PIAWARE_STATUS=$(piaware-status)
+
+# tests on piaware-status output
+if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "PiAware master process (piaware) is running")" -lt 1 ]]; then
+    echo "piaware-status reports: PiAware master process (piaware) is NOT running: $STR_UNHEALTHY"
+    EXITCODE=1
+else
+    echo "piaware-status reports: PiAware master process (piaware) is running: $STR_HEALTHY"
+fi
+if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "dump1090 is NOT producing data on")" -gt 0 ]]; then
+    echo "piaware-status reports: dump1090 is NOT producing data: $STR_UNHEALTHY"
+    EXITCODE=1
+else
+    echo "piaware-status reports: dump1090 is producing data: $STR_HEALTHY"
+fi
+if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "piaware is connected to FlightAware")" -lt 1 ]]; then
+    echo "piaware is NOT conneceted to FlightAware: $STR_UNHEALTHY"
+    EXITCODE=1
+else
+    echo "piaware is conneceted to FlightAware: $STR_HEALTHY"
+fi
+
 # ensure we're sending data to FA
 DATETIME_NOW=$(date +%s)
 # find last log entry reporting messages sent to FA
@@ -85,29 +108,6 @@ else
             echo " $STR_HEALTHY"
         fi
     fi
-fi
-
-# run piaware-status and store output
-PIAWARE_STATUS=$(piaware-status)
-
-# tests on piaware-status output
-if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "PiAware master process (piaware) is running")" -lt 1 ]]; then
-    echo "piaware-status reports: PiAware master process (piaware) is NOT running: $STR_UNHEALTHY"
-    EXITCODE=1
-else
-    echo "piaware-status reports: PiAware master process (piaware) is running: $STR_HEALTHY"
-fi
-if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "dump1090 is NOT producing data on")" -gt 0 ]]; then
-    echo "piaware-status reports: dump1090 is NOT producing data: $STR_UNHEALTHY"
-    EXITCODE=1
-else
-    echo "piaware-status reports: dump1090 is producing data: $STR_HEALTHY"
-fi
-if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "piaware is connected to FlightAware")" -lt 1 ]]; then
-    echo "piaware is NOT conneceted to FlightAware: $STR_UNHEALTHY"
-    EXITCODE=1
-else
-    echo "piaware is conneceted to FlightAware: $STR_HEALTHY"
 fi
 
 exit "$EXITCODE"
