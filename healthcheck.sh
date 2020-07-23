@@ -64,25 +64,26 @@ if [[ -z "$LOG_MSGS_SENT_LATEST_DATETIME" ]]; then
     echo "Cannot determine date/time of last log entry of msgs sent to FlightAware: $STR_UNHEALTHY"
     EXITCODE=1
 fi
-# get number of messages in last 5 min
-LOG_MSGS_SENT_LATEST_NUM=$(echo "$LOG_MSGS_SENT_LATEST" | grep -oP '\(\d+ in last 5m\)' | cut -d '(' -f 2 | cut -d ' ' -f 1 | tr -d ' ')
-if [[ -z "$LOG_MSGS_SENT_LATEST_NUM" ]]; then
-    echo "Cannot determine number of messages sent to FlightAware in last 5m: $STR_UNHEALTHY"
-    EXITCODE=1
-fi
 # make sure last entry is less than 5 minutes old (plus extra minute grace period)
 TIMEDELTA=$((DATETIME_NOW - LOG_MSGS_SENT_LATEST_DATETIME))
 if [[ "$TIMEDELTA" -gt 360 ]]; then
     echo "Logs indicate no msgs sent to FlightAware in past 5 minutes: $STR_UNHEALTHY"
     EXITCODE=1
 else
-    echo -n "Logs indicate $LOG_MSGS_SENT_LATEST_NUM msgs sent to FlightAware in past 5 minutes:"
-    # make sure LOG_MSGS_SENT_LATEST_NUM is positive
-    if [[ "$LOG_MSGS_SENT_LATEST_NUM" -lt 1 ]]; then
-        echo " $STR_UNHEALTHY"
+    # get number of messages in last 5 min
+    LOG_MSGS_SENT_LATEST_NUM=$(echo "$LOG_MSGS_SENT_LATEST" | grep -oP '\(\d+ in last 5m\)' | cut -d '(' -f 2 | cut -d ' ' -f 1 | tr -d ' ')
+    if [[ -z "$LOG_MSGS_SENT_LATEST_NUM" ]]; then
+        echo "Cannot determine number of messages sent to FlightAware in last 5m: $STR_UNHEALTHY"
         EXITCODE=1
     else
-        echo " $STR_HEALTHY"
+        echo -n "Logs indicate $LOG_MSGS_SENT_LATEST_NUM msgs sent to FlightAware in past 5 minutes:"
+        # make sure LOG_MSGS_SENT_LATEST_NUM is positive
+        if [[ "$LOG_MSGS_SENT_LATEST_NUM" -lt 1 ]]; then
+            echo " $STR_UNHEALTHY"
+            EXITCODE=1
+        else
+            echo " $STR_HEALTHY"
+        fi
     fi
 fi
 
