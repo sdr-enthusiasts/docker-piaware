@@ -44,11 +44,11 @@ function check_service_deathtally () {
 set -o pipefail
 
 # check service death tallys
-check_service_deathtally('beastproxy')
-check_service_deathtally('beastrelay')
-check_service_deathtally('dump1090')
-check_service_deathtally('piaware')
-check_service_deathtally('skyaware')
+check_service_deathtally 'beastproxy'
+check_service_deathtally 'beastrelay'
+check_service_deathtally 'dump1090'
+check_service_deathtally 'piaware'
+check_service_deathtally 'skyaware'
 
 # ensure we're sending data to FA
 DATETIME_NOW=$(date +%s)
