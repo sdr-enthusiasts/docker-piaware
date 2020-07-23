@@ -240,10 +240,10 @@ RUN set -x && \
     echo "========== Done! =========="
 
 COPY etc/ /etc/
-COPY healthcheck.py /healthcheck.py
+COPY healthcheck.sh /healthcheck.sh
 
 EXPOSE 30104/tcp 8080/tcp 30001/tcp 30002/tcp 30003/tcp 30004/tcp 30005/tcp
 
 ENTRYPOINT [ "/init" ]
 
-HEALTHCHECK --start-period=30s CMD /healthcheck.py
+# HEALTHCHECK --start-period=30s --interval=300s CMD /healthcheck.sh
