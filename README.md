@@ -13,6 +13,7 @@ For more information on what PiAware is, see here: [FlightAware - PiAware](https
 * `latest` should always contain the latest released versions of `rtl-sdr`, `bladeRF`, `tcllauncher`, `tcllib`, `piaware`, `dump1090`, `mlat-client`, `SoapySDR` and `dump978`. This image is built nightly from the [`master` branch](https://github.com/mikenye/docker-piaware/tree/master) [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile) for all supported architectures.
 * `development` ([`dev` branch](https://github.com/mikenye/docker-piaware/tree/master), [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile), `amd64` architecture only, built on commit, not recommended for production)
 * Specific version and architecture tags are available if required, however these are not regularly updated. It is generally recommended to run `latest`.
+* There are also `latest` and version-specific tags appended with `_nohealthcheck` where the container healthchecks have been excluded from the image build. See [issue #43](https://github.com/mikenye/docker-piaware/issues/43).
 
 ### Tags & Versions
 
