@@ -9,7 +9,7 @@ export DOCKER_CLI_EXPERIMENTAL="enabled"
 docker buildx use homecluster
 
 # Build & push latest
-docker buildx build -t ${REPO}/${IMAGE}:latest --compress --push --platform "${PLATFORMS}" .
+docker buildx build -t ${REPO}/${IMAGE}:latest --no-cache --compress --push --platform "${PLATFORMS}" .
 
 # Get piaware version from latest
 docker pull ${REPO}/${IMAGE}:latest
