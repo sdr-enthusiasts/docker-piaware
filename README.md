@@ -403,6 +403,7 @@ There are a series of available environment variables:
 | `LAT`                | Antenna's latitude (required)   |         |
 | `LONG`               | Antenna's longitude (required)  |         |
 | `TZ`                 | Your local timezone (optional)  | GMT     |
+| `DUMP1090_DEVICE`    | Select RTL-SDR device by index or serial number (optional)  | |
 | `ALLOW_MLAT`         | Used for setting `piaware-config` variable `allow-mlat` (optional) | yes |
 | `ALLOW_MODEAC`       | Used for setting `piaware-config` variable `allow-modeac` (optional) | yes |
 | `RTLSDR_PPM`         | Used for setting `piaware-config` variable `rtlsdr-ppm` (optional) | 0 |
