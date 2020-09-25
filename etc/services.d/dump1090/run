@@ -16,6 +16,11 @@ DUMP1090_CMD+=(--fix)
 ALLOW_MODEAC="$(piaware-config -show allow-modeac | tr '[:upper:]' '[:lower:]')"
 ALLOW_MLAT="$(piaware-config -show allow-mlat | tr '[:upper:]' '[:lower:]')"
 
+# Allow selection of RTLSDR device by serial number or index value
+if [ -n "${DUMP1090_DEVICE}" ]; then
+  DUMP1090_CMD+=(--device "${DUMP1090_DEVICE}")
+fi
+
 if [ -z "${BEASTHOST}" ]; then
   DUMP1090_CMD+=(--gain "${RTLSDR_GAIN}")
   RTLSDR_PPM="$(piaware-config -show rtlsdr-ppm)"
