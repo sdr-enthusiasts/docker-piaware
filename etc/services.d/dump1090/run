@@ -23,8 +23,9 @@ fi
 
 if [ -z "${BEASTHOST}" ]; then
   DUMP1090_CMD+=(--gain "${RTLSDR_GAIN}")
-  RTLSDR_PPM="$(piaware-config -show rtlsdr-ppm)"
-  DUMP1090_CMD+=(--ppm "${RTLSDR_PPM}")
+  if [[ -n "$RTLSDR_PPM" ]]; then
+    DUMP1090_CMD+=(--ppm "${RTLSDR_PPM}")
+  fi
 else
 
   # If an external beast provider is used, then operate in net-only mode.
