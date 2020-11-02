@@ -144,6 +144,9 @@ RUN set -x && \
     mkdir -p /run/piaware && \
     ldconfig && \
     popd && \
+    echo "========== Install piaware-web ==========" && \
+    git clone https://github.com/flightaware/piaware-web.git /src/piaware-web && \
+    cp -Rv /src/piaware-web/web/. /var/www/html/ && \
     echo "========== Install dump1090 ==========" && \
     git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
     pushd /src/dump1090 && \
