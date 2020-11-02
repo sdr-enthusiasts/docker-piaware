@@ -141,7 +141,7 @@ docker run \
  -e TZ="YOUR_TIMEZONE" \
  -e LAT=LATITUDE_OF_YOUR_ANTENNA \
  -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
- -p 8080:8080 \
+ -p 8080:80 \
  mikenye/piaware
 ```
 
@@ -156,7 +156,7 @@ docker run \
  -e TZ="Australia/Perth" \
  -e LAT=-33.33333 \
  -e LONG=111.11111 \
- -p 8080:8080 \
+ -p 8080:80 \
  mikenye/piaware
 ```
 
@@ -186,7 +186,7 @@ docker run \
  -e LAT=-33.33333 \
  -e LONG=111.11111 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
- -p 8080:8080 \
+ -p 8080:80 \
  mikenye/piaware
 ```
 
@@ -216,7 +216,7 @@ services:
     devices:
       - /dev/bus/usb/001/004:/dev/bus/usb/001/004
     ports:
-      - 8080:8080
+      - 8080:80
       - 30003:30003
       - 30005:30005
     environment:
@@ -254,7 +254,7 @@ services:
     devices:
       - /dev/bus/usb/001/004:/dev/bus/usb/001/004
     ports:
-      - 8080:8080
+      - 8080:80
       - 30003:30003
       - 30005:30005
     environment:
@@ -409,7 +409,8 @@ For an explanation of `piaware-config` variables, see [FlightAware PiAware Advan
 
 The following ports are used by this container:
 
-* `8080` - dump1090 web interface (PiAware Skyview) - optional but recommended so you can look at the pretty maps and watch the planes fly around.
+* `80` - PiAware Status page and dump1090 web interface (Skyaware) - optional but recommended so you can check status and and watch the planes fly around.
+* `8080` - dump1090 web interface (Skyaware) only. If you just want the map, you can use this instead of port `80`.
 * `30001` - dump1090 TCP raw input listen port - optional, recommended to leave unmapped unless explicitly needed
 * `30002` - dump1090 TCP raw output listen port - optional, recommended to leave unmapped unless explicitly needed
 * `30003` - dump1090 TCP BaseStation output listen port - optional, recommended to leave unmapped unless explicitly needed
