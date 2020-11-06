@@ -3,6 +3,7 @@
 
 # Remove existing piaware config
 rm /etc/piaware.conf > /dev/null 2>&1 || true
+touch /etc/piaware.conf
 
 # Check to make sure the correct command line arguments have been set
 EXITCODE=0
