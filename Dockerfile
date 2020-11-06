@@ -3,6 +3,7 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320" \
     VERBOSE_LOGGING="false" \
     BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" \
+    URL_REPO_BEASTSPLITTER="https://github.com/flightaware/beast-splitter.git" \
     URL_REPO_BLADERF="https://github.com/Nuand/bladeRF.git" \
     URL_REPO_DUMP978="https://github.com/flightaware/dump978.git" \
     URL_REPO_DUMP1090="https://github.com/flightaware/dump1090.git" \
@@ -75,6 +76,7 @@ RUN set -x && \
     KEPT_PACKAGES+=(itcl3) && \
     KEPT_PACKAGES+=(tcllib) && \
     KEPT_PACKAGES+=(net-tools) && \
+    KEPT_PACKAGES+=(procps) && \
     # Install packages.
     apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -239,6 +241,15 @@ RUN set -x && \
     ln -s /usr/local/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
     ldconfig && \
     popd && \
+    # Build & install beast-splitter
+    git clone "${URL_REPO_BEASTSPLITTER}" "/src/beast-splitter" && \
+    pushd "/src/beast-splitter" && \
+    BRANCH_BEASTSPLITTER="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_BEASTSPLITTER}" && \
+    echo "beast-splitter ${BRANCH_BEASTSPLITTER}" >> /VERSIONS && \
+    make && \
+    cp -v ./beast-splitter /usr/local/bin/ && \
+    popd && \
     # Deploy s6-overlay.
     curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
     # Clean up
@@ -265,4 +276,4 @@ EXPOSE 30104/tcp 8080/tcp 30001/tcp 30002/tcp 30003/tcp 30004/tcp 30005/tcp
 
 ENTRYPOINT [ "/init" ]
 
-HEALTHCHECK --start-period=300s --interval=300s CMD /scripts/healthcheck.sh
+#HEALTHCHECK --start-period=300s --interval=300s CMD /scripts/healthcheck.sh
