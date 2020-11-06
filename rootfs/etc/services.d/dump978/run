@@ -7,6 +7,14 @@ if [[ -n "$UAT_RECEIVER_HOST" ]]; then
   exit 0
 fi
 
+# Don't continue if UAT_RECEIVER_TYPE is none | relay
+case "$UAT_RECEIVER_TYPE" in
+  none | relay)
+    sleep 86400
+    exit 0
+  ;;
+esac
+
 # Set readsb binary
 DUMP978_BIN="/usr/local/bin/dump978-fa"
 
