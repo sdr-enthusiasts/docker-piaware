@@ -71,6 +71,17 @@ if [[ -n "$RADARCAPE_HOST" ]]; then
   piaware-config radarcape-host "$RADARCAPE_HOST"
 fi
 
+# If a UAT_RECEIVER_HOST is specified
+if [[ -n "$UAT_RECEIVER_HOST" ]]; then
+  piaware-config uat-receiver-type "sdr"
+  piaware-config uat-receiver-host "$UAT_RECEIVER_HOST"
+  piaware-config receiver-port "${UAT_RECEIVER_PORT:-30978}"
+
+elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
+  piaware-config uat-receiver-type "sdr"
+
+fi
+
 # Create log dir for piaware
 mkdir -p /var/log/piaware
 chown nobody:nogroup /var/log/piaware
