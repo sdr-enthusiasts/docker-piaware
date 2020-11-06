@@ -1,21 +1,29 @@
-#!/usr/bin/with-contenv sh
-# shellcheck shell=sh
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+# Remove existing piaware config
+rm /etc/piaware.conf > /dev/null 2>&1 || true
 
 # Check to make sure the correct command line arguments have been set
 EXITCODE=0
-if [ -z "${LAT}" ]; then
-  echo "ERROR: LAT environment variable not set"
-  EXITCODE=1
-fi
-if [ -z "${LONG}" ]; then
-  echo "ERROR: LONG environment variable not set"
-  EXITCODE=1
-fi
-if [ -n "${USERNAME+x}" ]; then
+if [[ -n "${USERNAME}" ]]; then
   echo "WARNING: USERNAME environment variable is DEPRECATED and does nothing"
 fi
-if [ -n "${PASSWORD+x}" ]; then
+if [[ -n "${PASSWORD}" ]]; then
   echo "WARNING: PASSWORD environment variable is DEPRECATED and does nothing"
+fi
+if [[ -n "${LAT}" ]]; then
+  echo "WARNING: LAT environment variable is DEPRECATED and does nothing. Latitude is pulled from your FlightAware site configuration."
+fi
+if [[ -n "${LONG}" ]]; then
+  echo "WARNING: LONG environment variable is DEPRECATED and does nothing. Longitude is pulled from your FlightAware site configuration."
+fi
+if [[ -n "${DUMP1090_DEVICE}" ]]; then
+  echo "WARNING: DUMP1090_DEVICE environment variable is DEPRECATED, use RECEIVER_TYPE/RTLSDR_DEVICE_INDEX instead"
+  set -x
+  RTLSDR_DEVICE_INDEX="$DUMP1090_DEVICE"
+  RECEIVER_TYPE="rtlsdr"
+  set +x
 fi
 if [ -z "${FEEDER_ID}" ]; then
   echo "INFO: no specific FEEDER_ID set, falling back to dynamic generated (/var/cache/piaware)"
@@ -46,13 +54,30 @@ else
 fi
 
 # Set up piaware
-piaware-config allow-mlat "${ALLOW_MLAT}"
-piaware-config allow-modeac "${ALLOW_MODEAC}"
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
+piaware-config allow-mlat "${ALLOW_MLAT:-yes}"
+piaware-config allow-modeac "${ALLOW_MODEAC:-yes}"
+piaware-config mlat-results "${MLAT_RESULTS:-yes}"
+piaware-config receiver-type "${RECEIVER_TYPE:-rtlsdr}"
+piaware-config rtlsdr-ppm "${RTLSDR_PPM:-0}"
+piaware-config rtlsdr-gain "${RTLSDR_GAIN:-max}"
+piaware-config rtlsdr-device-index "${RTLSDR_DEVICE_INDEX:-0}"
+
+if [[ -n "$BEASTHOST" ]]; then
+  piaware-config receiver-type "relay"
+  piaware-config receiver-host "$BEASTHOST"
+  piaware-config receiver-port "${BEASTPORT:-30005}"
+else
+  piaware-config receiver-type "${RECEIVER_TYPE:-rtlsdr}"
+fi
+
+if [[ -n "$RADARCAPE_HOST" ]]; then
+  piaware-config receiver-type "radarcape"
+  piaware-config radarcape-host "$RADARCAPE_HOST"
+fi
+
 
 # Create log dir for piaware
 mkdir -p /var/log/piaware
 chown nobody:nogroup /var/log/piaware
-mkdir -p /var/log/beastrelay
-chown nobody:nogroup /var/log/beastrelay

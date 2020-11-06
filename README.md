@@ -383,27 +383,60 @@ services:
 
 ... and issue a `docker-compose up -d` to re-create the container.
 
-## Runtime Environment Variables
+## Environment Variables
 
-There are a series of available environment variables:
+For an explanation of `piaware-config` variables, see [FlightAware PiAware Advanced Configuration](https://flightaware.com/adsb/piaware/advanced_configuration).
+
+### General
 
 | Environment Variable | Purpose                         | Default |
 | -------------------- | ------------------------------- | ------- |
-| `LAT`                | Antenna's latitude (required)   |         |
-| `LONG`               | Antenna's longitude (required)  |         |
-| `TZ`                 | Your local timezone (optional)  | GMT     |
-| `DUMP1090_DEVICE`    | Select RTL-SDR device by index or serial number (optional)  | |
-| `ALLOW_MLAT`         | Used for setting `piaware-config` variable `allow-mlat` (optional) | yes |
-| `ALLOW_MODEAC`       | Used for setting `piaware-config` variable `allow-modeac` (optional) | yes |
-| `RTLSDR_PPM`         | Used for setting `piaware-config` variable `rtlsdr-ppm` (optional) | 0 |
-| `RTLSDR_GAIN`        | Optimizing gain (optional) -- See [FlightAware -- Optimizing Gain](https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2) | -10 (max)|
-| `BEASTHOST`          | Optional. IP/Hostname of a Mode-S/BEAST provider (dump1090/readsb). If given, no USB device needs to be passed through to the container. | |
-| `BEASTPORT`          | Optional. TCP port number of Mode-S/BEAST provider (dump1090/readsb). | 30005 |
+| `TZ` | Local timezone in ["TZ database name" format](<https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>). | `UTC` |
 | `FEEDER_ID`          | Your FlightAware feeder ID (required) | |
 | `BINGMAPSAPIKEY`     | Optional. Bing Maps API Key. If set, it is configured in `dump1090`'s `config.js`. | |
 | `VERBOSE_LOGGING`    | Optional. Set to `true` for more verbose logs. | |
 
-For an explanation of `piaware-config` variables, see [FlightAware PiAware Advanced Configuration](https://flightaware.com/adsb/piaware/advanced_configuration).
+### Multilateration
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `ALLOW_MLAT` | `yes` or `no` | If `yes`, multilateration is enabled (also requires that receiver location is set on the FlightAware My ADS-B stats page) | `yes` |
+| `MLAT_RESULTS` | `yes` or `no` | If `yes`, multilateration results are returned to PiAware from FlightAware | `yes` |
+
+### Receiver Configuration (1090MHz)
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `RECEIVER_TYPE` | `rtlsdr`, `beast`, `radarcape`, `relay` | Configures how PiAware attempts to talk to the ADS-B receiver | `rtlsdr` |
+| `ALLOW_MODEAC` | `yes` or `no` | If `yes`, piaware and dump1090-fa will enable Mode A/C decoding if a client requests it.
+Mode A/C decoding requires additional CPU when enabled. | `yes` |
+
+### RTL-SDR Configuration (1090MHz)
+
+Use only with `RECEIVER_TYPE=rtlsdr`.
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `RTLSDR_PPM`   | a frequency correction in PPM | Configures the dongle PPM correction | `0` |
+| `RTLSDR_GAIN`  | `max` or a numeric gain level | Optimizing gain (optional) -- See [FlightAware -- Optimizing Gain](https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2) | `max` |
+| `RTLSDR_DEVICE_INDEX` | rtlsdr device serial number | Configures which dongle to use for 1090MHz reception if there is more than one connected | first device |
+
+### Relay Configuration (1090MHz)
+
+Use only with `RECEIVER_TYPE=relay`.
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `BEASTHOST` | a hostname or IP | Specify an external BEAST protocol provider (dump1090/readsb/etc). | |
+| `BEASTPORT` | a port number | Specify the TCP port number of the external BEAST protocol provider. | `30005` |
+
+### Radarcape Configuration (1090MHz)
+
+Use only with `RECEIVER_TYPE=radarcape`.
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `RADARCAPE_HOST` | a hostname or IP | Specify an external radarcape device. | |
 
 ## Ports
 
