@@ -37,6 +37,8 @@ RUN set -x && \
     # s6-overlay dependencies
     TEMP_PACKAGES+=(gnupg2) && \
     TEMP_PACKAGES+=(file) && \
+    # logging
+    KEPT_PACKAGES+=(gawk) && \
     # libusb (for rtl-sdr, SoapySDR)
     TEMP_PACKAGES+=(libusb-1.0-0-dev) && \
     KEPT_PACKAGES+=(libusb-1.0-0) && \
