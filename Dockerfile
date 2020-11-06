@@ -273,7 +273,7 @@ RUN set -x && \
 
 COPY rootfs/ /
 
-EXPOSE 30104/tcp 8080/tcp 30001/tcp 30002/tcp 30003/tcp 30004/tcp 30005/tcp
+EXPOSE 80/tcp 30003/tcp 30005/tcp 30105/tcp 30978/tcp 30979/tcp
 
 ENTRYPOINT [ "/init" ]
 
