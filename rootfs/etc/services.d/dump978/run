@@ -8,7 +8,7 @@ if [[ -n "$UAT_RECEIVER_HOST" ]]; then
 fi
 
 # Don't continue if UAT_RECEIVER_TYPE is none | relay
-case "$UAT_RECEIVER_TYPE" in
+case "${UAT_RECEIVER_TYPE:-none}" in
   none | relay)
     sleep 86400
     exit 0
