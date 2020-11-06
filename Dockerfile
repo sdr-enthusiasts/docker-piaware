@@ -55,8 +55,8 @@ RUN set -x && \
     TEMP_PACKAGES+=(libboost-filesystem1.67-dev) && \
     KEPT_PACKAGES+=(libboost-filesystem1.67.0) && \
     # dump1090 dependencies
-    KEPT_PACKAGES+=(libncurses5) && \
-    TEMP_PACKAGES+=(libncurses5-dev) && \
+    KEPT_PACKAGES+=(libncurses6) && \
+    TEMP_PACKAGES+=(libncurses6-dev) && \
     # tcllauncher dependencies
     KEPT_PACKAGES+=(tcl) && \
     TEMP_PACKAGES+=(tcl-dev) && \
