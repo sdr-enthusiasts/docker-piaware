@@ -8,7 +8,7 @@ if [[ -z "$UAT_RECEIVER_HOST" ]]; then
   exit 0
 fi
 
-socat -dd TCP-LISTEN:30978,fork TCP:"$UAT_RECEIVER_HOST":"${UAT_RECEIVER_PORT:-30978}" |
+socat -d -d TCP-LISTEN:30978,fork TCP:"$UAT_RECEIVER_HOST":"${UAT_RECEIVER_PORT:-30978}" |
  2>&1 | stdbuf -o0 awk '{print "[978raw-splitter] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
 
 sleep 5
