@@ -75,7 +75,7 @@ fi
 if [[ -n "$UAT_RECEIVER_HOST" ]]; then
   piaware-config uat-receiver-type "sdr"
   piaware-config uat-receiver-host "$UAT_RECEIVER_HOST"
-  piaware-config receiver-port "${UAT_RECEIVER_PORT:-30978}"
+  piaware-config uat-receiver-port "${UAT_RECEIVER_PORT:-30978}"
 
 elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
   piaware-config uat-receiver-type "sdr"
