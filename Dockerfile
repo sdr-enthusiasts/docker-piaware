@@ -77,6 +77,7 @@ RUN set -x && \
     KEPT_PACKAGES+=(tcllib) && \
     KEPT_PACKAGES+=(net-tools) && \
     KEPT_PACKAGES+=(procps) && \
+    KEPT_PACKAGES+=(socat) && \
     # Install packages.
     apt-get update && \
     apt-get install -y --no-install-recommends \
