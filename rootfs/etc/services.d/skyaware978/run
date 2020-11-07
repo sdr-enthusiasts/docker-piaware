@@ -1,19 +1,19 @@
 #!/usr/bin/with-contenv bash
 #shellcheck shell=bash
 
-# Don't continue if UAT_RECEIVER_HOST is set
-if [[ -n "$UAT_RECEIVER_HOST" ]]; then
+# Don't continue if UAT_RECEIVER_HOST is not set
+if [[ -z "$UAT_RECEIVER_HOST" ]]; then
   sleep 86400
   exit 0
+else
+  # Don't continue if UAT_RECEIVER_TYPE is none | relay
+  case "${UAT_RECEIVER_TYPE:-none}" in
+    none)
+      sleep 86400
+      exit 0
+    ;;
+  esac
 fi
-
-# Don't continue if UAT_RECEIVER_TYPE is none | relay
-case "${UAT_RECEIVER_TYPE:-none}" in
-  none | relay)
-    sleep 86400
-    exit 0
-  ;;
-esac
 
 set -eo pipefail
 
