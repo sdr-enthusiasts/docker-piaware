@@ -1,13 +1,23 @@
 FROM debian:stable-slim
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
-    DUMP1090_MAX_RANGE=400 \
-    ALLOW_MODEAC=yes \
-    ALLOW_MLAT=yes \
-    RTLSDR_GAIN=-10 \
-    RTLSDR_PPM=0 \
-    BEASTPORT=30005 \
     BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320" \
-    VERBOSE_LOGGING="false"
+    VERBOSE_LOGGING="false" \
+    BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" \
+    URL_REPO_BEASTSPLITTER="https://github.com/flightaware/beast-splitter.git" \
+    URL_REPO_BLADERF="https://github.com/Nuand/bladeRF.git" \
+    URL_REPO_DUMP978="https://github.com/flightaware/dump978.git" \
+    URL_REPO_DUMP1090="https://github.com/flightaware/dump1090.git" \
+    URL_REPO_FFTW="https://github.com/FFTW/fftw3.git" \
+    URL_REPO_HACKRF="https://github.com/mossmann/hackrf.git" \
+    URL_REPO_LIMESUITE="https://github.com/myriadrf/LimeSuite.git" \
+    URL_REPO_MLATCLIENT="https://github.com/mutability/mlat-client.git" \
+    URL_REPO_PIAWARE="https://github.com/flightaware/piaware.git" \
+    URL_REPO_PIAWARE_WEB="https://github.com/flightaware/piaware-web.git" \
+    URL_REPO_RTLSDR="git://git.osmocom.org/rtl-sdr" \
+    URL_REPO_SOAPYRTLSDR="https://github.com/pothosware/SoapyRTLSDR.git" \
+    URL_REPO_SOAPYSDR="https://github.com/pothosware/SoapySDR.git" \
+    URL_REPO_TCLLAUNCHER="https://github.com/flightaware/tcllauncher.git" \
+    URL_REPO_UAT2ESNT="https://github.com/adsbxchange/uat2esnt.git"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -16,77 +26,151 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # This should be revisited in future when rtlsdr 0.6.1 or newer is released
 
 RUN set -x && \
-    apt-get update -y && \
-    apt-get install --no-install-recommends -y \
-        autoconf \
-        bash \
-        ca-certificates \
-        cmake \
-        curl \
-        file \
-        gawk \
-        g++ \
-        gcc \
-        git \
-        gnupg \
-        iproute2 \
-        itcl3 \
-        libboost-dev \
-        libboost-filesystem1.67.0 \
-        libboost-filesystem-dev \
-        libboost-program-options1.67.0 \
-        libboost-program-options-dev \
-        libboost-regex1.67.0 \
-        libboost-regex-dev \
-        libboost-system1.67.0 \
-        libboost-system-dev \
-        libc-dev \
-        libusb-1.0-0 \ 
-        libusb-1.0-0-dev \
-        lighttpd \
-        make \
-        ncurses-dev \
-        net-tools \
-        pkg-config \
-        procps \
-        python3 \
-        python3-dev \
-        python3-numpy \
-        socat \
-        swig \
-        tcl \
-        tcl-dev \
-        tcl-tls \
-        tclx \
-        tzdata \
-        wget \
+    TEMP_PACKAGES=() && \
+    KEPT_PACKAGES=() && \
+    # Essentials
+    TEMP_PACKAGES+=(automake) && \
+    TEMP_PACKAGES+=(build-essential) && \
+    TEMP_PACKAGES+=(ca-certificates) && \
+    TEMP_PACKAGES+=(cmake) && \
+    TEMP_PACKAGES+=(curl) && \
+    TEMP_PACKAGES+=(git) && \
+    # s6-overlay dependencies
+    TEMP_PACKAGES+=(gnupg2) && \
+    TEMP_PACKAGES+=(file) && \
+    # logging
+    KEPT_PACKAGES+=(gawk) && \
+    # libusb (for rtl-sdr, SoapySDR)
+    TEMP_PACKAGES+=(libusb-1.0-0-dev) && \
+    KEPT_PACKAGES+=(libusb-1.0-0) && \
+    # rtl-sdr dependencies
+    TEMP_PACKAGES+=(pkg-config) && \
+    # dump978 dependencies
+    TEMP_PACKAGES+=(libboost-dev) && \
+    TEMP_PACKAGES+=(libboost-system1.67-dev) && \
+    KEPT_PACKAGES+=(libboost-system1.67.0) && \
+    TEMP_PACKAGES+=(libboost-program-options1.67-dev) && \
+    KEPT_PACKAGES+=(libboost-program-options1.67.0) && \
+    TEMP_PACKAGES+=(libboost-regex1.67-dev) && \
+    KEPT_PACKAGES+=(libboost-regex1.67.0) && \
+    TEMP_PACKAGES+=(libboost-filesystem1.67-dev) && \
+    KEPT_PACKAGES+=(libboost-filesystem1.67.0) && \
+    # dump1090 dependencies
+    KEPT_PACKAGES+=(libncurses6) && \
+    TEMP_PACKAGES+=(libncurses-dev) && \
+    # tcllauncher dependencies
+    KEPT_PACKAGES+=(tcl) && \
+    TEMP_PACKAGES+=(tcl-dev) && \
+    KEPT_PACKAGES+=(tcl-tls) && \
+    KEPT_PACKAGES+=(tclx) && \
+    # piaware-web dependencies
+    KEPT_PACKAGES+=(lighttpd) && \
+    # hackrf dependencies
+    KEPT_PACKAGES+=(libfftw3-3) && \
+    TEMP_PACKAGES+=(libfftw3-dev) && \
+    # mlat-client dependencies
+    KEPT_PACKAGES+=(python3-minimal) && \
+    KEPT_PACKAGES+=(python3-distutils) && \
+    TEMP_PACKAGES+=(python3-dev) && \
+    # piaware dependencies
+    KEPT_PACKAGES+=(itcl3) && \
+    KEPT_PACKAGES+=(tcllib) && \
+    KEPT_PACKAGES+=(net-tools) && \
+    KEPT_PACKAGES+=(procps) && \
+    KEPT_PACKAGES+=(socat) && \
+    # Install packages.
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ${KEPT_PACKAGES[@]} \
+        ${TEMP_PACKAGES[@]} \
         && \
-    file -L /bin/cp && \
     git config --global advice.detachedHead false && \
-    echo "========== Install RTL-SDR ==========" && \
-    git clone git://git.osmocom.org/rtl-sdr.git /src/rtl-sdr && \
-    pushd /src/rtl-sdr && \
+    # Build & install rtl-sdr
+    git clone "${URL_REPO_RTLSDR}" "/src/rtl-sdr" && \
+    pushd "/src/rtl-sdr" && \
     #BRANCH_RTLSDR=$(git tag --sort="-creatordate" | head -1) && \
-    #git checkout tags/${BRANCH_RTLSDR} && \
+    #git checkout "tags/${BRANCH_RTLSDR}" && \
     git checkout "${BRANCH_RTLSDR}" && \
     echo "rtl-sdr ${BRANCH_RTLSDR}" >> /VERSIONS && \
-    mkdir -p /src/rtl-sdr/build && \
-    popd && \
-    pushd /src/rtl-sdr/build && \
-    cmake ../ -DINSTALL_UDEV_RULES=ON -Wno-dev && \
+    mkdir -p "/src/rtl-sdr/build" && \
+    pushd "/src/rtl-sdr/build" && \
+    cmake ../ -DINSTALL_UDEV_RULES=ON -Wno-dev -DCMAKE_BUILD_TYPE=Release && \
     make -Wstringop-truncation && \
     make -Wstringop-truncation install && \
+    cp -v "/src/rtl-sdr/rtl-sdr.rules" "/etc/udev/rules.d/" && \
     ldconfig && \
+    popd && popd && \
+    # Build & install HackRF
+    git clone "${URL_REPO_HACKRF}" "/src/hackrf" && \
+    pushd "/src/hackrf" && \
+    BRANCH_HACKRF=$(git tag --sort="-creatordate" | head -1) && \
+    git checkout "${BRANCH_HACKRF}" && \
+    mkdir -p /src/hackrf/host/build && \
+    pushd /src/hackrf/host/build && \
+    cmake ../ -DCMAKE_BUILD_TYPE=Release && \
+    make && \
+    make install && \
+    ldconfig && \
+    popd && popd && \
+    # Build & install LimeSuite
+    git clone "${URL_REPO_LIMESUITE}" "/src/LimeSuite" && \
+    pushd "/src/LimeSuite" && \
+    git checkout stable && \
+    mkdir "/src/LimeSuite/builddir" && \
+    pushd "/src/LimeSuite/builddir" && \
+    cmake ../ -DCMAKE_BUILD_TYPE=Release && \
+    make && \
+    make install && \
+    ldconfig && \
+    popd && popd && \
+    # Build & install SoapySDR
+    git clone "${URL_REPO_SOAPYSDR}" "/src/SoapySDR" && \
+    pushd "/src/SoapySDR" && \
+    BRANCH_SOAPYSDR=$(git tag --sort="-creatordate" | head -1) && \
+    git checkout "${BRANCH_SOAPYSDR}" && \
+    mkdir -p "/src/SoapySDR/build" && \
+    pushd "/src/SoapySDR/build" && \
+    cmake ../ -DCMAKE_BUILD_TYPE=Release && \
+    make && \
+    make test && \
+    make install && \
+    ldconfig && \
+    echo "SoapySDR $(SoapySDRUtil --info | grep -i 'lib version:' | cut -d ':' -f 2 | tr -d ' ')" >> /VERSIONS && \
+    popd && popd && \
+    # Build & install SoapyRTLSDR
+    git clone "${URL_REPO_SOAPYRTLSDR}" "/src/SoapyRTLSDR" && \
+    pushd "/src/SoapyRTLSDR" && \
+    BRANCH_SOAPYRTLSDR=$(git tag --sort="-creatordate" | head -1) && \
+    git checkout "${BRANCH_SOAPYRTLSDR}" && \
+    echo "SoapyRTLSDR ${BRANCH_SOAPYRTLSDR}" >> /VERSIONS && \
+    mkdir -p "/src/SoapyRTLSDR/build" && \
+    pushd "/src/SoapyRTLSDR/build" && \
+    cmake ../ -DCMAKE_BUILD_TYPE=Release && \
+    make && \
+    make install && \
+    popd && popd && \
+    # Build & install dump978
+    git clone "${URL_REPO_DUMP978}" "/src/dump978" && \
+    pushd "/src/dump978" && \
+    BRANCH_DUMP978=$(git tag --sort="-creatordate" | head -1) && \
+    git checkout "${BRANCH_DUMP978}" && \
+    make all faup978 && \
+    mkdir -p "/usr/lib/piaware/helpers" && \
+    cp -v dump978-fa skyaware978 "/usr/local/bin/" && \
+    cp -v faup978 "/usr/lib/piaware/helpers/" && \
+    mkdir -p "/usr/share/skyaware978/html" && \
+    cp -a "/src/dump978/skyaware/"* "/usr/share/skyaware978/html/" && \
+    mkdir -p "/run/skyaware978" && \
     popd && \
-    echo "========== Install bladeRF ==========" && \
-    git clone --recursive https://github.com/Nuand/bladeRF.git /src/bladeRF && \
-    pushd /src/bladeRF && \
-    BRANCH_BLADERF="$(git tag --sort='-creatordate' | head -1)" && \
+    # Build & install bladeRF
+    git clone --recursive "${URL_REPO_BLADERF}" "/src/bladeRF" && \
+    pushd "/src/bladeRF" && \
+    BRANCH_BLADERF="$(git tag --sort='-creatordate' | grep -vE '\-rc[0-9]*$' | head -1)" && \
     git checkout "${BRANCH_BLADERF}" && \
     echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
-    mkdir /src/bladeRF/host/build && \
+    mkdir -p "/src/bladeRF/host/build" && \
     popd && \
-    pushd /src/bladeRF/host/build && \
+    pushd "/src/bladeRF/host/build" && \
     cmake \
         -DTREAT_WARNINGS_AS_ERRORS=OFF \
         -DCMAKE_BUILD_TYPE=Release \
@@ -96,8 +180,7 @@ RUN set -x && \
     make install && \
     ldconfig && \
     popd && \
-    echo "========== Downloading bladeRF FPGA Images ==========" && \
-    BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" && \
+    # Download bladeRF FPGA Images
     mkdir -p "$BLADERF_RBF_PATH" && \
     curl -o "$BLADERF_RBF_PATH/hostedxA4.rbf" https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
     curl -o "$BLADERF_RBF_PATH/hostedxA9.rbf" https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
@@ -107,9 +190,9 @@ RUN set -x && \
     curl -o "$BLADERF_RBF_PATH/adsbxA9.rbf" https://www.nuand.com/fpga/adsbxA9.rbf && \
     curl -o "$BLADERF_RBF_PATH/adsbx40.rbf" https://www.nuand.com/fpga/adsbx40.rbf && \
     curl -o "$BLADERF_RBF_PATH/adsbx115.rbf" https://www.nuand.com/fpga/adsbx115.rbf && \
-    echo "========== Install tcllauncher ==========" && \
-    git clone https://github.com/flightaware/tcllauncher.git /src/tcllauncher && \
-    pushd /src/tcllauncher && \
+    # Build & install tcllauncher
+    git clone "${URL_REPO_TCLLAUNCHER}" "/src/tcllauncher" && \
+    pushd "/src/tcllauncher" && \
     BRANCH_TCLLAUNCHER="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_TCLLAUNCHER}" && \
     echo "tcllauncher ${BRANCH_TCLLAUNCHER}" >> /VERSIONS && \
@@ -119,40 +202,28 @@ RUN set -x && \
     make install && \
     ldconfig && \
     popd && \
-    echo "========== Install tcllib ==========" && \
-    git clone https://github.com/tcltk/tcllib.git /src/tcllib && \
-    pushd /src/tcllib && \
-    BRANCH_TCLLIB="$(git tag --sort='-creatordate' | head -1)" && \
-    git checkout "${BRANCH_TCLLIB}" && \
-    echo "tcllib ${BRANCH_TCLLIB}" >> /VERSIONS && \
-    autoconf && \
-    ./configure && \
-    make && \
-    make install && \
-    ldconfig && \
-    popd && \
-    echo "========== Install piaware ==========" && \
-    git clone https://github.com/flightaware/piaware.git /src/piaware && \
-    pushd /src/piaware && \
+    # Build & install piaware
+    git clone "${URL_REPO_PIAWARE}" "/src/piaware" && \
+    pushd "/src/piaware" && \
     BRANCH_PIAWARE="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_PIAWARE}" && \
     echo "piaware ${BRANCH_PIAWARE}" >> /VERSIONS && \
-    make && \
     make install && \
     cp -v /src/piaware/package/ca/*.pem /etc/ssl/ && \
     touch /etc/piaware.conf && \
     mkdir -p /run/piaware && \
     ldconfig && \
     popd && \
-    echo "========== Install piaware-web ==========" && \
-    git clone https://github.com/flightaware/piaware-web.git /src/piaware-web && \
+    # Build & install piaware-web
+    git clone "${URL_REPO_PIAWARE_WEB}" "/src/piaware-web" && \
     cp -Rv /src/piaware-web/web/. /var/www/html/ && \
-    echo "========== Install dump1090 ==========" && \
-    git clone https://github.com/flightaware/dump1090.git /src/dump1090 && \
-    pushd /src/dump1090 && \
+    # Build & install dump1090
+    git clone "${URL_REPO_DUMP1090}" "/src/dump1090" && \
+    pushd "/src/dump1090" && \
     BRANCH_DUMP1090="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_DUMP1090}" && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
+    make showconfig && \
     make all && \
     make faup1090 && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
@@ -162,8 +233,8 @@ RUN set -x && \
     cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
     ldconfig && \
     popd && \
-    echo "========== Install mlat-client ==========" && \
-    git clone https://github.com/mutability/mlat-client.git /src/mlat-client && \
+    # Build & install mlat-client
+    git clone "${URL_REPO_MLATCLIENT}" "/src/mlat-client" && \
     pushd /src/mlat-client && \
     BRANCH_MLATCLIENT="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_MLATCLIENT}" && \
@@ -172,81 +243,39 @@ RUN set -x && \
     ln -s /usr/local/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
     ldconfig && \
     popd && \
-    echo "========== Install SoapySDR ==========" && \
-    git clone https://github.com/pothosware/SoapySDR.git /src/SoapySDR && \
-    pushd /src/SoapySDR && \
-    BRANCH_SOAPYSDR="$(git tag --sort='-creatordate' | head -1)" && \
-    git checkout "${BRANCH_SOAPYSDR}" && \
-    echo "SoapySDR ${BRANCH_SOAPYSDR}" >> /VERSIONS && \
-    mkdir -p /src/SoapySDR/build && \
-    popd && \
-    pushd /src/SoapySDR/build && \
-    cmake -Wno-dev .. && \
+    # Build & install beast-splitter
+    git clone "${URL_REPO_BEASTSPLITTER}" "/src/beast-splitter" && \
+    pushd "/src/beast-splitter" && \
+    BRANCH_BEASTSPLITTER="$(git tag --sort='-creatordate' | head -1)" && \
+    git checkout "${BRANCH_BEASTSPLITTER}" && \
+    echo "beast-splitter ${BRANCH_BEASTSPLITTER}" >> /VERSIONS && \
     make && \
-    make install && \
-    ldconfig && \
+    cp -v ./beast-splitter /usr/local/bin/ && \
     popd && \
-    echo "========== Install dump978 ==========" && \
-    git clone https://github.com/flightaware/dump978.git /src/dump978 && \
-    pushd /src/dump978 && \
-    BRANCH_DUMP978="$(git tag --sort='-creatordate' | head -1)" && \
-    git checkout "${BRANCH_DUMP978}" && \
-    echo "dump978 ${BRANCH_DUMP978}" >> /VERSIONS && \
-    popd && \
-    pushd /src/dump978 && \
-    make all && \
-    make faup978 && \
-    cp -v dump978-fa skyaware978 /usr/local/bin/ && \
-    cp -v faup978 /usr/lib/piaware/helpers/ && \
-    mkdir -p /usr/share/dump978-fa/html && \
-    cp -a /src/dump978/skyaware/* /usr/share/dump978-fa/html/ && \
-    ldconfig && \
-    popd && \
-    echo "========== Install s6-overlay ==========" && \
+    # Deploy s6-overlay.
     curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
-    echo "========== Clean up build environment ==========" && \
-    apt-get remove -y \
-        autoconf \
-        cmake \
-        curl \
-        file \
-        g++ \
-        gcc \
-        git \
-        gnupg \
-        libboost-dev \
-        libboost-filesystem-dev \
-        libboost-program-options-dev \
-        libboost-regex-dev \
-        libboost-system-dev \
-        libc-dev \
-        libusb-1.0-0-dev \
-        make \
-        ncurses-dev \
-        pkg-config \
-        python3-dev \
-        tcl-dev \
-        wget \
-        && \
+    # Clean up
+    apt-get remove -y ${TEMP_PACKAGES[@]} && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
     find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
-    echo "========== Testing ==========" && \
-    ldconfig && \
-    bladeRF-cli --version > /dev/null 2>&1 && \
-    dump1090 --help > /dev/null 2>&1 && \
-    mlat-client --help > /dev/null 2>&1 && \
-    piaware -v > /dev/null 2>&1 && \
-    SoapySDRUtil --info > /dev/null 2>&1 && \
-    # dump978-fa --version > /dev/null 2>&1 && \
+    # echo "========== Testing ==========" && \
+    # ldconfig && \
+    # bladeRF-cli --version > /dev/null 2>&1 && \
+    # hackrf_debug --help > /dev/null 2>&1 && \
+    # LimeUtil --help > /dev/null 2>&1 && \
+    # dump1090 --help > /dev/null 2>&1 && \
+    # mlat-client --help > /dev/null 2>&1 && \
+    # piaware -v > /dev/null 2>&1 && \
+    # SoapySDRUtil --info > /dev/null 2>&1 && \
+    # # dump978-fa --version > /dev/null 2>&1 && \
     echo "========== Done! =========="
 
-COPY etc/ /etc/
-COPY healthcheck.sh /healthcheck.sh
+COPY rootfs/ /
 
-EXPOSE 30104/tcp 8080/tcp 30001/tcp 30002/tcp 30003/tcp 30004/tcp 30005/tcp
+EXPOSE 80/tcp 30003/tcp 30005/tcp 30105/tcp 30978/tcp 30979/tcp
 
 ENTRYPOINT [ "/init" ]
 
-HEALTHCHECK --start-period=300s --interval=300s CMD /healthcheck.sh
+#HEALTHCHECK --start-period=300s --interval=300s CMD /scripts/healthcheck.sh

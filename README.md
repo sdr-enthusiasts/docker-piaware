@@ -1,17 +1,16 @@
 # mikenye/piaware
 
-FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090-fa (but not yet dump978, see endnote). Builds and runs on `linux/amd64`, `linux/arm/v6`, `linux/arm/v7` and `linux/arm64` (see below).
-
-Can optionally operate in "net only" mode and pull ADS-B data from another host/container running `readsb`/`dump1090`.
+FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090 and dump978. Builds and runs on `linux/amd64`, `linux/arm/v6`, `linux/arm/v7` and `linux/arm64` (see below).
 
 For more information on what PiAware is, see here: [FlightAware - PiAware](https://flightaware.com/adsb/piaware/)
 
-*Note:* bladeRF is untested - I don't own bladeRF hardware, but support for the devices is compiled in. If you have bladeRF and this container works for you, please let me know!
+Can optionally operate in "net only" mode and pull ADSB ES & UAT data from another host/container. This is the recommended way of deploying the container, and I'd humbly suggest [`mikenye/readsb`](https://github.com/mikenye/docker-readsb) and [`mikenye/dump978`](https://github.com/mikenye/docker-dump978).
+
+*Note:* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapper/helper scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
 
 ## Supported tags and respective Dockerfiles
 
-* `latest` should always contain the latest released versions of `rtl-sdr`, `bladeRF`, `tcllauncher`, `tcllib`, `piaware`, `dump1090`, `mlat-client`, `SoapySDR` and `dump978`. This image is built nightly from the [`master` branch](https://github.com/mikenye/docker-piaware/tree/master) [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile) for all supported architectures.
-* `development` ([`dev` branch](https://github.com/mikenye/docker-piaware/tree/master), [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile), `amd64` architecture only, built on commit, not recommended for production)
+* `latest` should always contain the latest released version of piaware and support tools. This image is built nightly from the [`master` branch](https://github.com/mikenye/docker-piaware/tree/master) [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile) for all supported architectures.
 * Specific version and architecture tags are available if required, however these are not regularly updated. It is generally recommended to run `latest`.
 * There are also `latest` and version-specific tags appended with `_nohealthcheck` where the container healthchecks have been excluded from the image build. See [issue #43](https://github.com/mikenye/docker-piaware/issues/43).
 
@@ -306,7 +305,7 @@ docker logs piaware | grep -i 'my feeder id'
 
 ...should return something like:
 
-```log
+```
 2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
 ```
 
@@ -358,7 +357,7 @@ docker logs piaware | grep -i 'my feeder id'
 
 ...should return something like:
 
-```log
+```
 2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
 ```
 
@@ -383,40 +382,100 @@ services:
 
 ... and issue a `docker-compose up -d` to re-create the container.
 
-## Runtime Environment Variables
+## Environment Variables
 
-There are a series of available environment variables:
+For an explanation of `piaware-config` variables, see [FlightAware PiAware Advanced Configuration](https://flightaware.com/adsb/piaware/advanced_configuration).
+
+### General
 
 | Environment Variable | Purpose                         | Default |
 | -------------------- | ------------------------------- | ------- |
-| `LAT`                | Antenna's latitude (required)   |         |
-| `LONG`               | Antenna's longitude (required)  |         |
-| `TZ`                 | Your local timezone (optional)  | GMT     |
-| `DUMP1090_DEVICE`    | Select RTL-SDR device by index or serial number (optional)  | |
-| `ALLOW_MLAT`         | Used for setting `piaware-config` variable `allow-mlat` (optional) | yes |
-| `ALLOW_MODEAC`       | Used for setting `piaware-config` variable `allow-modeac` (optional) | yes |
-| `RTLSDR_PPM`         | Used for setting `piaware-config` variable `rtlsdr-ppm` (optional) | 0 |
-| `RTLSDR_GAIN`        | Optimizing gain (optional) -- See [FlightAware -- Optimizing Gain](https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2) | -10 (max)|
-| `BEASTHOST`          | Optional. IP/Hostname of a Mode-S/BEAST provider (dump1090/readsb). If given, no USB device needs to be passed through to the container. | |
-| `BEASTPORT`          | Optional. TCP port number of Mode-S/BEAST provider (dump1090/readsb). | 30005 |
+| `TZ` | Local timezone in ["TZ database name" format](<https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>). | `UTC` |
 | `FEEDER_ID`          | Your FlightAware feeder ID (required) | |
 | `BINGMAPSAPIKEY`     | Optional. Bing Maps API Key. If set, it is configured in `dump1090`'s `config.js`. | |
 | `VERBOSE_LOGGING`    | Optional. Set to `true` for more verbose logs. | |
 
-For an explanation of `piaware-config` variables, see [FlightAware PiAware Advanced Configuration](https://flightaware.com/adsb/piaware/advanced_configuration).
+### Multilateration
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `ALLOW_MLAT` | `yes` or `no` | If `yes`, multilateration is enabled (also requires that receiver location is set on the FlightAware My ADS-B stats page) | `yes` |
+| `MLAT_RESULTS` | `yes` or `no` | If `yes`, multilateration results are returned to PiAware from FlightAware | `yes` |
+
+### Receiver Configuration (1090MHz)
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `ALLOW_MODEAC` | `yes` or `no` | If `yes`, piaware and dump1090-fa will enable Mode A/C decoding if a client requests it.
+Mode A/C decoding requires additional CPU when enabled. | `yes` |
+| `RECEIVER_TYPE` | `rtlsdr`, `relay` | Configures how PiAware attempts to talk to the ADS-B receiver | `rtlsdr` |
+
+Receiver types:
+
+* `rtlsdr` - For FlightAware dongles and any other RTL-SDR
+* `relay` - For use with an external BEAST protocol provider running on another host (dump1090/readsb/etc)
+* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapperr scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
+
+### RTL-SDR Configuration (1090MHz)
+
+Use only with `RECEIVER_TYPE=rtlsdr`.
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `RTLSDR_PPM`   | a frequency correction in PPM | Configures the dongle PPM correction | `0` |
+| `RTLSDR_GAIN`  | `max` or a numeric gain level | Optimizing gain (optional) -- See [FlightAware -- Optimizing Gain](https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2) | `max` |
+| `DUMP1090_DEVICE` | rtlsdr device serial number | Configures which dongle to use for 1090MHz reception if there is more than one connected | first available device |
+
+### Relay Configuration (1090MHz)
+
+Use only with `RECEIVER_TYPE=relay`.
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `BEASTHOST` | a hostname or IP | Specify an external BEAST protocol provider (dump1090/readsb/etc). | |
+| `BEASTPORT` | a port number | Specify the TCP port number of the external BEAST protocol provider. | `30005` |
+
+### Receiver Configuration (987MHz)
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `UAT_RECEIVER_TYPE`  | `none`, `rtlsdr`, `relay` | Configures how PiAware attempts to talk to the ADS-B receiver | `none` |
+
+Receiver types:
+
+* `rtlsdr` - For FlightAware dongles and any other RTL-SDR
+* `relay` - For use with an external BEAST protocol provider running on another host (dump1090/readsb/etc)
+* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapperr scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
+
+### RTL-SDR Configuration (978MHz)
+
+Use only with `UAT_RECEIVER_TYPE=rtlsdr`.
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `DUMP978_DEVICE` | rtlsdr device serial number | Configures which dongle to use for 978MHz reception if there is more than one connected | first available device |
+| `UAT_SDR_GAIN`       | `max` or a numeric gain level | Optimizing gain (optional) -- See [FlightAware -- Optimizing Gain](https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2) | `max` |
+| `UAT_SDR_PPM`        | a frequency correction in PPM | Configures the dongle PPM correction | `0` |
+
+### Relay Configuration (978MHz)
+
+Use only with `UAT_RECEIVER_TYPE=relay`.
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `UAT_RECEIVER_HOST`  | a hostname or IP | Specify an external UAT raw data provider (dump978-fa). | |
+| `UAT_RECEIVER_PORT`  | a port number | Specify the TCP port number of the external UAT raw data provider. | `30978` |
 
 ## Ports
 
 The following ports are used by this container:
 
 * `80` - PiAware Status page and dump1090 web interface (Skyaware) - optional but recommended so you can check status and and watch the planes fly around.
-* `8080` - dump1090 web interface (Skyaware) only. If you just want the map, you can use this instead of port `80`.
-* `30001` - dump1090 TCP raw input listen port - optional, recommended to leave unmapped unless explicitly needed
-* `30002` - dump1090 TCP raw output listen port - optional, recommended to leave unmapped unless explicitly needed
 * `30003` - dump1090 TCP BaseStation output listen port - optional, recommended to leave unmapped unless explicitly needed
-* `30004` - dump1090 TCP Beast input listen port - optional, recommended to leave unmapped unless explicitly needed
 * `30005` - dump1090 TCP Beast output listen port - optional, recommended to leave unmapped unless explicitly needed
-* `30104` - dump1090 TCP Beast input listen port - optional, recommended to leave unmapped unless explicitly needed
+* `30105` - If MLAT is enabled, `mlat-client` results published on this port in Beast format - optional, recommended to leave unmapped unless explicitly needed
+* `30978` - If UAT decoding is enabled, UAT raw data published on this port - optional, recommended to leave unmapped unless explicitly needed
+* `30979` - If UAT decoding is enabled, UAT decoded JSON published on this port - optional, recommended to leave unmapped unless explicitly needed
 
 ## Claiming
 
@@ -436,14 +495,6 @@ Check out the images:
 
 * All processes are logged to the container's stdout, and can be viewed with `docker logs [-f] container`.
 * `lighttpd` (which provides SkyAware & SkyAware978) is configured to not log (except for a startup message on container start)
-
-## Note about dump978
-
-`dump978` and its prerequisites (SoapySDR) compile in this docker image, however I don't have a suitable RTLSDR radio I can use to test this with. The FlightAware Pro Stick Plus Blue that I own has a 1090MHz bandpass filter built in, so it is basically useless for 978MHz. Furthermore, 978MHz is not yet used by aircraft in Australia. If anyone lives where 978MHz is used and wants to work on this project to include support for dump978, please get in touch! If you're interested in testing this yourself, the `dump978` binaries provided by [flightaware/dump978](https://github.com/flightaware/dump978) are included in the image, but for now you will have to run them manually.
-
-* `/usr/local/bin/dump978-fa`
-* `/usr/lib/piaware/helpers/faup978`
-* `/usr/local/bin/skyaware978`
 
 ## Getting help
 

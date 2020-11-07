@@ -1,5 +1,9 @@
-#!/usr/bin/with-contenv sh
-# shellcheck shell=sh
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+# Remove existing piaware config
+rm /etc/piaware.conf > /dev/null 2>&1 || true
+touch /etc/piaware.conf
 
 # Check to make sure the correct command line arguments have been set
 EXITCODE=0
@@ -11,10 +15,10 @@ if [ -z "${LONG}" ]; then
   echo "ERROR: LONG environment variable not set"
   EXITCODE=1
 fi
-if [ -n "${USERNAME+x}" ]; then
+if [[ -n "${USERNAME}" ]]; then
   echo "WARNING: USERNAME environment variable is DEPRECATED and does nothing"
 fi
-if [ -n "${PASSWORD+x}" ]; then
+if [[ -n "${PASSWORD}" ]]; then
   echo "WARNING: PASSWORD environment variable is DEPRECATED and does nothing"
 fi
 if [ -z "${FEEDER_ID}" ]; then
@@ -46,13 +50,38 @@ else
 fi
 
 # Set up piaware
-piaware-config allow-mlat "${ALLOW_MLAT}"
-piaware-config allow-modeac "${ALLOW_MODEAC}"
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
+piaware-config allow-mlat "${ALLOW_MLAT:-yes}"
+piaware-config mlat-results "${MLAT_RESULTS:-yes}"
+
+# If a BEASTHOST is specified
+if [[ -n "$BEASTHOST" ]]; then
+  piaware-config receiver-type "relay"
+  piaware-config receiver-host "$BEASTHOST"
+  piaware-config receiver-port "${BEASTPORT:-30005}"
+
+# Default - rtlsdr mode
+else
+  piaware-config receiver-type "rtlsdr"
+fi
+
+if [[ -n "$RADARCAPE_HOST" ]]; then
+  piaware-config receiver-type "radarcape"
+  piaware-config radarcape-host "$RADARCAPE_HOST"
+fi
+
+# If a UAT_RECEIVER_HOST is specified
+if [[ -n "$UAT_RECEIVER_HOST" ]]; then
+  piaware-config uat-receiver-type "sdr"
+  piaware-config uat-receiver-host "$UAT_RECEIVER_HOST"
+  piaware-config uat-receiver-port "${UAT_RECEIVER_PORT:-30978}"
+
+elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
+  piaware-config uat-receiver-type "sdr"
+
+fi
 
 # Create log dir for piaware
 mkdir -p /var/log/piaware
 chown nobody:nogroup /var/log/piaware
-mkdir -p /var/log/beastrelay
-chown nobody:nogroup /var/log/beastrelay
