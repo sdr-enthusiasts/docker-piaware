@@ -158,8 +158,9 @@ RUN set -x && \
     mkdir -p "/usr/lib/piaware/helpers" && \
     cp -v dump978-fa skyaware978 "/usr/local/bin/" && \
     cp -v faup978 "/usr/lib/piaware/helpers/" && \
-    mkdir -p "/usr/share/dump978-fa/html" && \
-    cp -a "/src/dump978/skyaware/"* "/usr/share/dump978-fa/html/" && \
+    mkdir -p "/usr/share/skyaware978/html" && \
+    cp -a "/src/dump978/skyaware/"* "/usr/share/skyaware978/html/" && \
+    mkdir -p "/run/skyaware978" && \
     popd && \
     # Build & install bladeRF
     git clone --recursive "${URL_REPO_BLADERF}" "/src/bladeRF" && \
