@@ -12,7 +12,7 @@ if [[ -n "$UAT_RECEIVER_TYPE" ]]; then
   fi
 fi
 
-if [[ -n "$RUN_SKYAWARE978" ]]; then
+if [[ -z "$RUN_SKYAWARE978" ]]; then
   sleep 86400
   exit 0
 fi

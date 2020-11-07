@@ -10,7 +10,7 @@ if [[ -n "$UAT_RECEIVER_TYPE" ]]; then
   fi
 fi
 
-if [[ -n "$RUN_DUMP978" ]]; then
+if [[ -z "$RUN_DUMP978" ]]; then
   sleep 86400
   exit 0
 fi
