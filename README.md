@@ -4,7 +4,7 @@ FlightAware's PiAware docker container including support for bladeRF, RTLSDR. In
 
 For more information on what PiAware is, see here: [FlightAware - PiAware](https://flightaware.com/adsb/piaware/)
 
-Can optionally operate in "net only" mode and pull ADSB ES & UAT data from another host/container. This is the recommended way of deploying the container, and I'd humbly suggest [`mikenye/readsb`](https://github.com/mikenye/docker-readsb) and [`mikenye/dump978`](https://github.com/mikenye/docker-dump978).
+Can optionally operate in "net only" mode and pull ADSB ES & UAT data from another host/container. This is the recommended way of deploying the container, and I'd humbly suggest [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) and [`mikenye/dump978`](https://github.com/mikenye/docker-dump978).
 
 *Note:* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapper/helper scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
 
