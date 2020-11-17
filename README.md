@@ -138,7 +138,7 @@ The command will run the container for 30 seconds, which should be ample time fo
 For example:
 
 ```shell
-$ timeout 30 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 mikenye/piaware:latest | grep "my feeder ID"
+timeout 30 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 mikenye/piaware:latest | grep "my feeder ID"
 ```
 
 Will output:
