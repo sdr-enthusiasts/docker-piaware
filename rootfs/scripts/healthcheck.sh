@@ -1,120 +1,110 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
-# Globals
-S6_SERVICE_ROOT="/run/s6/services"
-STR_HEALTHY="OK"
-STR_UNHEALTHY="UNHEALTHY"
+# Exit abnormally for any error
+set -eo pipefail
 
+# Set default exit code
 EXITCODE=0
 
-function check_service_deathtally () {
-    local service_name
-    service_name=${1}
+# Get list of flightaware server IPs
+FA_SERVER_IPS=$(piaware-config -show adept-serverhosts | cut -d '{' -f 2 | cut -d '}' -f 1)
 
-    # build service path
-    local service_path
-    service_path="${S6_SERVICE_ROOT%/}/${service_name}"
+# Get flightaware server port
+FA_SERVER_PORT=$(piaware-config -show adept-serverport)
 
-    # ensure service path exists
-    if [[ -d "$service_path" ]]; then
+# Get netstat output
+NETSTAT_AN=$(netstat -an)
 
-        # get service death tally since last check
-        local service_deathtally
-        service_deathtally=$(s6-svdt "${service_path}" | wc -l)
-
-        # clear death tally
-        s6-svdt-clear "${service_path}"
-
-        # print the first part of the text
-        echo -n "\"${service_name}\" death tally since last check: ${service_deathtally}"
-
-        # if healthy/unhealthy...
-        if [[ "$service_deathtally" -gt 0 ]]; then
-            echo ": $STR_UNHEALTHY"
-            EXITCODE=1
-        else
-            echo ": $STR_HEALTHY"
-        fi
-    else
-
-        # if service directory doesn't exist, throw an error
-        echo "ERROR: service path \"$service_path\" does not exist!"
-        EXITCODE=1
-    fi
+# Define function to return number msgs sent to FA from a process for a given time
+function check_logs_for_msgs_sent_to_fa () {
+    # $1 = sending process (eg: dump1090, socat, dump978-fa)
+    # $2 = number of output lines to consider (every line represents 5 minutes, so 12 would be an hour)
+    # ------
+    REGEX_FA_MSGS_SENT_PAST_5MIN="^(?'date'\d{4}-\d{1,2}-\d{1,2})\s+(?'time'\d{1,2}:\d{1,2}:[\d\.]+)\s+\[piaware\]\s+(?'date2'\d{4}\/\d{1,2}\/\d{1,2})\s+(?'time2'\d{1,2}:\d{1,2}:[\d\.]+)\s+\d+ msgs recv'd from $1 \(\K(?'msgslast5m'\d+) in last 5m\);\s+\d+ msgs sent to FlightAware\s*$"
+    NUM_MSGS_RECEIVED=$(tail -$(($2 * 10)) /var/log/piaware/current | grep -oP "$REGEX_FA_MSGS_SENT_PAST_5MIN" | tail "-$2" | tr -s " " | cut -d " " -f 1)
+    TOTAL_MSGS_RECEIVED=0
+    for NUM_MSGS in $NUM_MSGS_RECEIVED; do
+        TOTAL_MSGS_RECEIVED=$((TOTAL_MSGS_RECEIVED + NUM_MSGS))
+    done
+    echo "$TOTAL_MSGS_RECEIVED"
 }
 
-# MAIN
-
-set -o pipefail
-
-# check service death tallys
-check_service_deathtally 'beastproxy'
-check_service_deathtally 'beastrelay'
-check_service_deathtally 'dump1090'
-check_service_deathtally 'piaware'
-check_service_deathtally 'skyaware'
-
-# run piaware-status and store output
-PIAWARE_STATUS=$(piaware-status)
-
-# tests on piaware-status output
-if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "PiAware master process (piaware) is running")" -lt 1 ]]; then
-    echo "piaware-status reports: PiAware master process (piaware) is NOT running: $STR_UNHEALTHY"
+# Make sure there is an established connection to flightaware
+CONNECTED_TO_FA=""
+for FA_SERVER_IP in $FA_SERVER_IPS; do
+    IP_ESCAPED_DOTS=${FA_SERVER_IP//./\\.}
+    REGEX_FA_CONNECTION_FROM_NETSTAT="^\s*tcp\s+\d+\s+\d+\s+(?>\d{1,3}\.{0,1}){4}:\d{1,5}\s+(?>${IP_ESCAPED_DOTS}):(?>${FA_SERVER_PORT})\s+ESTABLISHED\s*$"
+    if echo "$NETSTAT_AN" | grep -P "$REGEX_FA_CONNECTION_FROM_NETSTAT" > /dev/null 2>&1; then
+        CONNECTED_TO_FA="true"
+        break 2
+    fi
+done
+if [[ -z "$CONNECTED_TO_FA" ]]; then
+    echo "No connection to Flightaware, NOT OK."
     EXITCODE=1
 else
-    echo "piaware-status reports: PiAware master process (piaware) is running: $STR_HEALTHY"
-fi
-if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "dump1090 is NOT producing data on")" -gt 0 ]]; then
-    echo "piaware-status reports: dump1090 is NOT producing data: $STR_UNHEALTHY"
-    EXITCODE=1
-else
-    echo "piaware-status reports: dump1090 is producing data: $STR_HEALTHY"
-fi
-if [[ "$(echo "${PIAWARE_STATUS}" | grep -c "piaware is connected to FlightAware")" -lt 1 ]]; then
-    echo "piaware is NOT conneceted to FlightAware: $STR_UNHEALTHY"
-    EXITCODE=1
-else
-    echo "piaware is conneceted to FlightAware: $STR_HEALTHY"
+    echo "Connected to Flightaware, OK."
 fi
 
-# ensure we're sending data to FA
-DATETIME_NOW=$(date +%s)
-# find last log entry reporting messages sent to FA
-LOG_MSGS_SENT_LATEST=$(tail -100 /var/log/piaware/current | grep "msgs sent to FlightAware" | tail -1)
-if [[ -z "$LOG_MSGS_SENT_LATEST" ]]; then
-    echo "Logs indicate no msgs sent to FlightAware: $STR_UNHEALTHY"
-    EXITCODE=1
-else
-    # get date of log entry
-    LOG_MSGS_SENT_LATEST_DATETIME=$(date --date="$(echo "$LOG_MSGS_SENT_LATEST" | grep -oP '^\d{4}\-\d{2}\-\d{2} \d{2}\:\d{2}\:\d{2}')" +%s)
-    if [[ -z "$LOG_MSGS_SENT_LATEST_DATETIME" ]]; then
-        echo "Cannot determine date/time of last log entry of msgs sent to FlightAware: $STR_UNHEALTHY"
-        EXITCODE=1
+# Make sure 1090MHz data is being sent to flightaware
+if [[ -n "$BEASTHOST" || "$RECEIVER_TYPE" == "rtlsdr" ]]; then
+    # look for log messages from dump1090
+    FA_DUMP1090_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa dump1090 12)
+    if [[ "$FA_DUMP1090_MSGS_SENT_PAST_HOUR" -gt 0 ]]; then
+        echo "$FA_DUMP1090_MSGS_SENT_PAST_HOUR dump1090 messages sent in past hour, OK."
     else
-        # make sure last entry is less than 5 minutes old (plus extra minute grace period)
-        TIMEDELTA=$((DATETIME_NOW - LOG_MSGS_SENT_LATEST_DATETIME))
-        if [[ "$TIMEDELTA" -gt 360 ]]; then
-            echo "Logs indicate no msgs sent to FlightAware in past 5 minutes: $STR_UNHEALTHY"
-            EXITCODE=1
-        else
-            # get number of messages in last 5 min
-            LOG_MSGS_SENT_LATEST_NUM=$(echo "$LOG_MSGS_SENT_LATEST" | grep -oP '\(\d+ in last 5m\)' | cut -d '(' -f 2 | cut -d ' ' -f 1 | tr -d ' ')
-            if [[ -z "$LOG_MSGS_SENT_LATEST_NUM" ]]; then
-                echo "Cannot determine number of messages sent to FlightAware in last 5m: $STR_UNHEALTHY"
-                EXITCODE=1
-            else
-                echo -n "Logs indicate $LOG_MSGS_SENT_LATEST_NUM msgs sent to FlightAware in past 5 minutes:"
-                # make sure LOG_MSGS_SENT_LATEST_NUM is positive
-                if [[ "$LOG_MSGS_SENT_LATEST_NUM" -lt 1 ]]; then
-                    echo " $STR_UNHEALTHY"
-                    EXITCODE=1
-                else
-                    echo " $STR_HEALTHY"
-                fi
-            fi
-        fi
+        echo "$FA_DUMP1090_MSGS_SENT_PAST_HOUR dump1090 messages sent in past hour, NOT OK."
+        EXITCODE=1
     fi
 fi
 
+# Make sure 978MHz data is being sent to flightaware
+if [[ -n "$UAT_RECEIVER_HOST" ]]; then
+    # look for log messages from socat
+    FA_DUMP978_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa socat 12)
+    if [[ "$FA_DUMP978_MSGS_SENT_PAST_HOUR" -gt 0 ]]; then
+        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past hour, OK."
+    else
+        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past hour, NOT OK."
+        EXITCODE=1
+    fi
+elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
+    # look for log messages from dump978-fa
+    FA_DUMP1090_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa dump978-fa 12)
+    if [[ "$FA_DUMP978_MSGS_SENT_PAST_HOUR" -gt 0 ]]; then
+        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past hour, OK."
+    else
+        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past hour, NOT OK."
+        EXITCODE=1
+    fi
+fi
+
+# Make sure web server listening on port 80
+WEBSERVER_LISTENING_PORT_80=""
+REGEX_WEBSERVER_LISTENING_PORT_80="^\s*tcp\s+\d+\s+\d+\s+(?>0\.0\.0\.0):80\s+(?>0\.0\.0\.0):(?>\*)\s+LISTEN\s*$"
+if echo "$NETSTAT_AN" | grep -P "$REGEX_WEBSERVER_LISTENING_PORT_80" > /dev/null 2>&1; then
+        WEBSERVER_LISTENING_PORT_80="true"
+fi
+if [[ -z "$WEBSERVER_LISTENING_PORT_80" ]]; then
+    echo "Webserver not listening on port 80, NOT OK."
+    EXITCODE=1
+else
+    echo "Webserver listening on port 80, OK."
+fi
+
+# Make sure web server listening on port 8080
+WEBSERVER_LISTENING_PORT_80=""
+REGEX_WEBSERVER_LISTENING_PORT_80="^\s*tcp\s+\d+\s+\d+\s+(?>0\.0\.0\.0):8080\s+(?>0\.0\.0\.0):(?>\*)\s+LISTEN\s*$"
+if echo "$NETSTAT_AN" | grep -P "$REGEX_WEBSERVER_LISTENING_PORT_80" > /dev/null 2>&1; then
+        WEBSERVER_LISTENING_PORT_80="true"
+fi
+if [[ -z "$WEBSERVER_LISTENING_PORT_80" ]]; then
+    echo "Webserver not listening on port 8080, NOT OK."
+    EXITCODE=1
+else
+    echo "Webserver listening on port 8080, OK."
+fi
+
+# Exit with determined exit status
 exit "$EXITCODE"
