@@ -1,12 +1,50 @@
 # mikenye/piaware
 
-FlightAware's PiAware docker container including support for bladeRF, RTLSDR. Includes dump1090 and dump978. Builds and runs on `linux/amd64`, `linux/arm/v6`, `linux/arm/v7` and `linux/arm64` (see below).
+FlightAware's PiAware docker container including support for RTL-SDR, bladeRF and others. Includes `dump1090` and `dump978`.
 
-For more information on what PiAware is, see here: [FlightAware - PiAware](https://flightaware.com/adsb/piaware/)
+Builds and runs on `linux/amd64`, `linux/arm/v6`, `linux/arm/v7` and `linux/arm64`.
 
-Can optionally operate in "net only" mode and pull ADSB ES & UAT data from another host/container. This is the recommended way of deploying the container, and I'd humbly suggest [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) and [`mikenye/dump978`](https://github.com/mikenye/docker-dump978).
+For more information on what PiAware is, see here: [FlightAware - PiAware](https://flightaware.com/adsb/piaware/).
+
+This container can operate in "net only" mode and pull ADS-B Mode-S & UAT data from another host/container. **This is the recommended way of deploying the container**, and I'd humbly suggest [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) and [`mikenye/dump978`](https://github.com/mikenye/docker-dump978) (if you live in an area that uses UAT).
 
 *Note:* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapper/helper scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
+
+## Table of Contents
+
+* [mikenye/piaware](#mikenyepiaware)
+  * [Table of Contents](#table-of-contents)
+  * [Supported tags and respective Dockerfiles](#supported-tags-and-respective-dockerfiles)
+  * [Contributors](#contributors)
+  * [Multi Architecture Support](#multi-architecture-support)
+  * [Prerequisites](#prerequisites)
+  * [Determining your Feeder ID](#determining-your-feeder-id)
+    * [Already running PiAware](#already-running-piaware)
+    * [New to PiAware](#new-to-piaware)
+  * [Deployment Examples](#deployment-examples)
+    * [Example `docker run` command with RTL-SDR USB for reception of 1090MHz](#example-docker-run-command-with-rtl-sdr-usb-for-reception-of-1090mhz)
+    * [Example `docker-compose.yml` with RTL-SDR USB for reception of 1090MHz](#example-docker-composeyml-with-rtl-sdr-usb-for-reception-of-1090mhz)
+    * [Example `docker run` command with 2x RTL-SDR USB for reception of 1090MHz and 978MHz](#example-docker-run-command-with-2x-rtl-sdr-usb-for-reception-of-1090mhz-and-978mhz)
+    * [Example `docker-compose.yml` with 2x RTL-SDR USB for reception of 1090MHz and 978MHz](#example-docker-composeyml-with-2x-rtl-sdr-usb-for-reception-of-1090mhz-and-978mhz)
+    * [Example `docker run` with external Mode-S/BEAST provider](#example-docker-run-with-external-mode-sbeast-provider)
+    * [Example `docker-compose.yml` with external Mode-S/BEAST provider](#example-docker-composeyml-with-external-mode-sbeast-provider)
+    * [Example `docker run` with external Mode-S/BEAST provider and external UAT provider](#example-docker-run-with-external-mode-sbeast-provider-and-external-uat-provider)
+    * [Example `docker-compose.yml` with external Mode-S/BEAST provider and external UAT provider](#example-docker-composeyml-with-external-mode-sbeast-provider-and-external-uat-provider)
+  * [Environment Variables](#environment-variables)
+    * [General](#general)
+    * [Multilateration](#multilateration)
+    * [Receiver Configuration (1090MHz)](#receiver-configuration-1090mhz)
+    * [RTL-SDR Configuration (1090MHz)](#rtl-sdr-configuration-1090mhz)
+    * [Relay Configuration (1090MHz)](#relay-configuration-1090mhz)
+    * [Receiver Configuration (987MHz)](#receiver-configuration-987mhz)
+    * [RTL-SDR Configuration (978MHz)](#rtl-sdr-configuration-978mhz)
+    * [Relay Configuration (978MHz)](#relay-configuration-978mhz)
+  * [Ports](#ports)
+  * [Claiming Your Receiver](#claiming-your-receiver)
+  * [Logging](#logging)
+  * [Other services to feed](#other-services-to-feed)
+  * [Getting help](#getting-help)
+  * [Changelog](#changelog)
 
 ## Supported tags and respective Dockerfiles
 
@@ -18,6 +56,7 @@ Can optionally operate in "net only" mode and pull ADSB ES & UAT data from anoth
 
 * Thanks to [Jan Collijs](https://github.com/visibilityspots) for contributing to the 3.7.1, 3.7.2 and 3.8.0 releases.
 * Thanks to [ShoGinn](https://github.com/ShoGinn) for many contributions to the 3.8.0 release and tidy up of code & readme.
+* Thanks to [ssbb](https://flightaware.com/adsb/stats/user/pmd5700#stats-134107) for allowing me to use his Pi as a development platform for UAT support.
 
 ## Multi Architecture Support
 
@@ -30,7 +69,7 @@ Currently, this image should pull and run on the following architectures:
 
 ## Prerequisites
 
-Before this container will work properly, you must blacklist the kernel modules for the RTL-SDR USB device from the host's kernel.
+If using an RTL-SDR, before this container will work properly, you must blacklist the kernel modules for the RTL-SDR USB device from the host's kernel.
 
 To do this, create a file `/etc/modprobe.d/blacklist-rtl2832.conf` containing the following:
 
@@ -46,7 +85,7 @@ Once this is done, you can plug in your RTL-SDR USB device and start the contain
 
 Failure to do this will result in the error below being spammed to the container log.
 
-```log
+```text
 2019-04-29 21:14:31.642500500  [dump1090-fa] Kernel driver is active, or device is claimed by second instance of librtlsdr.
 2019-04-29 21:14:31.642635500  [dump1090-fa] In the first case, please either detach or blacklist the kernel module
 2019-04-29 21:14:31.642663500  [dump1090-fa] (dvb_usb_rtl28xxu), or enable automatic detaching at compile time.
@@ -62,15 +101,13 @@ sudo rmmod dvb_usb_rtl28xxu
 sudo rmmod rtl2832
 ```
 
-## IMPORTANT
+## Determining your Feeder ID
 
-* You need to specify a feeder-id for the container, as this is used by FlightAware to track your PiAware instance.
+You need to specify a feeder-id for the container, as this is used by FlightAware to track your PiAware instance.
 
 **Make sure you set your feeder ID via the `FEEDER_ID` environment variable. Failure to do this will cause a new FlightAware site ID to be generated every time you launch the container.**
 
-See below for more info.
-
-## Already running PiAware
+### Already running PiAware
 
 You'll need your *feeder-id* from your existing feeder.
 
@@ -80,7 +117,7 @@ To get your *feeder-id*, log onto your feeder and issue the command:
 piaware-config -show feeder-id
 ```
 
-## New to PiAware
+### New to PiAware
 
 You'll need a *feeder-id*. To get one, you can temporarily run the container, to allow it to communicate with the FlightAware servers and get a new feeder ID.
 
@@ -102,6 +139,11 @@ For example:
 
 ```shell
 $ timeout 30 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 mikenye/piaware:latest | grep "my feeder ID"
+```
+
+Will output:
+
+```text
 Set allow-mlat to yes in /etc/piaware.conf:1
 Set allow-modeac to yes in /etc/piaware.conf:2
 Set allow-auto-updates to no in /etc/piaware.conf:3
@@ -117,93 +159,28 @@ You'll now want to "claim" this feeder.
 
 To do this, go to: [FlightAware PiAware Claim](https://flightaware.com/adsb/piaware/claim) and follow the instructions there.
 
-## Up-and-Running with `docker run` with RTLSDR USB
+## Deployment Examples
 
-Firstly, plug in your USB radio.
-
-Run the command `lsusb` and find your radio. It'll look something like this:
-
-```shell
-Bus 001 Device 004: ID 0bda:2832 Realtek Semiconductor Corp. RTL2832U DVB-T
-```
-
-Take note of the bus number, and device number. In the output above, its 001 and 004 respectively.
-
-Start the docker container, passing through the USB device:
+### Example `docker run` command with RTL-SDR USB for reception of 1090MHz
 
 ```shell
 docker run \
  -d \
  --rm \
  --name piaware \
- --device /dev/bus/usb/USB_BUS_NUMBER/USB_DEVICE_NUMBER \
- -e TZ="YOUR_TIMEZONE" \
- -e LAT=LATITUDE_OF_YOUR_ANTENNA \
- -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
- -p 8080:80 \
- mikenye/piaware
-```
-
-For example, based on the `lsusb` output above:
-
-```shell
-docker run \
- -d \
- --rm \
- --name piaware \
- --device /dev/bus/usb/001/004 \
- -e TZ="Australia/Perth" \
- -e LAT=-33.33333 \
- -e LONG=111.11111 \
- -p 8080:80 \
- mikenye/piaware
-```
-
-After running for the first time, it is strongly suggested to get your feeded ID from the container logs, and re-create the container with the `FEEDER_ID` environment variable set.
-
-For example:
-
-```shell
-docker logs piaware | grep -i 'my feeder id'
-```
-
-...should return something like:
-
-```shell
-2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
-```
-
-You would then re-create your container:
-
-```shell
-docker run \
- -d \
- --rm \
- --name piaware \
- --device /dev/bus/usb/001/004 \
+ --device /dev/bus/usb \
  -e TZ="Australia/Perth" \
  -e LAT=-33.33333 \
  -e LONG=111.11111 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
+ -e RECEIVER_TYPE=rtlsdr \
  -p 8080:80 \
  mikenye/piaware
 ```
 
-## Up-and-Running with Docker Compose with RTLSDR USB
+### Example `docker-compose.yml` with RTL-SDR USB for reception of 1090MHz
 
-Firstly, plug in your USB radio.
-
-Run the command `lsusb` and find your radio. It'll look something like this:
-
-```shell
-Bus 001 Device 004: ID 0bda:2832 Realtek Semiconductor Corp. RTL2832U DVB-T
-```
-
-Take note of the bus number, and device number. In the output above, its 001 and 004 respectively. This is used in the `devices:` section of the `docker-compose.xml`. Change these in your environment as required.
-
-An example `docker-compose.xml` file is below:
-
-```shell
+```yaml
 version: '2.0'
 
 services:
@@ -213,7 +190,7 @@ services:
     container_name: piaware
     restart: always
     devices:
-      - /dev/bus/usb/001/004:/dev/bus/usb/001/004
+      - /dev/bus/usb:/dev/bus/usb
     ports:
       - 8080:80
       - 30003:30003
@@ -222,26 +199,42 @@ services:
       - TZ="Australia/Perth"
       - LAT=-33.33333
       - LONG=111.11111
-
+      - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
+      - RECEIVER_TYPE=rtlsdr
 ```
 
-After running for the first time, it is strongly suggested to get your feeded ID from the container logs, and re-create the container with the `FEEDER_ID` environment variable set.
+### Example `docker run` command with 2x RTL-SDR USB for reception of 1090MHz and 978MHz
 
-For example:
+This will currently only work in the United States of America, as they are the only country that uses ADS-B UAT on 978MHz.
+
+This example assumes that:
+
+* Your 1090MHz RTL-SDR has its serial set to `00001090`
+* Your 978MHz RTL-SDR has its serial set to `00000978`
 
 ```shell
-docker logs piaware | grep -i 'my feeder id'
+docker run \
+ -d \
+ --rm \
+ --name piaware \
+ --device /dev/bus/usb \
+ -e TZ="Australia/Perth" \
+ -e LAT=-33.33333 \
+ -e LONG=111.11111 \
+ -e RECEIVER_TYPE=rtlsdr \
+ -e DUMP1090_DEVICE=00001090 \
+ -e UAT_RECEIVER_TYPE=rtlsdr \
+ -e DUMP978_DEVICE=00000978 \
+ -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
+ -p 8080:80 \
+ mikenye/piaware
 ```
 
-...should return something like:
+### Example `docker-compose.yml` with 2x RTL-SDR USB for reception of 1090MHz and 978MHz
 
-```shell
-2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
-```
+This will currently only work in the United States of America, as they are the only country that uses ADS-B UAT on 978MHz.
 
-You would then update your `docker-compose.yml` file:
-
-```shell
+```yaml
 version: '2.0'
 
 services:
@@ -251,7 +244,7 @@ services:
     container_name: piaware
     restart: always
     devices:
-      - /dev/bus/usb/001/004:/dev/bus/usb/001/004
+      - /dev/bus/usb:/dev/bus/usb
     ports:
       - 8080:80
       - 30003:30003
@@ -261,76 +254,47 @@ services:
       - LAT=-33.33333
       - LONG=111.11111
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
+      - RECEIVER_TYPE=rtlsdr
+      - DUMP1090_DEVICE=00001090
+      - UAT_RECEIVER_TYPE=rtlsdr
+      - DUMP978_DEVICE=00000978
 ```
 
-... and issue a `docker-compose up -d` to re-create the container.
+### Example `docker run` with external Mode-S/BEAST provider
 
-## Up-and-Running with `docker run` with external Mode-S/BEAST provider
+An example of an external Mode-S/BEAST provider would be:
 
-Start the docker container, passing the hostname (and port if not using 30005) of the external Mode-S/BEAST provider as environment variables:
+* [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) container
+* Another hardware feeder that provides BEAST output data on port 30005
+
+In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
 
 ```shell
 docker run \
  -d \
  --rm \
  --name piaware \
- -e TZ="YOUR_TIMEZONE" \
- -e LAT=LATITUDE_OF_YOUR_ANTENNA \
- -e LONG=LONGITUDE_OF_YOUR_ANTENNA \
- -e BEASTHOST=beasthost \
- mikenye/piaware
-```
-
-For example, based on the `lsusb` output above:
-
-```shell
-docker run \
- -d \
- --rm \
- --name piaware \
+ --device /dev/bus/usb \
  -e TZ="Australia/Perth" \
  -e LAT=-33.33333 \
  -e LONG=111.11111 \
+ -e RECEIVER_TYPE=relay \
  -e BEASTHOST=beasthost \
- mikenye/piaware
-```
-
-After running for the first time, it is strongly suggested to get your feeded ID from the container logs, and re-create the container with the `FEEDER_ID` environment variable set.
-
-For example:
-
-```shell
-docker logs piaware | grep -i 'my feeder id'
-```
-
-...should return something like:
-
-```
-2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
-```
-
-You would then re-create your container:
-
-```shell
-docker run \
- -d \
- --rm \
- --name piaware \
- -e TZ="Australia/Perth" \
- -e LAT=-33.33333 \
- -e LONG=111.11111 \
- -e BEASTHOST=beasthost \
+ -e BEASTPORT=30005 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  mikenye/piaware
 ```
 
-## Up-and-Running with Docker Compose with external Mode-S/BEAST provider
+### Example `docker-compose.yml` with external Mode-S/BEAST provider
 
-Pass the hostname (and port if not using 30005) of the external Mode-S/BEAST provider as environment variables:
+An example of an external Mode-S/BEAST provider would be:
 
-An example `docker-compose.xml` file is below:
+* [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) container
+* Another hardware feeder that provides BEAST output data on port 30005
 
-```shell
+In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
+
+```yaml
 version: '2.0'
 
 services:
@@ -339,48 +303,94 @@ services:
     tty: true
     container_name: piaware
     restart: always
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
     environment:
       - TZ="Australia/Perth"
       - LAT=-33.33333
       - LONG=111.11111
+      - RECEIVER_TYPE=relay
       - BEASTHOST=beasthost
-
-```
-
-After running for the first time, it is strongly suggested to get your feeded ID from the container logs, and re-create the container with the `FEEDER_ID` environment variable set.
-
-For example:
-
-```shell
-docker logs piaware | grep -i 'my feeder id'
-```
-
-...should return something like:
-
-```
-2020-02-19 16:17:03.153071500 [piaware] my feeder ID is c478b1c99-23d3-4376-1f82-47352a28cg37
-```
-
-You would then update your `docker-compose.yml` file:
-
-```shell
-version: '2.0'
-
-services:
-  piaware:
-    image: mikenye/piaware:latest
-    tty: true
-    container_name: piaware
-    restart: always
-    environment:
-      - TZ="Australia/Perth"
-      - LAT=-33.33333
-      - LONG=111.11111
-      - BEASTHOST=beasthost
+      - BEASTPORT=30005
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
 ```
 
-... and issue a `docker-compose up -d` to re-create the container.
+### Example `docker run` with external Mode-S/BEAST provider and external UAT provider
+
+This will currently only work in the United States of America, as they are the only country that uses ADS-B UAT on 978MHz.
+
+An example of an external Mode-S/BEAST provider would be:
+
+* [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) container
+* Another hardware feeder that provides BEAST output data on port 30005
+
+In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
+
+An example of an external UAT provider would be:
+
+* [`mikenye/dump978`](https://github.com/mikenye/docker-dump978) container
+
+In the example below, it is assumed that the external UAT provider resolves to `uathost` and is listening for connections on TCP port `30978`.
+
+```shell
+docker run \
+ -d \
+ --rm \
+ --name piaware \
+ --device /dev/bus/usb \
+ -e TZ="Australia/Perth" \
+ -e LAT=-33.33333 \
+ -e LONG=111.11111 \
+ -e RECEIVER_TYPE=relay \
+ -e BEASTHOST=beasthost \
+ -e BEASTPORT=30005
+ -e UAT_RECEIVER_TYPE=relay \
+ -e UAT_RECEIVER_HOST=uathost \
+ -e UAT_RECEIVER_PORT=30978 \
+ -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
+ mikenye/piaware
+```
+
+### Example `docker-compose.yml` with external Mode-S/BEAST provider and external UAT provider
+
+This will currently only work in the United States of America, as they are the only country that uses ADS-B UAT on 978MHz.
+
+An example of an external Mode-S/BEAST provider would be:
+
+* [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) container
+* Another hardware feeder that provides BEAST output data on port 30005
+
+In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
+
+An example of an external UAT provider would be:
+
+* [`mikenye/dump978`](https://github.com/mikenye/docker-dump978) container
+
+In the example below, it is assumed that the external UAT provider resolves to `uathost` and is listening for connections on TCP port `30978`.
+
+```yaml
+version: '2.0'
+
+services:
+  piaware:
+    image: mikenye/piaware:latest
+    tty: true
+    container_name: piaware
+    restart: always
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    environment:
+      - TZ="Australia/Perth"
+      - LAT=-33.33333
+      - LONG=111.11111
+      - RECEIVER_TYPE=relay
+      - BEASTHOST=beasthost
+      - BEASTPORT=30005
+      - UAT_RECEIVER_TYPE=relay
+      - UAT_RECEIVER_HOST=uathost
+      - UAT_RECEIVER_PORT=30978
+      - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
+```
 
 ## Environment Variables
 
@@ -477,24 +487,27 @@ The following ports are used by this container:
 * `30978` - If UAT decoding is enabled, UAT raw data published on this port - optional, recommended to leave unmapped unless explicitly needed
 * `30979` - If UAT decoding is enabled, UAT decoded JSON published on this port - optional, recommended to leave unmapped unless explicitly needed
 
-## Claiming
+## Claiming Your Receiver
 
 Since version 3.8.0 the `flightaware-user` and `flightaware-password` configuration options are no longer used; please use the normal site-claiming mechanisms to associate sites with a FlightAware account.
 
 [FlightAware PiAware Claim](https://flightaware.com/adsb/piaware/claim)
 
-## Feed to other services
-
-Check out the images:
-
-* [mikenye/adsbexchange](https://hub.docker.com/r/mikenye/adsbexchange)
-* [mikenye/fr24feed](https://hub.docker.com/r/mikenye/fr24feed)
-* [mikenye/readsb](https://hub.docker.com/repository/docker/mikenye/readsb)
-
 ## Logging
 
 * All processes are logged to the container's stdout, and can be viewed with `docker logs [-f] container`.
 * `lighttpd` (which provides SkyAware & SkyAware978) is configured to not log (except for a startup message on container start)
+
+## Other services to feed
+
+Check out these other images:
+
+* [`mikenye/adsbexchange`](https://hub.docker.com/r/mikenye/adsbexchange) to feed ADSB data to [adsbexchange.com](https://adsbexchange.com)
+* [`mikenye/adsbhub`](https://hub.docker.com/r/mikenye/adsbhub) to feed ADSB data into [adsbhub.org](https://adsbhub.org/)
+* [`mikenye/fr24feed`](https://hub.docker.com/r/mikenye/fr24feed) to feed ADSB data into [flightradar24.com](https://www.flightradar24.com)
+* [`mikenye/radarbox`](https://hub.docker.com/r/mikenye/radarbox) to feed ADSB data into [radarbox.com](https://www.radarbox.com)
+* [`mikenye/opensky-network`](https://hub.docker.com/r/mikenye/opensky-network) to feed ADSB data into [opensky-network.org](https://opensky-network.org/)
+* [`mikenye/planefinder`](https://hub.docker.com/r/mikenye/planefinder) to feed ADSB data into [planefinder.net](https://planefinder.net/)
 
 ## Getting help
 
