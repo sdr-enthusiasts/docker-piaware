@@ -62,20 +62,20 @@ fi
 # Make sure 978MHz data is being sent to flightaware
 if [[ -n "$UAT_RECEIVER_HOST" ]]; then
     # look for log messages from socat
-    FA_DUMP978_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa socat 12)
+    FA_DUMP978_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa socat 24)
     if [[ "$FA_DUMP978_MSGS_SENT_PAST_HOUR" -gt 0 ]]; then
-        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past hour, OK."
+        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past 2 hours, OK."
     else
-        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past hour, NOT OK."
+        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past 2 hours, NOT OK."
         EXITCODE=1
     fi
 elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
     # look for log messages from dump978-fa
-    FA_DUMP1090_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa dump978-fa 12)
+    FA_DUMP1090_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa dump978-fa 24)
     if [[ "$FA_DUMP978_MSGS_SENT_PAST_HOUR" -gt 0 ]]; then
-        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past hour, OK."
+        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past 2 hours, OK."
     else
-        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past hour, NOT OK."
+        echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past 2 hours, NOT OK."
         EXITCODE=1
     fi
 fi
