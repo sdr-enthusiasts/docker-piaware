@@ -71,7 +71,7 @@ jobs:
         name: Get latest image version
         run: |
           docker pull "${{ env.REPO }}/${{ env.IMAGE }}:latest"
-          ./.github/get_version.sh
+          echo "VERSION_TAG=$(docker run --rm --entrypoint cat "${REPO}/${IMAGE}:latest" /VERSIONS | grep piaware | cut -d " " -f 2)" >> $GITHUB_ENV
           echo "${{ env.REPO }}/${{ env.IMAGE }}:latest contains version: ${{ env.VERSION_TAG }}"
 
       # Build version specific
