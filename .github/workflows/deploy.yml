@@ -4,16 +4,24 @@ on:
 
   # Build and deploy the image on pushes to master branch
   push:
-    branches: 
-      - master
+    #branches: 
+    #  - master
 
   # Build and deploy the image nightly (to ensure we pick up any security updates)
   schedule:
     - cron: "0 0 * * *"
 
 jobs:
-  deploy:
+  deploy_dockerhub:
+    name: Deploy to DockerHub
     runs-on: ubuntu-latest
+
+    # Set job-wide environment variables
+    #  - REPO: repo name on dockerhub
+    #  - IMAGE: image name on dockerhub
+    env:
+      REPO: mikenye
+      IMAGE: piaware
     steps:
 
       # Check out our code
@@ -56,15 +64,21 @@ jobs:
       # Build "latest"
       - 
         name: Build & Push - latest
-        run: docker buildx build --no-cache --progress plain -t "mikenye/piaware:latest" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        run: docker buildx build --no-cache --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+
+      # Get version from "latest"
+      -
+        name: Get latest image version
+        run: |
+          docker pull "${{ env.REPO }}/${{ env.IMAGE }}:latest"
+          ./.github/get_version.sh
+          echo "${{ env.REPO }}/${{ env.IMAGE }}:latest contains version: ${{ env.VERSION_TAG }}"
 
       # Build version specific
       - 
         name: Build & Push - version specific
         run: |
-          docker pull "mikenye/piaware:latest"
-          VERSION=$(docker run --rm -it --entrypoint cat mikenye/piaware /VERSIONS | grep piaware | cut -d " " -f 2)
-          docker buildx build --progress plain -t "mikenye/piaware:${VERSION}" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+          docker buildx build --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
 
       # Patch dockerfile to remove healthcheck
       -
@@ -74,12 +88,10 @@ jobs:
       # Build "latest_nohealthcheck"
       - 
         name: Build & Push - latest
-        run: docker buildx build -f Dockerfile.nohealthcheck --no-cache --progress plain -t "mikenye/piaware:latest_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        run: docker buildx build -f Dockerfile.nohealthcheck --no-cache --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
 
       # Build version specific _nohealthcheck
       - 
         name: Build & Push - version specific
         run: |
-          docker pull "mikenye/piaware:latest"
-          VERSION=$(docker run --rm -it --entrypoint cat mikenye/piaware /VERSIONS | grep piaware | cut -d " " -f 2)
-          docker buildx build -f Dockerfile.nohealthcheck --progress plain -t "mikenye/piaware:${VERSION}_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+          docker buildx build -f Dockerfile.nohealthcheck --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
