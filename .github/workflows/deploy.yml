@@ -36,9 +36,10 @@ jobs:
         uses: docker/setup-buildx-action@v1
       - 
         name: Build & Push - latest
-        run: docker buildx build --no-cache --progress plain -t "mikenye/piaware:latest" --compress --load --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        run: docker buildx build --no-cache --progress plain -t "mikenye/piaware:latest" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
       - 
         name: Build & Push - version specific
         run: |
+          docker pull "mikenye/piaware:latest"
           VERSION=$(docker run --rm -it --entrypoint cat mikenye/piaware /VERSIONS | grep piaware | cut -d " " -f 2)
-          docker buildx build --progress plain -t "mikenye/piaware:${VERSION}" --compress --load --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+          docker buildx build --progress plain -t "mikenye/piaware:${VERSION}" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
