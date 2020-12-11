@@ -65,3 +65,21 @@ jobs:
           docker pull "mikenye/piaware:latest"
           VERSION=$(docker run --rm -it --entrypoint cat mikenye/piaware /VERSIONS | grep piaware | cut -d " " -f 2)
           docker buildx build --progress plain -t "mikenye/piaware:${VERSION}" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+
+      # Patch dockerfile to remove healthcheck
+      -
+        name: Patch Dockerfile to remove healthcheck
+        run: sed '/^HEALTHCHECK /d' < Dockerfile > Dockerfile.nohealthcheck
+      
+      # Build "latest_nohealthcheck"
+      - 
+        name: Build & Push - latest
+        run: docker buildx build -f Dockerfile.nohealthcheck --no-cache --progress plain -t "mikenye/piaware:latest_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+
+      # Build version specific _nohealthcheck
+      - 
+        name: Build & Push - version specific
+        run: |
+          docker pull "mikenye/piaware:latest"
+          VERSION=$(docker run --rm -it --entrypoint cat mikenye/piaware /VERSIONS | grep piaware | cut -d " " -f 2)
+          docker buildx build -f Dockerfile.nohealthcheck --progress plain -t "mikenye/piaware:${VERSION}_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
