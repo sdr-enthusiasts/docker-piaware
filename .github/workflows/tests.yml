@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  buildx:
+    name: Test image build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        docker-platform:
+          - linux/amd64
+          - linux/arm64
+          - linux/arm/v6
+          - linux/arm/v7
+          - linux/i386
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      - 
+        name: Copy CA Certificates from GitHub Runner to Image rootfs
+        run: |
+          ls -la /etc/ssl/certs/
+          mkdir -p ./rootfs/etc/ssl/certs
+          mkdir -p ./rootfs/usr/share/ca-certificates/mozilla
+          cp --no-dereference /etc/ssl/certs/*.crt ./rootfs/etc/ssl/certs
+          cp --no-dereference /etc/ssl/certs/*.pem ./rootfs/etc/ssl/certs
+          cp --no-dereference /usr/share/ca-certificates/mozilla/*.crt ./rootfs/usr/share/ca-certificates/mozilla
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - 
+        name: Build ${{ matrix.docker-platform }}
+        run: docker buildx build --no-cache --progress plain -t "mikenye/piaware" --platform ${{ matrix.docker-platform }} .
