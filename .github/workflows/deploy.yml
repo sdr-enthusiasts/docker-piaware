@@ -4,8 +4,8 @@ on:
 
   # Build and deploy the image on pushes to master branch
   push:
-    #branches: 
-    #  - master
+    branches: 
+      - master
 
   # Build and deploy the image nightly (to ensure we pick up any security updates)
   schedule:
@@ -87,11 +87,11 @@ jobs:
       
       # Build "latest_nohealthcheck"
       - 
-        name: Build & Push - latest
+        name: Build & Push - latest nohealthcheck
         run: docker buildx build -f Dockerfile.nohealthcheck --no-cache --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
 
       # Build version specific _nohealthcheck
       - 
-        name: Build & Push - version specific
+        name: Build & Push - version specific nohealthcheck
         run: |
           docker buildx build -f Dockerfile.nohealthcheck --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
