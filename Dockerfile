@@ -21,6 +21,8 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+COPY rootfs/ /
+
 # Note, the specific commit of rtlsdr is to address issue #15
 # See: https://github.com/mikenye/docker-piaware/issues/15
 # This should be revisited in future when rtlsdr 0.6.1 or newer is released
@@ -272,8 +274,6 @@ RUN set -x && \
     # SoapySDRUtil --info > /dev/null 2>&1 && \
     # # dump978-fa --version > /dev/null 2>&1 && \
     echo "========== Done! =========="
-
-COPY rootfs/ /
 
 EXPOSE 80/tcp 30003/tcp 30005/tcp 30105/tcp 30978/tcp 30979/tcp
 
