@@ -13,7 +13,7 @@ on:
 
 jobs:
   deploy_dockerhub:
-    name: Deploy to DockerHub (Single Arch)
+    name: Deploy to DockerHub
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -69,24 +69,28 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v1
 
+      # Get archictecture tag
+      -
+        name: Get image architecture suffix
+        run: echo "ARCH_TAG=$(echo '${{ matrix.docker-platform }}' | cut -d '/' -f2- | tr -s '/' '_')" >> $GITHUB_ENV
+
       # Build "latest"
       - 
         name: Build & Push - latest
-        run: docker buildx build --no-cache --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ matrix.docker-platform }}" --compress --platform "${{ matrix.docker-platform }}" .
+        run: docker buildx build --no-cache --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ env.ARCH_TAG }}" --compress --platform "${{ matrix.docker-platform }}" .
 
       # Get version from "latest"
       -
         name: Get latest image version
         run: |
-          docker pull "${{ env.REPO }}/${{ env.IMAGE }}:latest"
-          echo "VERSION_TAG=$(docker run --rm --entrypoint cat "${REPO}/${IMAGE}:latest_${{ matrix.docker-platform }}" /CONTAINER_VERSION)" >> $GITHUB_ENV
-          echo "${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ matrix.docker-platform }} contains version: ${{ env.VERSION_TAG }}"
+          docker pull "${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ env.ARCH_TAG }}"
+          echo "VERSION_TAG=$(docker run --rm --entrypoint cat "${REPO}/${IMAGE}:latest_${{ env.ARCH_TAG }}" /CONTAINER_VERSION)" >> $GITHUB_ENV
+          echo "${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ env.ARCH_TAG }} contains version: ${{ env.VERSION_TAG }}"
 
       # Build version specific
       - 
         name: Build & Push - version specific
-        run: |
-          docker buildx build --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_${{ matrix.docker-platform }}" --compress --platform "${{ matrix.docker-platform }}" .
+        run: docker buildx build --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_${{ env.ARCH_TAG }}" --compress --platform "${{ matrix.docker-platform }}" .
 
       # Patch dockerfile to remove healthcheck
       -
@@ -96,10 +100,9 @@ jobs:
       # Build "latest_nohealthcheck"
       - 
         name: Build & Push - latest nohealthcheck
-        run: docker buildx build -f Dockerfile.nohealthcheck --no-cache --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck_${{ matrix.docker-platform }}" --compress --platform "${{ matrix.docker-platform }}" .
+        run: docker buildx build -f Dockerfile.nohealthcheck --no-cache --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck_${{ env.ARCH_TAG }}" --compress --platform "${{ matrix.docker-platform }}" .
 
       # Build version specific _nohealthcheck
       - 
         name: Build & Push - version specific nohealthcheck
-        run: |
-          docker buildx build -f Dockerfile.nohealthcheck --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck_${{ matrix.docker-platform }}" --compress --platform "${{ matrix.docker-platform }}" .
+        run: docker buildx build -f Dockerfile.nohealthcheck --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck_${{ env.ARCH_TAG }}" --compress --platform "${{ matrix.docker-platform }}" .

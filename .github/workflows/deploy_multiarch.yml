@@ -77,8 +77,7 @@ jobs:
       # Build version specific
       - 
         name: Build & Push - version specific
-        run: |
-          docker buildx build --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        run: docker buildx build --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
 
       # Patch dockerfile to remove healthcheck
       -
@@ -93,5 +92,4 @@ jobs:
       # Build version specific _nohealthcheck
       - 
         name: Build & Push - version specific nohealthcheck
-        run: |
-          docker buildx build -f Dockerfile.nohealthcheck --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        run: docker buildx build -f Dockerfile.nohealthcheck --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck" --compress --push --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
