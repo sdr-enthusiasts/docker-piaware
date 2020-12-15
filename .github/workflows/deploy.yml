@@ -6,6 +6,7 @@ on:
   push:
     branches: 
       - master
+      - main
 
   # Build and deploy the image nightly (to ensure we pick up any security updates)
   schedule:
@@ -72,6 +73,11 @@ jobs:
         run: |
           docker pull "${{ env.REPO }}/${{ env.IMAGE }}:latest"
           echo "VERSION_TAG=$(docker run --rm --entrypoint cat "${REPO}/${IMAGE}:latest" /CONTAINER_VERSION)" >> $GITHUB_ENV
+
+      # Show version from "latest"
+      -
+        name: Show latest image version
+        run: |
           echo "${{ env.REPO }}/${{ env.IMAGE }}:latest contains version: ${{ env.VERSION_TAG }}"
 
       # Build version specific
@@ -156,6 +162,11 @@ jobs:
         name: Get image architecture suffix
         run: |
           echo "ARCH_TAG=$(echo '${{ matrix.docker-platform }}' | cut -d '/' -f2- | tr -s '/' '_')" >> $GITHUB_ENV
+      
+      # Show archictecture suffix
+      -
+        name: Show image architecture suffix
+        run: |
           echo "Architecture suffix: ${{ env.ARCH_TAG }}"
 
       # Build "latest"
@@ -169,7 +180,12 @@ jobs:
         run: |
           docker pull "${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ env.ARCH_TAG }}"
           echo "VERSION_TAG=$(docker run --rm --entrypoint cat "${REPO}/${IMAGE}:latest_${{ env.ARCH_TAG }}" /CONTAINER_VERSION)" >> $GITHUB_ENV
-          echo "${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ env.ARCH_TAG }} contains version: ${{ env.VERSION_TAG }}"
+
+      # Show version from "latest"
+      -
+        name: Show latest image version
+        run: |
+          echo "${{ env.REPO }}/${{ env.IMAGE }}:latest contains version: ${{ env.VERSION_TAG }}"
 
       # Build version specific
       - 
