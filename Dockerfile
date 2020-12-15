@@ -263,17 +263,8 @@ RUN set -x && \
     apt-get clean -y && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
     find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
-    # echo "========== Testing ==========" && \
-    # ldconfig && \
-    # bladeRF-cli --version > /dev/null 2>&1 && \
-    # hackrf_debug --help > /dev/null 2>&1 && \
-    # LimeUtil --help > /dev/null 2>&1 && \
-    # dump1090 --help > /dev/null 2>&1 && \
-    # mlat-client --help > /dev/null 2>&1 && \
-    # piaware -v > /dev/null 2>&1 && \
-    # SoapySDRUtil --info > /dev/null 2>&1 && \
-    # # dump978-fa --version > /dev/null 2>&1 && \
-    echo "========== Done! =========="
+    # Store container version
+    grep piaware /VERSIONS | cut -d " " -f 2 > /CONTAINER_VERSION
 
 EXPOSE 80/tcp 30003/tcp 30005/tcp 30105/tcp 30978/tcp 30979/tcp
 
