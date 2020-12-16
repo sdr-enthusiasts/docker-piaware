@@ -23,6 +23,8 @@ jobs:
     env:
       REPO: mikenye
       IMAGE: piaware
+      PUSH: true
+    
     steps:
 
       # Check out our code
@@ -63,9 +65,16 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       # Build "latest"
-      - 
+      -
         name: Build & Push - latest
-        run: docker buildx build --no-cache --push --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest" --compress --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          no-cache: true
+          platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64
+          push: ${{ env.PUSH }}
+          tags: ${{ env.REPO }}/${{ env.IMAGE }}:latest
 
       # Get version from "latest"
       -
@@ -81,9 +90,16 @@ jobs:
           echo "${{ env.REPO }}/${{ env.IMAGE }}:latest contains version: ${{ env.VERSION_TAG }}"
 
       # Build version specific
-      - 
+      -
         name: Build & Push - version specific
-        run: docker buildx build --push --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}" --compress --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          no-cache: true
+          platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64
+          push: ${{ env.PUSH }}
+          tags: ${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}
 
       # Patch dockerfile to remove healthcheck
       -
@@ -91,14 +107,28 @@ jobs:
         run: sed '/^HEALTHCHECK /d' < Dockerfile > Dockerfile.nohealthcheck
       
       # Build "latest_nohealthcheck"
-      - 
+      -
         name: Build & Push - latest nohealthcheck
-        run: docker buildx build -f Dockerfile.nohealthcheck --no-cache --push --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck" --compress --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile.nohealthcheck
+          no-cache: true
+          platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64
+          push: ${{ env.PUSH }}
+          tags: ${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck
 
       # Build version specific _nohealthcheck
-      - 
+      -
         name: Build & Push - version specific nohealthcheck
-        run: docker buildx build -f Dockerfile.nohealthcheck --push --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck" --compress --platform "linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64" .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile.nohealthcheck
+          no-cache: true
+          platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64
+          push: ${{ env.PUSH }}
+          tags: ${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck
 
   deploy_dockerhub_single_arch:
     name: Deploy to DockerHub
@@ -118,6 +148,8 @@ jobs:
     env:
       REPO: mikenye
       IMAGE: piaware
+      PUSH: true
+
     steps:
 
       # Check out our code
@@ -170,10 +202,17 @@ jobs:
           echo "Architecture suffix: ${{ env.ARCH_TAG }}"
 
       # Build "latest"
-      - 
+      -
         name: Build & Push - latest
-        run: docker buildx build --no-cache --push --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ env.ARCH_TAG }}" --compress --platform "${{ matrix.docker-platform }}" .
-
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          no-cache: true
+          platforms: ${{ matrix.docker-platform }}
+          push: ${{ env.PUSH }}
+          tags: ${{ env.REPO }}/${{ env.IMAGE }}:latest_${{ env.ARCH_TAG }}
+      
       # Get version from "latest"
       -
         name: Get latest image version
@@ -188,9 +227,16 @@ jobs:
           echo "${{ env.REPO }}/${{ env.IMAGE }}:latest contains version: ${{ env.VERSION_TAG }}"
 
       # Build version specific
-      - 
+      -
         name: Build & Push - version specific
-        run: docker buildx build --push --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_${{ env.ARCH_TAG }}" --compress --platform "${{ matrix.docker-platform }}" .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          no-cache: true
+          platforms: ${{ matrix.docker-platform }}
+          push: ${{ env.PUSH }}
+          tags: ${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_${{ env.ARCH_TAG }}
 
       # Patch dockerfile to remove healthcheck
       -
@@ -198,11 +244,25 @@ jobs:
         run: sed '/^HEALTHCHECK /d' < Dockerfile > Dockerfile.nohealthcheck
       
       # Build "latest_nohealthcheck"
-      - 
+      -
         name: Build & Push - latest nohealthcheck
-        run: docker buildx build -f Dockerfile.nohealthcheck --no-cache --push --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck_${{ env.ARCH_TAG }}" --compress --platform "${{ matrix.docker-platform }}" .
-
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile.nohealthcheck
+          no-cache: true
+          platforms: ${{ matrix.docker-platform }}
+          push: ${{ env.PUSH }}
+          tags: ${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck_${{ env.ARCH_TAG }}
+      
       # Build version specific _nohealthcheck
-      - 
+      -
         name: Build & Push - version specific nohealthcheck
-        run: docker buildx build -f Dockerfile.nohealthcheck --push --progress plain -t "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck_${{ env.ARCH_TAG }}" --compress --platform "${{ matrix.docker-platform }}" .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile.nohealthcheck
+          no-cache: true
+          platforms: ${{ matrix.docker-platform }}
+          push: ${{ env.PUSH }}
+          tags: ${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck_${{ env.ARCH_TAG }}
