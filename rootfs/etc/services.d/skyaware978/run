@@ -17,6 +17,8 @@ if [[ -z "$RUN_SKYAWARE978" ]]; then
   exit 0
 fi
 
+mkdir -p /run/skyaware978
+
 set -eo pipefail
 
 # shellcheck disable=SC2016
