@@ -180,6 +180,8 @@ docker run \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  -e RECEIVER_TYPE=rtlsdr \
  -p 8080:80 \
+ --tmpfs=/run:exec,size=64M \
+ --tmpfs=/var/log \
  mikenye/piaware
 ```
 
@@ -206,6 +208,9 @@ services:
       - LONG=111.11111
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
       - RECEIVER_TYPE=rtlsdr
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log
 ```
 
 ### Example `docker run` command with 2x RTL-SDR USB for reception of 1090MHz and 978MHz
@@ -232,6 +237,8 @@ docker run \
  -e DUMP978_DEVICE=00000978 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  -p 8080:80 \
+ --tmpfs=/run:exec,size=64M \
+ --tmpfs=/var/log \
  mikenye/piaware
 ```
 
@@ -263,6 +270,9 @@ services:
       - DUMP1090_DEVICE=00001090
       - UAT_RECEIVER_TYPE=rtlsdr
       - DUMP978_DEVICE=00000978
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log
 ```
 
 ### Example `docker run` with external Mode-S/BEAST provider
@@ -287,6 +297,8 @@ docker run \
  -e BEASTHOST=beasthost \
  -e BEASTPORT=30005 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
+ --tmpfs=/run:exec,size=64M \
+ --tmpfs=/var/log \
  mikenye/piaware
 ```
 
@@ -318,6 +330,9 @@ services:
       - BEASTHOST=beasthost
       - BEASTPORT=30005
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log
 ```
 
 ### Example `docker run` with external Mode-S/BEAST provider and external UAT provider
@@ -353,6 +368,8 @@ docker run \
  -e UAT_RECEIVER_HOST=uathost \
  -e UAT_RECEIVER_PORT=30978 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
+ --tmpfs=/run:exec,size=64M \
+ --tmpfs=/var/log \
  mikenye/piaware
 ```
 
@@ -395,6 +412,9 @@ services:
       - UAT_RECEIVER_HOST=uathost
       - UAT_RECEIVER_PORT=30978
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log
 ```
 
 ## Environment Variables
