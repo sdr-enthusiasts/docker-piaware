@@ -2,6 +2,8 @@
 # shellcheck shell=bash
 set -eo pipefail
 
+mkdir -p /run/dump1090-fa
+
 DUMP1090_BIN="/usr/local/bin/dump1090"
 
 # Global settings
