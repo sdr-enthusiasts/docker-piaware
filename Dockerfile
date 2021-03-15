@@ -233,8 +233,9 @@ RUN git clone "${URL_REPO_PIAWARE_WEB}" "/src/piaware-web" && \
     cp -Rv /src/piaware-web/web/. /var/www/html/
 
     # Build & install dump1090
-RUN git clone "${URL_REPO_DUMP1090}" "/src/dump1090" && \
-    pushd "/src/dump1090" && \
+RUN git clone "${URL_REPO_DUMP1090}" "/src/dump1090"
+
+RUN pushd "/src/dump1090" && \
     BRANCH_DUMP1090="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_DUMP1090}" && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
