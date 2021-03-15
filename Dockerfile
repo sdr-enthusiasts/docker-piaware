@@ -237,10 +237,9 @@ RUN git clone "${URL_REPO_DUMP1090}" "/src/dump1090" && \
     pushd "/src/dump1090" && \
     BRANCH_DUMP1090="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_DUMP1090}" && \
-    echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS
-
+    echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
     # Reduce aggressive compiler optimisations
-RUN sed -i 's/ -O3 / -O2 /g' Makefile && \
+    sed -i 's/ -O3 / -O2 /g' Makefile && \
     make showconfig && \
     make all && \
     make faup1090 && \
