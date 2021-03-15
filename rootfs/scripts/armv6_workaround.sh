@@ -13,4 +13,5 @@ if echo "${FILEOUTPUT}" | grep "aarch64" > /dev/null; then TARGET_ARCH="aarch64"
 if [ -z "${TARGET_ARCH}" ]; then exit 1; fi
 
 # Workaround for compiling for armv6
+# shellcheck disable=SC2016
 if [[ "$TARGET_ARCH" == "arm" ]]; then sed -i 's/ARCH ?= $(shell uname -m)/ARCH ?= generic/g' "$1"; fi
