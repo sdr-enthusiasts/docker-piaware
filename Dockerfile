@@ -236,7 +236,7 @@ RUN git clone "${URL_REPO_PIAWARE_WEB}" "/src/piaware-web" && \
 RUN git clone "${URL_REPO_DUMP1090}" "/src/dump1090"
 
 RUN set -x && \
-    echo "$TARGETPLATFORM" && \
+    uname -m && \
     pushd "/src/dump1090" && \
     BRANCH_DUMP1090="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_DUMP1090}" && \
