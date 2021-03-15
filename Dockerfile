@@ -227,7 +227,10 @@ RUN set -x && \
     git checkout "${BRANCH_DUMP1090}" && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
     # Reduce aggressive compiler optimisations
-    sed -i 's/ -O3 / -O2 /g' Makefile && \
+    sed -i 's/ -O3 / -O2 /g' ./Makefile && \
+    # Implement ARMv6 workaround
+    bash -x /scripts/armv6_workaround.sh ./Makefile && \
+    # Make dump1090
     make showconfig && \
     make all && \
     make faup1090 && \
@@ -258,7 +261,8 @@ RUN set -x && \
     cp -v ./beast-splitter /usr/local/bin/ && \
     popd && \
     # Deploy s6-overlay.
-    curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
+    curl -s -o /tmp/deploy-s6-overlay.sh https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh && \
+    bash /tmp/deploy-s6-overlay.sh && \
     # Clean up
     apt-get remove -y ${TEMP_PACKAGES[@]} && \
     apt-get autoremove -y && \
