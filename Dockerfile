@@ -239,7 +239,9 @@ RUN git clone "${URL_REPO_DUMP1090}" "/src/dump1090" && \
     git checkout "${BRANCH_DUMP1090}" && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
     # Reduce aggressive compiler optimisations
-    #sed -i 's/ -O3 / -O2 /g' Makefile && \
+    sed -i 's/ -O3 / -O2 /g' Makefile && \
+    # Remove -Werror (so warnings are warnings, not errors - seems to be required for ARMv6)
+    sed -i 's/ -Werror / /g' Makefile && \
     make showconfig && \
     make all && \
     make faup1090 && \
