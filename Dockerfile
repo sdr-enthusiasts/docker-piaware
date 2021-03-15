@@ -243,8 +243,19 @@ RUN set -x && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
     # Reduce aggressive compiler optimisations
     sed -i 's/ -O3 / -O2 /g' Makefile && \
-    # Remove -Werror (so warnings are warnings, not errors - seems to be required for ARMv6)
-    sed -i 's/ -Werror / /g' Makefile && \
+    # # Remove -Werror (so warnings are warnings, not errors - seems to be required for ARMv6)
+    # sed -i 's/ -Werror / /g' Makefile && \
+
+    # Determine architecture
+    FILEBINARY=$(which file) && \
+    FILEOUTPUT=$("${FILEBINARY}" -L "${FILEBINARY}") && \
+    if echo "${FILEOUTPUT}" | grep "Intel 80386" > /dev/null; then TARGET_ARCH="x86"; fi && \
+    if echo "${FILEOUTPUT}" | grep "x86-64" > /dev/null; then TARGET_ARCH="amd64"; fi && \
+    if echo "${FILEOUTPUT}" | grep "ARM" > /dev/null; then TARGET_ARCH="arm"; fi && \
+    if echo "${FILEOUTPUT}" | grep "armhf" > /dev/null; then TARGET_ARCH="armhf"; fi && \
+    if echo "${FILEOUTPUT}" | grep "aarch64" > /dev/null; then TARGET_ARCH="aarch64"; fi && \
+    if [ -z "${S6OVERLAY_ARCH}" ]; then exit 1; fi && \
+    # ---
     make showconfig && \
     make wisdom.local && \
     make all && \
