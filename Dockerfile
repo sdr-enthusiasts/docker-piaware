@@ -254,10 +254,12 @@ RUN set -x && \
     if echo "${FILEOUTPUT}" | grep "ARM" > /dev/null; then TARGET_ARCH="arm"; fi && \
     if echo "${FILEOUTPUT}" | grep "armhf" > /dev/null; then TARGET_ARCH="armhf"; fi && \
     if echo "${FILEOUTPUT}" | grep "aarch64" > /dev/null; then TARGET_ARCH="aarch64"; fi && \
-    if [ -z "${S6OVERLAY_ARCH}" ]; then exit 1; fi && \
+    if [ -z "${TARGET_ARCH}" ]; then exit 1; fi && \
+    # Workaround for compiling for armv6
+    if [[ "$TARGET_ARCH" == "arm" ]]; then sed -i 's/ARCH ?= $(shell uname -m)/ARCH ?= generic/g' ./Makefile; fi && \
     # ---
+
     make showconfig && \
-    make wisdom.local && \
     make all && \
     make faup1090 && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
