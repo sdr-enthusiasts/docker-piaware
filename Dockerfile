@@ -242,6 +242,9 @@ RUN git clone "${URL_REPO_DUMP1090}" "/src/dump1090" && \
     sed -i 's/ -O3 / -O2 /g' Makefile && \
     # Remove -Werror (so warnings are warnings, not errors - seems to be required for ARMv6)
     sed -i 's/ -Werror / /g' Makefile && \
+    echo "====================" && \
+    grep -i '-Werror' Makefile && \
+    echo "====================" && \
     make showconfig && \
     make all && \
     make faup1090 && \
