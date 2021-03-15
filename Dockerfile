@@ -145,8 +145,8 @@ RUN git clone "${URL_REPO_SOAPYSDR}" "/src/SoapySDR" && \
     echo "SoapySDR $(SoapySDRUtil --info | grep -i 'lib version:' | cut -d ':' -f 2 | tr -d ' ')" >> /VERSIONS && \
     popd && popd
 
-RUN # Build & install SoapyRTLSDR
-    git clone "${URL_REPO_SOAPYRTLSDR}" "/src/SoapyRTLSDR" && \
+    # Build & install SoapyRTLSDR
+RUN git clone "${URL_REPO_SOAPYRTLSDR}" "/src/SoapyRTLSDR" && \
     pushd "/src/SoapyRTLSDR" && \
     BRANCH_SOAPYRTLSDR=$(git tag --sort="-creatordate" | head -1) && \
     git checkout "${BRANCH_SOAPYRTLSDR}" && \
