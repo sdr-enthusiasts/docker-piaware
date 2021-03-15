@@ -87,9 +87,10 @@ RUN set -x && \
         ${KEPT_PACKAGES[@]} \
         ${TEMP_PACKAGES[@]} \
         && \
-    git config --global advice.detachedHead false && \
+    git config --global advice.detachedHead false
+
     # Build & install rtl-sdr
-    git clone "${URL_REPO_RTLSDR}" "/src/rtl-sdr" && \
+RUN git clone "${URL_REPO_RTLSDR}" "/src/rtl-sdr" && \
     pushd "/src/rtl-sdr" && \
     #BRANCH_RTLSDR=$(git tag --sort="-creatordate" | head -1) && \
     #git checkout "tags/${BRANCH_RTLSDR}" && \
@@ -102,9 +103,10 @@ RUN set -x && \
     make -Wstringop-truncation install && \
     cp -v "/src/rtl-sdr/rtl-sdr.rules" "/etc/udev/rules.d/" && \
     ldconfig && \
-    popd && popd && \
+    popd && popd
+
     # Build & install HackRF
-    git clone "${URL_REPO_HACKRF}" "/src/hackrf" && \
+RUN git clone "${URL_REPO_HACKRF}" "/src/hackrf" && \
     pushd "/src/hackrf" && \
     BRANCH_HACKRF=$(git tag --sort="-creatordate" | head -1) && \
     git checkout "${BRANCH_HACKRF}" && \
@@ -114,9 +116,10 @@ RUN set -x && \
     make && \
     make install && \
     ldconfig && \
-    popd && popd && \
+    popd && popd
+
     # Build & install LimeSuite
-    git clone "${URL_REPO_LIMESUITE}" "/src/LimeSuite" && \
+RUN git clone "${URL_REPO_LIMESUITE}" "/src/LimeSuite" && \
     pushd "/src/LimeSuite" && \
     git checkout stable && \
     mkdir "/src/LimeSuite/builddir" && \
@@ -125,9 +128,10 @@ RUN set -x && \
     make && \
     make install && \
     ldconfig && \
-    popd && popd && \
+    popd && popd
+
     # Build & install SoapySDR
-    git clone "${URL_REPO_SOAPYSDR}" "/src/SoapySDR" && \
+RUN git clone "${URL_REPO_SOAPYSDR}" "/src/SoapySDR" && \
     pushd "/src/SoapySDR" && \
     BRANCH_SOAPYSDR=$(git tag --sort="-creatordate" | head -1) && \
     git checkout "${BRANCH_SOAPYSDR}" && \
@@ -139,8 +143,9 @@ RUN set -x && \
     make install && \
     ldconfig && \
     echo "SoapySDR $(SoapySDRUtil --info | grep -i 'lib version:' | cut -d ':' -f 2 | tr -d ' ')" >> /VERSIONS && \
-    popd && popd && \
-    # Build & install SoapyRTLSDR
+    popd && popd
+
+RUN # Build & install SoapyRTLSDR
     git clone "${URL_REPO_SOAPYRTLSDR}" "/src/SoapyRTLSDR" && \
     pushd "/src/SoapyRTLSDR" && \
     BRANCH_SOAPYRTLSDR=$(git tag --sort="-creatordate" | head -1) && \
@@ -151,9 +156,10 @@ RUN set -x && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
     make && \
     make install && \
-    popd && popd && \
+    popd && popd
+
     # Build & install dump978
-    git clone "${URL_REPO_DUMP978}" "/src/dump978" && \
+RUN git clone "${URL_REPO_DUMP978}" "/src/dump978" && \
     pushd "/src/dump978" && \
     BRANCH_DUMP978=$(git tag --sort="-creatordate" | head -1) && \
     git checkout "${BRANCH_DUMP978}" && \
@@ -164,9 +170,10 @@ RUN set -x && \
     mkdir -p "/usr/share/skyaware978/html" && \
     cp -a "/src/dump978/skyaware/"* "/usr/share/skyaware978/html/" && \
     mkdir -p "/run/skyaware978" && \
-    popd && \
+    popd
+
     # Build & install bladeRF
-    git clone --recursive "${URL_REPO_BLADERF}" "/src/bladeRF" && \
+RUN git clone --recursive "${URL_REPO_BLADERF}" "/src/bladeRF" && \
     pushd "/src/bladeRF" && \
     BRANCH_BLADERF="$(git tag --sort='-creatordate' | grep -vE '\-rc[0-9]*$' | head -1)" && \
     git checkout "${BRANCH_BLADERF}" && \
@@ -182,9 +189,10 @@ RUN set -x && \
     make && \
     make install && \
     ldconfig && \
-    popd && \
+    popd
+
     # Download bladeRF FPGA Images
-    mkdir -p "$BLADERF_RBF_PATH" && \
+RUN mkdir -p "$BLADERF_RBF_PATH" && \
     curl -o "$BLADERF_RBF_PATH/hostedxA4.rbf" https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
     curl -o "$BLADERF_RBF_PATH/hostedxA9.rbf" https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
     curl -o "$BLADERF_RBF_PATH/hostedx40.rbf" https://www.nuand.com/fpga/hostedx40-latest.rbf && \
@@ -192,9 +200,10 @@ RUN set -x && \
     curl -o "$BLADERF_RBF_PATH/adsbxA4.rbf" https://www.nuand.com/fpga/adsbxA4.rbf && \
     curl -o "$BLADERF_RBF_PATH/adsbxA9.rbf" https://www.nuand.com/fpga/adsbxA9.rbf && \
     curl -o "$BLADERF_RBF_PATH/adsbx40.rbf" https://www.nuand.com/fpga/adsbx40.rbf && \
-    curl -o "$BLADERF_RBF_PATH/adsbx115.rbf" https://www.nuand.com/fpga/adsbx115.rbf && \
+    curl -o "$BLADERF_RBF_PATH/adsbx115.rbf" https://www.nuand.com/fpga/adsbx115.rbf
+
     # Build & install tcllauncher
-    git clone "${URL_REPO_TCLLAUNCHER}" "/src/tcllauncher" && \
+RUN git clone "${URL_REPO_TCLLAUNCHER}" "/src/tcllauncher" && \
     pushd "/src/tcllauncher" && \
     BRANCH_TCLLAUNCHER="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_TCLLAUNCHER}" && \
@@ -204,9 +213,10 @@ RUN set -x && \
     make && \
     make install && \
     ldconfig && \
-    popd && \
+    popd
+
     # Build & install piaware
-    git clone "${URL_REPO_PIAWARE}" "/src/piaware" && \
+RUN git clone "${URL_REPO_PIAWARE}" "/src/piaware" && \
     pushd "/src/piaware" && \
     BRANCH_PIAWARE="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_PIAWARE}" && \
@@ -216,18 +226,21 @@ RUN set -x && \
     touch /etc/piaware.conf && \
     mkdir -p /run/piaware && \
     ldconfig && \
-    popd && \
+    popd
+
     # Build & install piaware-web
-    git clone "${URL_REPO_PIAWARE_WEB}" "/src/piaware-web" && \
-    cp -Rv /src/piaware-web/web/. /var/www/html/ && \
+RUN git clone "${URL_REPO_PIAWARE_WEB}" "/src/piaware-web" && \
+    cp -Rv /src/piaware-web/web/. /var/www/html/
+
     # Build & install dump1090
-    git clone "${URL_REPO_DUMP1090}" "/src/dump1090" && \
+RUN git clone "${URL_REPO_DUMP1090}" "/src/dump1090" && \
     pushd "/src/dump1090" && \
     BRANCH_DUMP1090="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_DUMP1090}" && \
-    echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
+    echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS
+
     # Reduce aggressive compiler optimisations
-    sed -i 's/ -O3 / -O2 /g' Makefile && \
+RUN sed -i 's/ -O3 / -O2 /g' Makefile && \
     make showconfig && \
     make all && \
     make faup1090 && \
@@ -237,9 +250,10 @@ RUN set -x && \
     mkdir -p /usr/share/dump1090-fa/html && \
     cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
     ldconfig && \
-    popd && \
+    popd
+
     # Build & install mlat-client
-    git clone "${URL_REPO_MLATCLIENT}" "/src/mlat-client" && \
+RUN git clone "${URL_REPO_MLATCLIENT}" "/src/mlat-client" && \
     pushd /src/mlat-client && \
     BRANCH_MLATCLIENT="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_MLATCLIENT}" && \
@@ -247,20 +261,23 @@ RUN set -x && \
     ./setup.py install && \
     ln -s /usr/local/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
     ldconfig && \
-    popd && \
+    popd
+
     # Build & install beast-splitter
-    git clone "${URL_REPO_BEASTSPLITTER}" "/src/beast-splitter" && \
+RUN git clone "${URL_REPO_BEASTSPLITTER}" "/src/beast-splitter" && \
     pushd "/src/beast-splitter" && \
     BRANCH_BEASTSPLITTER="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_BEASTSPLITTER}" && \
     echo "beast-splitter ${BRANCH_BEASTSPLITTER}" >> /VERSIONS && \
     make && \
     cp -v ./beast-splitter /usr/local/bin/ && \
-    popd && \
+    popd
+
     # Deploy s6-overlay.
-    curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
+RUN curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh
+
     # Clean up
-    apt-get remove -y ${TEMP_PACKAGES[@]} && \
+RUN apt-get remove -y ${TEMP_PACKAGES[@]} && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
