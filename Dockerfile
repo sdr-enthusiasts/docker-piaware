@@ -242,23 +242,10 @@ RUN set -x && \
     git checkout "${BRANCH_DUMP1090}" && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
     # Reduce aggressive compiler optimisations
-    sed -i 's/ -O3 / -O2 /g' Makefile && \
-    # # Remove -Werror (so warnings are warnings, not errors - seems to be required for ARMv6)
-    # sed -i 's/ -Werror / /g' Makefile && \
-
-    # Determine architecture
-    FILEBINARY=$(which file) && \
-    FILEOUTPUT=$("${FILEBINARY}" -L "${FILEBINARY}") && \
-    if echo "${FILEOUTPUT}" | grep "Intel 80386" > /dev/null; then TARGET_ARCH="x86"; fi && \
-    if echo "${FILEOUTPUT}" | grep "x86-64" > /dev/null; then TARGET_ARCH="amd64"; fi && \
-    if echo "${FILEOUTPUT}" | grep "ARM" > /dev/null; then TARGET_ARCH="arm"; fi && \
-    if echo "${FILEOUTPUT}" | grep "armhf" > /dev/null; then TARGET_ARCH="armhf"; fi && \
-    if echo "${FILEOUTPUT}" | grep "aarch64" > /dev/null; then TARGET_ARCH="aarch64"; fi && \
-    if [ -z "${TARGET_ARCH}" ]; then exit 1; fi && \
-    # Workaround for compiling for armv6
-    if [[ "$TARGET_ARCH" == "arm" ]]; then sed -i 's/ARCH ?= $(shell uname -m)/ARCH ?= generic/g' ./Makefile; fi && \
-    # ---
-
+    sed -i 's/ -O3 / -O2 /g' ./Makefile && \
+    # Implement ARMv6 workaround
+    bash -x /scripts/armv6_workaround.sh ./Makefile && \
+    # Make dump1090
     make showconfig && \
     make all && \
     make faup1090 && \
