@@ -239,6 +239,8 @@ RUN set -x && \
     mkdir -p /run/dump1090-fa && \
     mkdir -p /usr/share/dump1090-fa/html && \
     cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
+    mkdir -p /usr/share/skyaware/html && \
+    cp -a /src/dump1090/public_html_merged/* usr/share/skyaware/html && \
     ldconfig && \
     popd && \
     # Build & install mlat-client
