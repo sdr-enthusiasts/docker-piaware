@@ -289,7 +289,6 @@ docker run \
  -d \
  --rm \
  --name piaware \
- --device /dev/bus/usb \
  -e TZ="Australia/Perth" \
  -e LAT=-33.33333 \
  -e LONG=111.11111 \
@@ -320,8 +319,6 @@ services:
     tty: true
     container_name: piaware
     restart: always
-    devices:
-      - /dev/bus/usb:/dev/bus/usb
     environment:
       - TZ="Australia/Perth"
       - LAT=-33.33333
@@ -357,7 +354,6 @@ docker run \
  -d \
  --rm \
  --name piaware \
- --device /dev/bus/usb \
  -e TZ="Australia/Perth" \
  -e LAT=-33.33333 \
  -e LONG=111.11111 \
@@ -399,8 +395,6 @@ services:
     tty: true
     container_name: piaware
     restart: always
-    devices:
-      - /dev/bus/usb:/dev/bus/usb
     environment:
       - TZ="Australia/Perth"
       - LAT=-33.33333
