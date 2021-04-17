@@ -15,6 +15,7 @@ FA_SERVER_PORT=$(piaware-config -show adept-serverport)
 
 # Get netstat output
 NETSTAT_AN=$(netstat -an)
+NETSTAT=$(netstat)
 
 # Define function to return number msgs sent to FA from a process for a given time
 function check_logs_for_msgs_sent_to_fa () {
@@ -40,6 +41,15 @@ for FA_SERVER_IP in $FA_SERVER_IPS; do
         break 2
     fi
 done
+# if previous section didn't find a connection to FA, lets try something else
+# should match lines that look like
+# tcp        0      0 c8fbd48fe046:40469      liniy.dal.flightaw:1200 ESTABLISHED
+if [[ -z "$CONNECTED_TO_FA" ]]; then
+   REGEX_FA_CONNECTION_FROM_NETSTAT="^\s*tcp\s+\d+\s+\d+\s+\S+:\d+\s+[a-z]+\.?[a-z]+\.?[a-z]+:(?>${FA_SERVER_PORT})\s+ESTABLISHED\s*$"
+   if echo "$NETSTAT" | grep -P "$REGEX_FA_CONNECTION_FROM_NETSTAT" > /dev/null 2>&1; then
+      CONNECTED_TO_FA="true"
+   fi
+fi
 if [[ -z "$CONNECTED_TO_FA" ]]; then
     echo "No connection to Flightaware, NOT OK."
     EXITCODE=1
