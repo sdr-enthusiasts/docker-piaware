@@ -272,7 +272,8 @@ RUN set -x && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
     find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
     # Store container version
-    grep piaware /VERSIONS | cut -d " " -f 2 > /CONTAINER_VERSION
+    grep piaware /VERSIONS | cut -d " " -f 2 > /CONTAINER_VERSION && \
+    uname -a
 
 EXPOSE 80/tcp 30003/tcp 30005/tcp 30105/tcp 30978/tcp 30979/tcp
 
