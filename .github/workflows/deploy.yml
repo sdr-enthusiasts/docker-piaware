@@ -68,6 +68,7 @@ jobs:
       # Build "latest"
       -
         name: Build & Push - latest
+        timeout-minutes: 1200
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -93,6 +94,7 @@ jobs:
       # Build version specific
       -
         name: Build & Push - version specific
+        timeout-minutes: 1200
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -110,6 +112,7 @@ jobs:
       # Build "latest_nohealthcheck"
       -
         name: Build & Push - latest nohealthcheck
+        timeout-minutes: 1200
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -122,6 +125,7 @@ jobs:
       # Build version specific _nohealthcheck
       -
         name: Build & Push - version specific nohealthcheck
+        timeout-minutes: 1200
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -206,6 +210,7 @@ jobs:
       # Build "latest"
       -
         name: Build & Push - latest
+        timeout-minutes: 1200
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -231,6 +236,7 @@ jobs:
       # Build version specific
       -
         name: Build & Push - version specific
+        timeout-minutes: 1200
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -248,6 +254,7 @@ jobs:
       # Build "latest_nohealthcheck"
       -
         name: Build & Push - latest nohealthcheck
+        timeout-minutes: 1200
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -260,6 +267,7 @@ jobs:
       # Build version specific _nohealthcheck
       -
         name: Build & Push - version specific nohealthcheck
+        timeout-minutes: 1200
         uses: docker/build-push-action@v2
         with:
           context: .
