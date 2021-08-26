@@ -99,7 +99,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          no-cache: true
+          no-cache: false
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64
           push: ${{ env.PUSH }}
           tags: ${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}
@@ -117,7 +117,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.nohealthcheck
-          no-cache: true
+          no-cache: false
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64
           push: ${{ env.PUSH }}
           tags: ${{ env.REPO }}/${{ env.IMAGE }}:latest_nohealthcheck
@@ -130,7 +130,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.nohealthcheck
-          no-cache: true
+          no-cache: false
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm/v6,linux/arm64
           push: ${{ env.PUSH }}
           tags: ${{ env.REPO }}/${{ env.IMAGE }}:${{ env.VERSION_TAG }}_nohealthcheck
