@@ -262,6 +262,7 @@ RUN set -x && \
     make && \
     cp -v ./beast-splitter /usr/local/bin/ && \
     popd && \
+    cp /scripts/fa_services.tcl /usr/lib/piaware_packages/ && \
     # Deploy s6-overlay.
     curl -s -o /tmp/deploy-s6-overlay.sh https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh && \
     bash /tmp/deploy-s6-overlay.sh && \
