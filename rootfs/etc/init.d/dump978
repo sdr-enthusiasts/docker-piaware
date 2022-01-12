@@ -8,7 +8,7 @@
 
 case "$1" in
     restart)
-    pkill /usr/local/bin/dump978-fa
+    pkill dump978-fa
     ;;
     *)
     echo "Usage: $0 {start|stop|restart|status}"
