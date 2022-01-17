@@ -1,4 +1,5 @@
-FROM debian:buster-20211220-slim
+FROM debian:bullseye-slim
+
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320" \
     VERBOSE_LOGGING="false" \
@@ -49,14 +50,14 @@ RUN set -x && \
     TEMP_PACKAGES+=(pkg-config) && \
     # dump978 dependencies
     TEMP_PACKAGES+=(libboost-dev) && \
-    TEMP_PACKAGES+=(libboost-system1.67-dev) && \
-    KEPT_PACKAGES+=(libboost-system1.67.0) && \
-    TEMP_PACKAGES+=(libboost-program-options1.67-dev) && \
-    KEPT_PACKAGES+=(libboost-program-options1.67.0) && \
-    TEMP_PACKAGES+=(libboost-regex1.67-dev) && \
-    KEPT_PACKAGES+=(libboost-regex1.67.0) && \
-    TEMP_PACKAGES+=(libboost-filesystem1.67-dev) && \
-    KEPT_PACKAGES+=(libboost-filesystem1.67.0) && \
+    TEMP_PACKAGES+=(libboost-system1.74-dev) && \
+    KEPT_PACKAGES+=(libboost-system1.74.0) && \
+    TEMP_PACKAGES+=(libboost-program-options1.74-dev) && \
+    KEPT_PACKAGES+=(libboost-program-options1.74.0) && \
+    TEMP_PACKAGES+=(libboost-regex1.74-dev) && \
+    KEPT_PACKAGES+=(libboost-regex1.74.0) && \
+    TEMP_PACKAGES+=(libboost-filesystem1.74-dev) && \
+    KEPT_PACKAGES+=(libboost-filesystem1.74.0) && \
     # dump1090 dependencies
     KEPT_PACKAGES+=(libatomic1) && \
     KEPT_PACKAGES+=(libncurses6) && \
