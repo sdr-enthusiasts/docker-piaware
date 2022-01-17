@@ -104,7 +104,7 @@ jobs:
       
       # Patch Dockerfile to include first-run build of dump1090
       - 
-        name: Patch Dockerfile to include first-run build of rtl_airband
+        name: Patch Dockerfile to include first-run build of dump1090
         run: echo "bash -x /etc/cont-init.d/01-firstrun-build-dump1090" >> Dockerfile
 
       # Test container build for all supported platforms (defined above)
