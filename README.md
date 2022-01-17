@@ -7,7 +7,7 @@
 
 FlightAware's PiAware docker container including support for RTL-SDR, bladeRF and others. Includes `dump1090` and `dump978`.
 
-Builds and runs on `linux/amd64`, `linux/386`, `linux/arm/v6`, `linux/arm/v7` and `linux/arm64`.
+Builds and runs on `linux/amd64`, `linux/386`, `linux/arm/v7` and `linux/arm64`.
 
 For more information on what PiAware is, see here: [FlightAware - PiAware](https://flightaware.com/adsb/piaware/).
 
@@ -67,10 +67,10 @@ This container can operate in "net only" mode and pull ADS-B Mode-S & UAT data f
 
 Currently, this image should pull and run on the following architectures:
 
-* `linux/amd64`: Built on Linux x86-64
-* `linux/arm/v6`: Built on Odroid HC2 running ARMv7 32-bit
-* `linux/arm/v7`: Built on Odroid HC2 running ARMv7 32-bit
-* `linux/arm64`: Built on a Raspberry Pi 4 Model B running ARMv8 64-bit
+* `linux/i386`
+* `linux/amd64`
+* `linux/arm/v7`
+* `linux/arm64`
 
 ## Prerequisites
 
