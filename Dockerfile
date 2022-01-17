@@ -255,6 +255,18 @@ RUN set -x && \
     # Clean up
     apt-get remove -y ${TEMP_PACKAGES[@]} && \
     apt-get autoremove -y && \
+    # Add packages neccessary for first-run build of dump1090
+    unset KEPT_PACKAGES && \
+    KEPT_PACKAGES=() && \
+    KEPT_PACKAGES+=(gcc) && \
+    KEPT_PACKAGES+=(libncurses-dev) && \
+    KEPT_PACKAGES+=(libstdc++-10-dev) && \
+    KEPT_PACKAGES+=(make) && \
+    KEPT_PACKAGES+=(pkg-config) && \
+    apt-get install -y --no-install-recommends \
+        ${KEPT_PACKAGES[@]} \
+        && \
+    # Finish clean up
     apt-get clean -y && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
     find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
