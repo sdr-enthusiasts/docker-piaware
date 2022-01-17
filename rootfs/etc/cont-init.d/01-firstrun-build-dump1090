@@ -12,6 +12,11 @@ if [[ -z "$FEEDER_ID" ]]; then
 
         echo "dump1090 detected: $DUMP1090_BIN. Not building."
 
+        # Print dump1090-fa version
+        # shellcheck disable=SC2016
+        dump1090 --version \
+            2>&1 | stdbuf -o0 awk '{print "[dump1090] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+
     else
 
         # If it does not, build it
@@ -60,6 +65,11 @@ if [[ -z "$FEEDER_ID" ]]; then
             2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:ldconfig] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
         
         popd > /dev/null 2>&1
+
+        # Print dump1090-fa version
+        # shellcheck disable=SC2016
+        dump1090 --version \
+            2>&1 | stdbuf -o0 awk '{print "[dump1090] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
 
     fi
 fi

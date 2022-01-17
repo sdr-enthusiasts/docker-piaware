@@ -43,11 +43,6 @@ else
 
 fi
 
-# Print dump1090-fa version
-# shellcheck disable=SC2016
-"${DUMP1090_BIN}" --version \
-  2>&1 | stdbuf -o0 awk '{print "[dump1090] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
-
 # shellcheck disable=SC2016
 # run dump1090
 "${DUMP1090_BIN}" "${DUMP1090_CMD[@]}" \
