@@ -69,6 +69,7 @@ RUN set -x && \
     KEPT_PACKAGES+=(tclx) && \
     # piaware-web dependencies
     KEPT_PACKAGES+=(lighttpd) && \
+    KEPT_PACKAGES+=(lighttpd-mod-deflate) && \
     # hackrf dependencies
     KEPT_PACKAGES+=(libfftw3-3) && \
     TEMP_PACKAGES+=(libfftw3-dev) && \
@@ -229,8 +230,6 @@ RUN set -x && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
     # Reduce aggressive compiler optimisations
     sed -i 's/ -O3 / -O2 /g' ./Makefile && \
-    # Implement ARMv6 workaround
-    bash -x /scripts/armv6_workaround.sh ./Makefile && \
     # Make dump1090
     make showconfig && \
     make all && \
