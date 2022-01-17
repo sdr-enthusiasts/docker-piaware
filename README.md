@@ -72,6 +72,8 @@ Currently, this image should pull and run on the following architectures:
 * `linux/arm/v7`
 * `linux/arm64`
 
+In order to ensure `dump1090` is optimised for the hardware running it, the `dump1090` binary is built on first-run of the container.
+
 ## Prerequisites
 
 If using an RTL-SDR, before this container will work properly, you must blacklist the kernel modules for the RTL-SDR USB device from the host's kernel.
@@ -130,7 +132,7 @@ Run the commands:
 
 ```shell
 docker pull mikenye/piaware:latest
-timeout 60 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE mikenye/piaware:latest | grep "my feeder ID"
+timeout 120 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE mikenye/piaware:latest | grep "my feeder ID"
 ```
 
 Be sure to change the following:
@@ -138,12 +140,12 @@ Be sure to change the following:
 * Replace `YOURLATITUDE` with the latitude of your antenna (xx.xxxxx)
 * Replace `YOURLONGITUDE` with the longitude of your antenna (xx.xxxxx)
 
-The command will run the container for 30 seconds, which should be ample time for the container to receive a feeder-id.
+The command will run the container for 120 seconds, which should be ample time for the container to receive a feeder-id.
 
 For example:
 
 ```shell
-timeout 30 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 mikenye/piaware:latest | grep "my feeder ID"
+timeout 120 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 mikenye/piaware:latest | grep "my feeder ID"
 ```
 
 Will output:
