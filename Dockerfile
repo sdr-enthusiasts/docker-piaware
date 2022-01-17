@@ -1,4 +1,5 @@
-FROM debian:buster-20211220-slim
+FROM debian:bullseye-slim
+
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320" \
     VERBOSE_LOGGING="false" \
