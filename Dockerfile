@@ -222,26 +222,12 @@ RUN set -x && \
     # Build & install piaware-web
     git clone "${URL_REPO_PIAWARE_WEB}" "/src/piaware-web" && \
     cp -Rv /src/piaware-web/web/. /var/www/html/ && \
-    # Build & install dump1090
-    git clone "${URL_REPO_DUMP1090}" "/src/dump1090" && \
-    pushd "/src/dump1090" && \
+    # get dump1090 sources
+    git clone "${URL_REPO_DUMP1090}" "/opt/dump1090" && \
+    pushd "/opt/dump1090" && \
     BRANCH_DUMP1090="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_DUMP1090}" && \
     echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
-    # Reduce aggressive compiler optimisations
-    sed -i 's/ -O3 / -O2 /g' ./Makefile && \
-    # Make dump1090
-    make showconfig && \
-    make all && \
-    make faup1090 && \
-    cp -v view1090 dump1090 /usr/local/bin/ && \
-    cp -v faup1090 /usr/lib/piaware/helpers/ && \
-    mkdir -p /run/dump1090-fa && \
-    mkdir -p /usr/share/dump1090-fa/html && \
-    cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
-    mkdir -p /usr/share/skyaware/html && \
-    cp -a /src/dump1090/public_html_merged/* /usr/share/skyaware/html && \
-    ldconfig && \
     popd && \
     # Build & install mlat-client
     git clone "${URL_REPO_MLATCLIENT}" "/src/mlat-client" && \
