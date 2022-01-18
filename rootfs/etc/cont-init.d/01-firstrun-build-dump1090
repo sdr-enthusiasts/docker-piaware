@@ -6,7 +6,7 @@ set -x
 set +e
 
 # If the feeder ID is not set, then don't make dump1090 as the user is likely trying to get a feeder-id
-if [[ -z "$FEEDER_ID" ]]; then
+if [[ -n "$FEEDER_ID" ]]; then
 
     # Check to see if dump1090 exists
     DUMP1090_BIN=$(which dump1090)
