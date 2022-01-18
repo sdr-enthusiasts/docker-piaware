@@ -3,6 +3,7 @@
 # shellcheck disable=SC2016
 
 set -x
+set +e
 
 # If the feeder ID is not set, then don't make dump1090 as the user is likely trying to get a feeder-id
 if [[ -z "$FEEDER_ID" ]]; then
