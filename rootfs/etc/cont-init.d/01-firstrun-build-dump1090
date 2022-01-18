@@ -22,7 +22,7 @@ if [[ -n "$FEEDER_ID" ]]; then
 
         # If it does not, build it
 
-        echo "dump1090 not found, performing first-run build."
+        echo "dump1090 not found, starting first-run build at: $(date)"
 
         DUMP1090_VERSION=$(grep dump1090 /VERSIONS | cut -d " " -f 2)
         export DUMP1090_VERSION
@@ -64,6 +64,8 @@ if [[ -n "$FEEDER_ID" ]]; then
             2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:ldconfig] " $0}'
         
         popd > /dev/null 2>&1 || exit 1
+
+        echo "Finished first-run dump1090 build at: $(date)"
 
         # Print dump1090-fa version
         # shellcheck disable=SC2016
