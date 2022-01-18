@@ -22,8 +22,6 @@ if [[ -z "$FEEDER_ID" ]]; then
 
         # If it does not, build it
 
-        set -e
-
         echo "dump1090 not found, performing first-run build."
 
         DUMP1090_VERSION=$(grep dump1090 /VERSIONS | cut -d " " -f 2)
