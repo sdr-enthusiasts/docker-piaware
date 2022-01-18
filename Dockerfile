@@ -225,10 +225,22 @@ RUN set -x && \
     # get dump1090 sources
     git clone "${URL_REPO_DUMP1090}" "/opt/dump1090" && \
     pushd "/opt/dump1090" && \
-    BRANCH_DUMP1090="$(git tag --sort='-creatordate' | head -1)" && \
-    git checkout "${BRANCH_DUMP1090}" && \
-    echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
+    DUMP1090_VERSION="$(git tag --sort='-creatordate' | head -1)" && \
+    export DUMP1090_VERSION && \
+    git checkout "${DUMP1090_VERSION}" && \
+    echo "dump1090 ${DUMP1090_VERSION}" >> /VERSIONS && \
+    make showconfig BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes && \
+    make all BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
+    make faup1090 BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
+    cp -v view1090 dump1090 /usr/local/bin/ && \
+    cp -v faup1090 /usr/lib/piaware/helpers/ && \
+    mkdir -p /usr/share/dump1090-fa/html && \
+    cp -a /opt/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
+    mkdir -p /usr/share/skyaware/html && \
+    cp -a /opt/dump1090/public_html_merged/* /usr/share/skyaware/html && \
+    ldconfig && \
     popd && \
+    dump1090 --version && \
     # Build & install mlat-client
     git clone "${URL_REPO_MLATCLIENT}" "/src/mlat-client" && \
     pushd /src/mlat-client && \
@@ -255,17 +267,17 @@ RUN set -x && \
     # Clean up
     apt-get remove -y ${TEMP_PACKAGES[@]} && \
     apt-get autoremove -y && \
-    # Add packages neccessary for first-run build of dump1090
-    unset KEPT_PACKAGES && \
-    KEPT_PACKAGES=() && \
-    KEPT_PACKAGES+=(gcc) && \
-    KEPT_PACKAGES+=(libncurses-dev) && \
-    KEPT_PACKAGES+=(libstdc++-10-dev) && \
-    KEPT_PACKAGES+=(make) && \
-    KEPT_PACKAGES+=(pkg-config) && \
-    apt-get install -y --no-install-recommends \
-        ${KEPT_PACKAGES[@]} \
-        && \
+    # # Add packages neccessary for first-run build of dump1090
+    # unset KEPT_PACKAGES && \
+    # KEPT_PACKAGES=() && \
+    # KEPT_PACKAGES+=(gcc) && \
+    # KEPT_PACKAGES+=(libncurses-dev) && \
+    # KEPT_PACKAGES+=(libstdc++-10-dev) && \
+    # KEPT_PACKAGES+=(make) && \
+    # KEPT_PACKAGES+=(pkg-config) && \
+    # apt-get install -y --no-install-recommends \
+    #     ${KEPT_PACKAGES[@]} \
+    #     && \
     # Finish clean up
     apt-get clean -y && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
