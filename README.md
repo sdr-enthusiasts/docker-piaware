@@ -72,6 +72,8 @@ Currently, this image should pull and run on the following architectures:
 * `linux/arm/v7`
 * `linux/arm64`
 
+In order to ensure `dump1090` is optimised for the hardware running it, the `dump1090` binary is built on first-run of the container.
+
 ## Prerequisites
 
 If using an RTL-SDR, before this container will work properly, you must blacklist the kernel modules for the RTL-SDR USB device from the host's kernel.
@@ -130,7 +132,7 @@ Run the commands:
 
 ```shell
 docker pull mikenye/piaware:latest
-timeout 60 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE mikenye/piaware:latest | grep "my feeder ID"
+timeout 30 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE mikenye/piaware:latest | grep "my feeder ID"
 ```
 
 Be sure to change the following:
