@@ -16,7 +16,7 @@ if [[ -n "$FEEDER_ID" ]]; then
         # Print dump1090-fa version
         # shellcheck disable=SC2016
         dump1090 --version \
-            2>&1 | stdbuf -o0 awk '{print "[dump1090] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[dump1090] " $0}'
 
     else
 
@@ -32,43 +32,43 @@ if [[ -n "$FEEDER_ID" ]]; then
         # Make dump1090
 
         make showconfig BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes \
-            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:make showconfig] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:make showconfig] " $0}'
 
         make all BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j \
-            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:make all] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:make all] " $0}'
 
         make faup1090 BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j \
-            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:make all] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:make all] " $0}'
 
         # Copy files
 
         cp -v view1090 dump1090 /usr/local/bin/ \
-            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:cp] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:cp] " $0}'
 
         cp -v faup1090 /usr/lib/piaware/helpers/ \
-            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:cp] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:cp] " $0}'
         
         mkdir -p /usr/share/dump1090-fa/html
         
         cp -a /opt/dump1090/public_html/* /usr/share/dump1090-fa/html/ \
-            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:cp] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:cp] " $0}'
         
         mkdir -p /usr/share/skyaware/html
         
         cp -a /opt/dump1090/public_html_merged/* /usr/share/skyaware/html \
-            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:cp] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:cp] " $0}'
         
         # Update links
 
         ldconfig \
-            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:ldconfig] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[firstrun:dump1090:ldconfig] " $0}'
         
         popd > /dev/null 2>&1 || exit 1
 
         # Print dump1090-fa version
         # shellcheck disable=SC2016
         dump1090 --version \
-            2>&1 | stdbuf -o0 awk '{print "[dump1090] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+            2>&1 | stdbuf -o0 awk '{print "[dump1090] " $0}'
 
     fi
 fi
