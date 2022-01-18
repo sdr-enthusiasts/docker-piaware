@@ -8,9 +8,9 @@ on:
       - master
       - main
 
-  # Build and deploy the image nightly (to ensure we pick up any security updates)
+  # Build and deploy the image weekly
   schedule:
-    - cron: "0 5 * * *"
+    - cron: "0 5 * * 0"
 
 jobs:
   deploy_dockerhub_multiarch:
