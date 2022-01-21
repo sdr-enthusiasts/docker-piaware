@@ -15,41 +15,14 @@ This container can operate in "net only" mode and pull ADS-B Mode-S & UAT data f
 
 *Note:* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapper/helper scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
 
-## Note for ARM32 Users
+## Note for Users running 32-bit Debian Buster-based OSes on ARM
 
-As of January 2022, 32-bit Raspberry Pi users running Debian "Buster"-based operating systems may not run this container properly. The image has been updated to use Debian "Bullseye" as its base image, which is necessary to ensure the container continues to receive bug fixes and timely security updates for installed packages.
-
-The issue with "Buster"-based systems involves a very outdated system package called `libseccomp2`. Using "Bullseye"-based base images requires a more up-to-date `libseccomp2` that is not typically available without extra steps.
-
-You have four options to ensure this container will work on your Pi.
-
-* Update `libseccomp2` in your operating system.
-* Update to a fresh install of Raspberry Pi OS 1.4 (Debian "Bullseye"-based), or an install of Raspberry Pi OS from an image made after November 2021.
-* Use Ubuntu ARM 64 bit
-* Run this container with the `priviledged` flag. **SECURITY ISSUE: NOT RECOMMENDED**
-
-[KX1T](https://github.com/kx1t) has created a [script](https://github.com/fredclausen/docker-acarshub/blob/main/libseccomp2-checker.sh) that you can run that will check your system and ensure it is ready. This script will only work on "Buster"-based Debian distros and will only change anything if your `libseccomp2` is outdated.
-
-The `libseccomp2` script will do the following things to your system if the version of libseccomp2 is outdated:
-
-* Add an official Debian repository to your apt sources along with the associated GPG key
-* Update your system packages prior to updating `libseccomp2`
-* Finally, install `libseccomp2`
-
-You may be prompted for a password because the script is modifying things that require escalated privileges.
-
-To run this script, which only needs to be done once, please do the following:
-
-```shell
-curl -sL https://raw.githubusercontent.com/fredclausen/docker-acarshub/main/libseccomp2-checker.sh | bash
-```
-
-Apologies for any inconvenience this causes, however "Buster"-based distributions are now getting pretty old, and updating the container's base image to something less old provides benefits that outweigh the cost of running a simple script to fix your host. :-)
+Please see: https://github.com/fredclausen/Buster-Docker-Fixes !
 
 ## Table of Contents
 
 * [mikenye/piaware](#mikenyepiaware)
-  * [Note for ARM32 Users](#note-for-arm32-users)
+  * [Note for Users running 32-bit Debian Buster-based OSes on ARM](#note-for-users-running-32-bit-debian-buster-based-oses-on-arm)
   * [Table of Contents](#table-of-contents)
   * [Supported tags and respective Dockerfiles](#supported-tags-and-respective-dockerfiles)
   * [Contributors](#contributors)
