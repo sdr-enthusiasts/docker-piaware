@@ -28,7 +28,7 @@ You have four options to ensure this container will work on your Pi.
 * Use Ubuntu ARM 64 bit
 * Run this container with the `priviledged` flag. **SECURITY ISSUE: NOT RECOMMENDED**
 
-[KX1T](https://github.com/kx1t) has created a [script](libseccomp2-checker.sh) that you can run that will check your system and ensure it is ready. This script will only work on "Buster"-based Debian distros and will only change anything if your `libseccomp2` is outdated.
+[KX1T](https://github.com/kx1t) has created a [script](https://github.com/fredclausen/docker-acarshub/blob/main/libseccomp2-checker.sh) that you can run that will check your system and ensure it is ready. This script will only work on "Buster"-based Debian distros and will only change anything if your `libseccomp2` is outdated.
 
 The `libseccomp2` script will do the following things to your system if the version of libseccomp2 is outdated:
 
