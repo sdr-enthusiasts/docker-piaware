@@ -15,9 +15,14 @@ This container can operate in "net only" mode and pull ADS-B Mode-S & UAT data f
 
 *Note:* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapper/helper scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
 
+## Note for Users running 32-bit Debian Buster-based OSes on ARM
+
+Please see: [Buster-Docker-Fixes](https://github.com/fredclausen/Buster-Docker-Fixes)!
+
 ## Table of Contents
 
 * [mikenye/piaware](#mikenyepiaware)
+  * [Note for Users running 32-bit Debian Buster-based OSes on ARM](#note-for-users-running-32-bit-debian-buster-based-oses-on-arm)
   * [Table of Contents](#table-of-contents)
   * [Supported tags and respective Dockerfiles](#supported-tags-and-respective-dockerfiles)
   * [Contributors](#contributors)
