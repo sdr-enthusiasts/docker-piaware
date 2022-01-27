@@ -24,6 +24,7 @@ RUN set -x && \
     KEPT_PACKAGES+=(gawk) && \
     # libusb for a number of things
     KEPT_PACKAGES+=(libusb-1.0-0) && \
+    TEMP_PACKAGES+=(libusb-1.0-0-dev) && \
     # dump978 dependencies
     TEMP_PACKAGES+=(libboost-dev) && \
     TEMP_PACKAGES+=(libboost-system1.74-dev) && \
