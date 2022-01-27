@@ -1,6 +1,6 @@
 # mikenye/piaware
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mikenye/docker-piaware/Deploy%20to%20Docker%20Hub)](https://github.com/mikenye/docker-piaware/actions?query=workflow%3A%22Deploy+to+Docker+Hub%22)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mikenye/docker-piaware/Push)](https://github.com/mikenye/docker-piaware/actions?query=workflow%3A%22Push%22)
 [![Docker Pulls](https://img.shields.io/docker/pulls/mikenye/piaware.svg)](https://hub.docker.com/r/mikenye/piaware)
 [![Docker Image Size (tag)](https://img.shields.io/docker/image-size/mikenye/piaware/latest)](https://hub.docker.com/r/mikenye/piaware)
 [![Discord](https://img.shields.io/discord/734090820684349521)](https://discord.gg/sTf9uYF)
