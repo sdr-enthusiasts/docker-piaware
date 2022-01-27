@@ -183,9 +183,9 @@ RUN set -x && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
     cp -v faup1090 /usr/lib/piaware/helpers/ && \
     mkdir -p /usr/share/dump1090-fa/html && \
-    cp -a /opt/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
+    cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
     mkdir -p /usr/share/skyaware/html && \
-    cp -a /opt/dump1090/public_html_merged/* /usr/share/skyaware/html && \
+    cp -a /src/dump1090/public_html_merged/* /usr/share/skyaware/html && \
     ldconfig && \
     popd && \
     dump1090 --version && \
