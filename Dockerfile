@@ -17,6 +17,7 @@ RUN set -x && \
     TEMP_PACKAGES+=(cmake) && \
     TEMP_PACKAGES+=(curl) && \
     TEMP_PACKAGES+=(git) && \
+    TEMP_PACKAGES+=(pkg-config) && \
     # s6-overlay dependencies
     TEMP_PACKAGES+=(gnupg2) && \
     TEMP_PACKAGES+=(file) && \
@@ -73,7 +74,7 @@ RUN set -x && \
     mkdir -p /src/hackrf/host/build && \
     pushd /src/hackrf/host/build && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make -j "$(nproc)"&& \
+    make -j "$(nproc)" && \
     make install && \
     ldconfig && \
     popd && \
@@ -82,7 +83,7 @@ RUN set -x && \
     mkdir "/src/LimeSuite/builddir" && \
     pushd "/src/LimeSuite/builddir" && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make -j "$(nproc)"&& \
+    make -j "$(nproc)" && \
     make install && \
     ldconfig && \
     popd && \
@@ -92,7 +93,7 @@ RUN set -x && \
     mkdir -p "/src/SoapySDR/build" && \
     pushd "/src/SoapySDR/build" && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make -j "$(nproc)"&& \
+    make -j "$(nproc)" && \
     make test && \
     make install && \
     ldconfig && \
@@ -105,7 +106,7 @@ RUN set -x && \
     mkdir -p "/src/SoapyRTLSDR/build" && \
     pushd "/src/SoapyRTLSDR/build" && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make -j "$(nproc)"&& \
+    make -j "$(nproc)" && \
     make install && \
     popd && \
     # Build & install dump978
