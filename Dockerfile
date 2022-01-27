@@ -173,10 +173,10 @@ RUN set -x && \
     git clone "https://github.com/flightaware/piaware-web.git" "/src/piaware-web" && \
     cp -Rv /src/piaware-web/web/. /var/www/html/ && \
     # get dump1090 sources
-    BRANCH_DUMP1090=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/dump1090.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
-    git clone --depth 1 --branch "$BRANCH_DUMP1090" "https://github.com/flightaware/dump1090.git" "/src/dump1090" && \
+    DUMP1090_VERSION=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/dump1090.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
+    git clone --depth 1 --branch "$DUMP1090_VERSION" "https://github.com/flightaware/dump1090.git" "/src/dump1090" && \
     pushd "/src/dump1090" && \
-    echo "dump1090 ${BRANCH_DUMP1090}" >> /VERSIONS && \
+    echo "dump1090 ${DUMP1090_VERSION}" >> /VERSIONS && \
     make -j "$(nproc)" showconfig BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes && \
     make -j "$(nproc)" all BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
     make -j "$(nproc)" faup1090 BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
