@@ -174,6 +174,7 @@ RUN set -x && \
     cp -Rv /src/piaware-web/web/. /var/www/html/ && \
     # get dump1090 sources
     DUMP1090_VERSION=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/dump1090.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
+    export DUMP1090_VERSION && \
     git clone --depth 1 --branch "$DUMP1090_VERSION" "https://github.com/flightaware/dump1090.git" "/src/dump1090" && \
     pushd "/src/dump1090" && \
     echo "dump1090 ${DUMP1090_VERSION}" >> /VERSIONS && \
