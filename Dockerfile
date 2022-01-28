@@ -1,32 +1,11 @@
-FROM debian:bullseye-20220125-slim
+FROM ghcr.io/fredclausen/docker-baseimage:rtlsdr
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
-    BRANCH_RTLSDR="d794155ba65796a76cd0a436f9709f4601509320" \
-    VERBOSE_LOGGING="false" \
-    BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" \
-    URL_REPO_BEASTSPLITTER="https://github.com/flightaware/beast-splitter.git" \
-    URL_REPO_BLADERF="https://github.com/Nuand/bladeRF.git" \
-    URL_REPO_DUMP978="https://github.com/flightaware/dump978.git" \
-    URL_REPO_DUMP1090="https://github.com/flightaware/dump1090.git" \
-    URL_REPO_FFTW="https://github.com/FFTW/fftw3.git" \
-    URL_REPO_HACKRF="https://github.com/mossmann/hackrf.git" \
-    URL_REPO_LIMESUITE="https://github.com/myriadrf/LimeSuite.git" \
-    URL_REPO_MLATCLIENT="https://github.com/mutability/mlat-client.git" \
-    URL_REPO_PIAWARE="https://github.com/flightaware/piaware.git" \
-    URL_REPO_PIAWARE_WEB="https://github.com/flightaware/piaware-web.git" \
-    URL_REPO_RTLSDR="git://git.osmocom.org/rtl-sdr" \
-    URL_REPO_SOAPYRTLSDR="https://github.com/pothosware/SoapyRTLSDR.git" \
-    URL_REPO_SOAPYSDR="https://github.com/pothosware/SoapySDR.git" \
-    URL_REPO_TCLLAUNCHER="https://github.com/flightaware/tcllauncher.git" \
-    URL_REPO_UAT2ESNT="https://github.com/adsbxchange/uat2esnt.git"
+    VERBOSE_LOGGING="false"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 COPY rootfs/ /
-
-# Note, the specific commit of rtlsdr is to address issue #15
-# See: https://github.com/mikenye/docker-piaware/issues/15
-# This should be revisited in future when rtlsdr 0.6.1 or newer is released
 
 RUN set -x && \
     TEMP_PACKAGES=() && \
@@ -38,16 +17,15 @@ RUN set -x && \
     TEMP_PACKAGES+=(cmake) && \
     TEMP_PACKAGES+=(curl) && \
     TEMP_PACKAGES+=(git) && \
+    TEMP_PACKAGES+=(pkg-config) && \
     # s6-overlay dependencies
     TEMP_PACKAGES+=(gnupg2) && \
     TEMP_PACKAGES+=(file) && \
     # logging
     KEPT_PACKAGES+=(gawk) && \
-    # libusb (for rtl-sdr, SoapySDR)
-    TEMP_PACKAGES+=(libusb-1.0-0-dev) && \
+    # libusb for a number of things
     KEPT_PACKAGES+=(libusb-1.0-0) && \
-    # rtl-sdr dependencies
-    TEMP_PACKAGES+=(pkg-config) && \
+    TEMP_PACKAGES+=(libusb-1.0-0-dev) && \
     # dump978 dependencies
     TEMP_PACKAGES+=(libboost-dev) && \
     TEMP_PACKAGES+=(libboost-system1.74-dev) && \
@@ -90,76 +68,52 @@ RUN set -x && \
         ${TEMP_PACKAGES[@]} \
         && \
     git config --global advice.detachedHead false && \
-    # Build & install rtl-sdr
-    git clone "${URL_REPO_RTLSDR}" "/src/rtl-sdr" && \
-    pushd "/src/rtl-sdr" && \
-    #BRANCH_RTLSDR=$(git tag --sort="-creatordate" | head -1) && \
-    #git checkout "tags/${BRANCH_RTLSDR}" && \
-    git checkout "${BRANCH_RTLSDR}" && \
-    echo "rtl-sdr ${BRANCH_RTLSDR}" >> /VERSIONS && \
-    mkdir -p "/src/rtl-sdr/build" && \
-    pushd "/src/rtl-sdr/build" && \
-    cmake ../ -DINSTALL_UDEV_RULES=ON -Wno-dev -DCMAKE_BUILD_TYPE=Release && \
-    make -Wstringop-truncation && \
-    make -Wstringop-truncation install && \
-    cp -v "/src/rtl-sdr/rtl-sdr.rules" "/etc/udev/rules.d/" && \
-    ldconfig && \
-    popd && popd && \
     # Build & install HackRF
-    git clone "${URL_REPO_HACKRF}" "/src/hackrf" && \
-    pushd "/src/hackrf" && \
-    BRANCH_HACKRF=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout "${BRANCH_HACKRF}" && \
+    BRANCH_HACKRF=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/mossmann/hackrf.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v' | tail -1) && \
+    git clone --depth 1 --branch "$BRANCH_HACKRF" "https://github.com/mossmann/hackrf.git" "/src/hackrf" && \
     mkdir -p /src/hackrf/host/build && \
     pushd /src/hackrf/host/build && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make && \
+    make -j "$(nproc)" && \
     make install && \
     ldconfig && \
-    popd && popd && \
+    popd && \
     # Build & install LimeSuite
-    git clone "${URL_REPO_LIMESUITE}" "/src/LimeSuite" && \
-    pushd "/src/LimeSuite" && \
-    git checkout stable && \
+    git clone --depth 1 --branch stable "https://github.com/myriadrf/LimeSuite.git" "/src/LimeSuite" && \
     mkdir "/src/LimeSuite/builddir" && \
     pushd "/src/LimeSuite/builddir" && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make && \
+    make -j "$(nproc)" && \
     make install && \
     ldconfig && \
-    popd && popd && \
+    popd && \
     # Build & install SoapySDR
-    git clone "${URL_REPO_SOAPYSDR}" "/src/SoapySDR" && \
-    pushd "/src/SoapySDR" && \
-    BRANCH_SOAPYSDR=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout "${BRANCH_SOAPYSDR}" && \
+    BRANCH_SOAPYSDR=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/pothosware/SoapySDR.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^soapy-sdr-.*' | tail -1) && \
+    git clone --depth 1 --branch "$BRANCH_SOAPYSDR" "https://github.com/pothosware/SoapySDR.git" "/src/SoapySDR" && \
     mkdir -p "/src/SoapySDR/build" && \
     pushd "/src/SoapySDR/build" && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make && \
+    make -j "$(nproc)" && \
     make test && \
     make install && \
     ldconfig && \
     echo "SoapySDR $(SoapySDRUtil --info | grep -i 'lib version:' | cut -d ':' -f 2 | tr -d ' ')" >> /VERSIONS && \
-    popd && popd && \
+    popd && \
     # Build & install SoapyRTLSDR
-    git clone "${URL_REPO_SOAPYRTLSDR}" "/src/SoapyRTLSDR" && \
-    pushd "/src/SoapyRTLSDR" && \
-    BRANCH_SOAPYRTLSDR=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout "${BRANCH_SOAPYRTLSDR}" && \
+    BRANCH_SOAPYRTLSDR=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/pothosware/SoapyRTLSDR.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^soapy-rtl.*' | tail -1) && \
+    git clone --depth 1 --branch "$BRANCH_SOAPYRTLSDR" "https://github.com/pothosware/SoapyRTLSDR.git" "/src/SoapyRTLSDR" && \
     echo "SoapyRTLSDR ${BRANCH_SOAPYRTLSDR}" >> /VERSIONS && \
     mkdir -p "/src/SoapyRTLSDR/build" && \
     pushd "/src/SoapyRTLSDR/build" && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make && \
+    make -j "$(nproc)" && \
     make install && \
-    popd && popd && \
+    popd && \
     # Build & install dump978
-    git clone "${URL_REPO_DUMP978}" "/src/dump978" && \
+    BRANCH_DUMP978=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/dump978.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
+    git clone --depth 1 --branch "$BRANCH_DUMP978" "https://github.com/flightaware/dump978.git" "/src/dump978" && \
     pushd "/src/dump978" && \
-    BRANCH_DUMP978=$(git tag --sort="-creatordate" | head -1) && \
-    git checkout "${BRANCH_DUMP978}" && \
-    make all faup978 && \
+    make -j "$(nproc)" all faup978 && \
     mkdir -p "/usr/lib/piaware/helpers" && \
     cp -v dump978-fa skyaware978 "/usr/local/bin/" && \
     cp -v faup978 "/usr/lib/piaware/helpers/" && \
@@ -167,82 +121,78 @@ RUN set -x && \
     cp -a "/src/dump978/skyaware/"* "/usr/share/skyaware978/html/" && \
     mkdir -p "/run/skyaware978" && \
     popd && \
-    # Build & install bladeRF
-    git clone --recursive "${URL_REPO_BLADERF}" "/src/bladeRF" && \
-    pushd "/src/bladeRF" && \
-    BRANCH_BLADERF="$(git tag --sort='-creatordate' | grep -vE '\-rc[0-9]*$' | head -1)" && \
-    git checkout "${BRANCH_BLADERF}" && \
-    echo "bladeRF ${BRANCH_BLADERF}" >> /VERSIONS && \
-    mkdir -p "/src/bladeRF/host/build" && \
-    popd && \
-    pushd "/src/bladeRF/host/build" && \
+    # bladeRF: get latest release tag without cloning repo
+    BRANCH_BLADERF=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/Nuand/bladeRF.git' | grep -v '\^' | grep 'refs/tags/libbladeRF_' | cut -d '/' -f 3 | tail -1) && \
+    # bladeRF: clone repo
+    git clone \
+      --branch "$BRANCH_BLADERF" \
+      --depth 1 \
+      --single-branch \
+      'https://github.com/Nuand/bladeRF.git' \
+      /src/bladeRF \
+      && \
+    # bladeRF: prepare to build
+    mkdir /src/bladeRF/build && \
+    pushd /src/bladeRF/build && \
     cmake \
-        -DTREAT_WARNINGS_AS_ERRORS=OFF \
-        -DCMAKE_BUILD_TYPE=Release \
-        ../ \
-        && \
-    make && \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \
+      -DINSTALL_UDEV_RULES=ON \
+      ../ \
+      && \
+    # bladeRF: build & install
+    make -j "$(nproc)" && \
     make install && \
     ldconfig && \
     popd && \
-    # Download bladeRF FPGA Images
-    mkdir -p "$BLADERF_RBF_PATH" && \
-    curl -o "$BLADERF_RBF_PATH/hostedxA4.rbf" https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
-    curl -o "$BLADERF_RBF_PATH/hostedxA9.rbf" https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
-    curl -o "$BLADERF_RBF_PATH/hostedx40.rbf" https://www.nuand.com/fpga/hostedx40-latest.rbf && \
-    curl -o "$BLADERF_RBF_PATH/hostedx115.rbf" https://www.nuand.com/fpga/hostedx115-latest.rbf && \
-    curl -o "$BLADERF_RBF_PATH/adsbxA4.rbf" https://www.nuand.com/fpga/adsbxA4.rbf && \
-    curl -o "$BLADERF_RBF_PATH/adsbxA9.rbf" https://www.nuand.com/fpga/adsbxA9.rbf && \
-    curl -o "$BLADERF_RBF_PATH/adsbx40.rbf" https://www.nuand.com/fpga/adsbx40.rbf && \
-    curl -o "$BLADERF_RBF_PATH/adsbx115.rbf" https://www.nuand.com/fpga/adsbx115.rbf && \
+    # bladeRF: simple test
+    bladeRF-cli --version && \
     # Build & install tcllauncher
-    git clone "${URL_REPO_TCLLAUNCHER}" "/src/tcllauncher" && \
+    BRANCH_TCLLAUNCHER=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/tcllauncher.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
+    git clone --depth 1 --branch "$BRANCH_TCLLAUNCHER" "https://github.com/flightaware/tcllauncher.git" "/src/tcllauncher" && \
     pushd "/src/tcllauncher" && \
-    BRANCH_TCLLAUNCHER="$(git tag --sort='-creatordate' | head -1)" && \
-    git checkout "${BRANCH_TCLLAUNCHER}" && \
     echo "tcllauncher ${BRANCH_TCLLAUNCHER}" >> /VERSIONS && \
     autoconf && \
     ./configure --prefix=/opt/tcl && \
-    make && \
+    make -j "$(nproc)" && \
     make install && \
     ldconfig && \
     popd && \
     # Build & install piaware
-    git clone "${URL_REPO_PIAWARE}" "/src/piaware" && \
+    BRANCH_PIAWARE=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/piaware.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
+    git clone --depth 1 --branch "$BRANCH_PIAWARE" "https://github.com/flightaware/piaware.git" "/src/piaware" && \
     pushd "/src/piaware" && \
-    BRANCH_PIAWARE="$(git tag --sort='-creatordate' | head -1)" && \
-    git checkout "${BRANCH_PIAWARE}" && \
     echo "piaware ${BRANCH_PIAWARE}" >> /VERSIONS && \
-    make install && \
+    make -j "$(nproc)" install && \
     cp -v /src/piaware/package/ca/*.pem /etc/ssl/ && \
     touch /etc/piaware.conf && \
     mkdir -p /run/piaware && \
     ldconfig && \
     popd && \
     # Build & install piaware-web
-    git clone "${URL_REPO_PIAWARE_WEB}" "/src/piaware-web" && \
+    git clone "https://github.com/flightaware/piaware-web.git" "/src/piaware-web" && \
     cp -Rv /src/piaware-web/web/. /var/www/html/ && \
     # get dump1090 sources
-    git clone "${URL_REPO_DUMP1090}" "/opt/dump1090" && \
-    pushd "/opt/dump1090" && \
-    DUMP1090_VERSION="$(git tag --sort='-creatordate' | head -1)" && \
+    DUMP1090_VERSION=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/dump1090.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
     export DUMP1090_VERSION && \
-    git checkout "${DUMP1090_VERSION}" && \
+    git clone --depth 1 --branch "$DUMP1090_VERSION" "https://github.com/flightaware/dump1090.git" "/src/dump1090" && \
+    pushd "/src/dump1090" && \
     echo "dump1090 ${DUMP1090_VERSION}" >> /VERSIONS && \
-    make showconfig BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes && \
-    make all BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
-    make faup1090 BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
+    make -j "$(nproc)" showconfig BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes && \
+    make -j "$(nproc)" all BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
+    make -j "$(nproc)" faup1090 BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
     cp -v view1090 dump1090 /usr/local/bin/ && \
     cp -v faup1090 /usr/lib/piaware/helpers/ && \
     mkdir -p /usr/share/dump1090-fa/html && \
-    cp -a /opt/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
+    cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
     mkdir -p /usr/share/skyaware/html && \
-    cp -a /opt/dump1090/public_html_merged/* /usr/share/skyaware/html && \
+    cp -a /src/dump1090/public_html_merged/* /usr/share/skyaware/html && \
     ldconfig && \
     popd && \
     dump1090 --version && \
     # Build & install mlat-client
-    git clone "${URL_REPO_MLATCLIENT}" "/src/mlat-client" && \
+    BRANCH_MLATCLIENT=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/mutability/mlat-client.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
+    git clone --depth 1 --branch "$BRANCH_MLATCLIENT" "https://github.com/mutability/mlat-client.git" "/src/mlat-client" && \
     pushd /src/mlat-client && \
     BRANCH_MLATCLIENT="$(git tag --sort='-creatordate' | head -1)" && \
     git checkout "${BRANCH_MLATCLIENT}" && \
@@ -252,33 +202,29 @@ RUN set -x && \
     ldconfig && \
     popd && \
     # Build & install beast-splitter
-    git clone "${URL_REPO_BEASTSPLITTER}" "/src/beast-splitter" && \
+    BRANCH_BEASTSPLITTER=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/beast-splitter.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
+    git clone --depth 1 --branch "$BRANCH_BEASTSPLITTER" "https://github.com/flightaware/beast-splitter.git" "/src/beast-splitter" && \
     pushd "/src/beast-splitter" && \
-    BRANCH_BEASTSPLITTER="$(git tag --sort='-creatordate' | head -1)" && \
-    git checkout "${BRANCH_BEASTSPLITTER}" && \
     echo "beast-splitter ${BRANCH_BEASTSPLITTER}" >> /VERSIONS && \
-    make && \
+    make -j "$(nproc)" && \
     cp -v ./beast-splitter /usr/local/bin/ && \
     popd && \
     cp /scripts/fa_services.tcl /usr/lib/piaware_packages/ && \
-    # Deploy s6-overlay.
-    curl -s -o /tmp/deploy-s6-overlay.sh https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh && \
-    bash /tmp/deploy-s6-overlay.sh && \
+    # bladeRF: download bladeRF FPGA images
+    BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" && \
+    export BLADERF_RBF_PATH && \
+    mkdir -p "$BLADERF_RBF_PATH" && \
+    curl -L -o "$BLADERF_RBF_PATH/hostedxA4.rbf" https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
+    curl -L -o "$BLADERF_RBF_PATH/hostedxA9.rbf" https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
+    curl -L -o "$BLADERF_RBF_PATH/hostedx40.rbf" https://www.nuand.com/fpga/hostedx40-latest.rbf && \
+    curl -L -o "$BLADERF_RBF_PATH/hostedx115.rbf" https://www.nuand.com/fpga/hostedx115-latest.rbf && \
+    curl -L -o "$BLADERF_RBF_PATH/adsbxA4.rbf" https://www.nuand.com/fpga/adsbxA4.rbf && \
+    curl -L -o "$BLADERF_RBF_PATH/adsbxA9.rbf" https://www.nuand.com/fpga/adsbxA9.rbf && \
+    curl -L -o "$BLADERF_RBF_PATH/adsbx40.rbf" https://www.nuand.com/fpga/adsbx40.rbf && \
+    curl -L -o "$BLADERF_RBF_PATH/adsbx115.rbf" https://www.nuand.com/fpga/adsbx115.rbf && \
     # Clean up
     apt-get remove -y ${TEMP_PACKAGES[@]} && \
     apt-get autoremove -y && \
-    # # Add packages neccessary for first-run build of dump1090
-    # unset KEPT_PACKAGES && \
-    # KEPT_PACKAGES=() && \
-    # KEPT_PACKAGES+=(gcc) && \
-    # KEPT_PACKAGES+=(libncurses-dev) && \
-    # KEPT_PACKAGES+=(libstdc++-10-dev) && \
-    # KEPT_PACKAGES+=(make) && \
-    # KEPT_PACKAGES+=(pkg-config) && \
-    # apt-get install -y --no-install-recommends \
-    #     ${KEPT_PACKAGES[@]} \
-    #     && \
-    # Finish clean up
     apt-get clean -y && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
     find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
