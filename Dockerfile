@@ -1,4 +1,4 @@
-FROM ghcr.io/fredclausen/docker-baseimage:rtlsdr
+FROM ghcr.io/fredclausen/docker-baseimage:dump978-full
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     VERBOSE_LOGGING="false"
@@ -26,16 +26,6 @@ RUN set -x && \
     # libusb for a number of things
     KEPT_PACKAGES+=(libusb-1.0-0) && \
     TEMP_PACKAGES+=(libusb-1.0-0-dev) && \
-    # dump978 dependencies
-    TEMP_PACKAGES+=(libboost-dev) && \
-    TEMP_PACKAGES+=(libboost-system1.74-dev) && \
-    KEPT_PACKAGES+=(libboost-system1.74.0) && \
-    TEMP_PACKAGES+=(libboost-program-options1.74-dev) && \
-    KEPT_PACKAGES+=(libboost-program-options1.74.0) && \
-    TEMP_PACKAGES+=(libboost-regex1.74-dev) && \
-    KEPT_PACKAGES+=(libboost-regex1.74.0) && \
-    TEMP_PACKAGES+=(libboost-filesystem1.74-dev) && \
-    KEPT_PACKAGES+=(libboost-filesystem1.74.0) && \
     # dump1090 dependencies
     KEPT_PACKAGES+=(libatomic1) && \
     KEPT_PACKAGES+=(libncurses6) && \
@@ -86,40 +76,6 @@ RUN set -x && \
     make -j "$(nproc)" && \
     make install && \
     ldconfig && \
-    popd && \
-    # Build & install SoapySDR
-    BRANCH_SOAPYSDR=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/pothosware/SoapySDR.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^soapy-sdr-.*' | tail -1) && \
-    git clone --depth 1 --branch "$BRANCH_SOAPYSDR" "https://github.com/pothosware/SoapySDR.git" "/src/SoapySDR" && \
-    mkdir -p "/src/SoapySDR/build" && \
-    pushd "/src/SoapySDR/build" && \
-    cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make -j "$(nproc)" && \
-    make test && \
-    make install && \
-    ldconfig && \
-    echo "SoapySDR $(SoapySDRUtil --info | grep -i 'lib version:' | cut -d ':' -f 2 | tr -d ' ')" >> /VERSIONS && \
-    popd && \
-    # Build & install SoapyRTLSDR
-    BRANCH_SOAPYRTLSDR=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/pothosware/SoapyRTLSDR.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^soapy-rtl.*' | tail -1) && \
-    git clone --depth 1 --branch "$BRANCH_SOAPYRTLSDR" "https://github.com/pothosware/SoapyRTLSDR.git" "/src/SoapyRTLSDR" && \
-    echo "SoapyRTLSDR ${BRANCH_SOAPYRTLSDR}" >> /VERSIONS && \
-    mkdir -p "/src/SoapyRTLSDR/build" && \
-    pushd "/src/SoapyRTLSDR/build" && \
-    cmake ../ -DCMAKE_BUILD_TYPE=Release && \
-    make -j "$(nproc)" && \
-    make install && \
-    popd && \
-    # Build & install dump978
-    BRANCH_DUMP978=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/dump978.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
-    git clone --depth 1 --branch "$BRANCH_DUMP978" "https://github.com/flightaware/dump978.git" "/src/dump978" && \
-    pushd "/src/dump978" && \
-    make -j "$(nproc)" all faup978 && \
-    mkdir -p "/usr/lib/piaware/helpers" && \
-    cp -v dump978-fa skyaware978 "/usr/local/bin/" && \
-    cp -v faup978 "/usr/lib/piaware/helpers/" && \
-    mkdir -p "/usr/share/skyaware978/html" && \
-    cp -a "/src/dump978/skyaware/"* "/usr/share/skyaware978/html/" && \
-    mkdir -p "/run/skyaware978" && \
     popd && \
     # bladeRF: get latest release tag without cloning repo
     BRANCH_BLADERF=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/Nuand/bladeRF.git' | grep -v '\^' | grep 'refs/tags/libbladeRF_' | cut -d '/' -f 3 | tail -1) && \
