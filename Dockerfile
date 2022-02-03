@@ -51,6 +51,8 @@ RUN set -x && \
     KEPT_PACKAGES+=(net-tools) && \
     KEPT_PACKAGES+=(procps) && \
     KEPT_PACKAGES+=(socat) && \
+    # beast-splitter dependencies
+    TEMP_PACKAGES+=(libboost1.74-dev) && \
     # Install packages.
     apt-get update && \
     apt-get install -y --no-install-recommends \
