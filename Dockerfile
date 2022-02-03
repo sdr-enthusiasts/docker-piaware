@@ -53,6 +53,12 @@ RUN set -x && \
     KEPT_PACKAGES+=(socat) && \
     # beast-splitter dependencies
     TEMP_PACKAGES+=(libboost1.74-dev) && \
+    TEMP_PACKAGES+=(libboost-system1.74-dev) && \
+    KEPT_PACKAGES+=(libboost-system1.74.0) && \
+    TEMP_PACKAGES+=(libboost-program-options1.74-dev) && \
+    KEPT_PACKAGES+=(libboost-program-options1.74.0) && \
+    TEMP_PACKAGES+=(libboost-regex1.74-dev) && \
+    KEPT_PACKAGES+=(libboost-regex1.74.0) && \
     # Install packages.
     apt-get update && \
     apt-get install -y --no-install-recommends \
