@@ -471,7 +471,7 @@ Use only with `RECEIVER_TYPE=relay`.
 | `BEASTHOST` | a hostname or IP | Specify an external BEAST protocol provider (dump1090/readsb/etc). | |
 | `BEASTPORT` | a port number | Specify the TCP port number of the external BEAST protocol provider. | `30005` |
 
-### Receiver Configuration (987MHz)
+### Receiver Configuration (978MHz)
 
 | Environment Variable | Possible Values | Description | Default |
 | -------------------- | --------------- | ------- | ------- |
