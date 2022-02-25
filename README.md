@@ -1,7 +1,5 @@
-# mikenye/piaware
+# sdr-enthusiasts/docker-piaware
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mikenye/docker-piaware/Push)](https://github.com/mikenye/docker-piaware/actions?query=workflow%3A%22Push%22)
-[![Docker Pulls](https://img.shields.io/docker/pulls/mikenye/piaware.svg)](https://hub.docker.com/r/mikenye/piaware)
 [![Docker Image Size (tag)](https://img.shields.io/docker/image-size/mikenye/piaware/latest)](https://hub.docker.com/r/mikenye/piaware)
 [![Discord](https://img.shields.io/discord/734090820684349521)](https://discord.gg/sTf9uYF)
 
@@ -11,21 +9,20 @@ Builds and runs on `linux/amd64`, `linux/386`, `linux/arm/v7` and `linux/arm64`.
 
 For more information on what PiAware is, see here: [FlightAware - PiAware](https://flightaware.com/adsb/piaware/).
 
-This container can operate in "net only" mode and pull ADS-B Mode-S & UAT data from another host/container. **This is the recommended way of deploying the container**, and I'd humbly suggest [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) and [`mikenye/dump978`](https://github.com/mikenye/docker-dump978) (if you live in an area that uses UAT).
+This container can operate in "net only" mode and pull ADS-B Mode-S & UAT data from another host/container. **This is the recommended way of deploying the container**, and I'd humbly suggest [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) and [`sdr-enthusiasts/docker-dump978`](https://github.com/sdr-enthusiasts/docker-dump978) (if you live in an area that uses UAT).
 
 *Note:* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapper/helper scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
 
 ## Note for Users running 32-bit Debian Buster-based OSes on ARM
 
-Please see: [Buster-Docker-Fixes](https://github.com/fredclausen/Buster-Docker-Fixes)!
+Please see: [Buster-Docker-Fixes](https://github.com/sdr-enthusiasts/Buster-Docker-Fixes)!
 
 ## Table of Contents
 
-* [mikenye/piaware](#mikenyepiaware)
+* [sdr-enthusiasts/docker-piaware](#sdr-enthusiastsdocker-piaware)
   * [Note for Users running 32-bit Debian Buster-based OSes on ARM](#note-for-users-running-32-bit-debian-buster-based-oses-on-arm)
   * [Table of Contents](#table-of-contents)
   * [Supported tags and respective Dockerfiles](#supported-tags-and-respective-dockerfiles)
-  * [Contributors](#contributors)
   * [Multi Architecture Support](#multi-architecture-support)
   * [Prerequisites](#prerequisites)
   * [Determining your Feeder ID](#determining-your-feeder-id)
@@ -46,7 +43,7 @@ Please see: [Buster-Docker-Fixes](https://github.com/fredclausen/Buster-Docker-F
     * [Receiver Configuration (1090MHz)](#receiver-configuration-1090mhz)
     * [RTL-SDR Configuration (1090MHz)](#rtl-sdr-configuration-1090mhz)
     * [Relay Configuration (1090MHz)](#relay-configuration-1090mhz)
-    * [Receiver Configuration (987MHz)](#receiver-configuration-987mhz)
+    * [Receiver Configuration (978MHz)](#receiver-configuration-978mhz)
     * [RTL-SDR Configuration (978MHz)](#rtl-sdr-configuration-978mhz)
     * [Relay Configuration (978MHz)](#relay-configuration-978mhz)
   * [Ports](#ports)
@@ -54,19 +51,12 @@ Please see: [Buster-Docker-Fixes](https://github.com/fredclausen/Buster-Docker-F
   * [Logging](#logging)
   * [Other services to feed](#other-services-to-feed)
   * [Getting help](#getting-help)
-  * [Changelog](#changelog)
 
 ## Supported tags and respective Dockerfiles
 
-* `latest` should always contain the latest released version of piaware and support tools. This image is built nightly from the [`master` branch](https://github.com/mikenye/docker-piaware/tree/master) [`Dockerfile`](https://github.com/mikenye/docker-piaware/blob/master/Dockerfile) for all supported architectures.
+* `latest` should always contain the latest released version of piaware and support tools, for all supported architectures.
 * Specific version and architecture tags are available if required, however these are not regularly updated. It is generally recommended to run `latest`.
-* There are also `latest` and version-specific tags appended with `_nohealthcheck` where the container healthchecks have been excluded from the image build. See [issue #43](https://github.com/mikenye/docker-piaware/issues/43).
-
-## Contributors
-
-* Thanks to [Jan Collijs](https://github.com/visibilityspots) for contributing to the 3.7.1, 3.7.2 and 3.8.0 releases.
-* Thanks to [ShoGinn](https://github.com/ShoGinn) for many contributions to the 3.8.0 release and tidy up of code & readme.
-* Thanks to [ssbb](https://flightaware.com/adsb/stats/user/pmd5700#stats-134107) for allowing me to use his Pi as a development platform for UAT support.
+* There are also `latest` and version-specific tags appended with `_nohealthcheck` where the container healthchecks have been excluded from the image build. See [issue #43](https://github.com/sdr-enthusiasts/docker-piaware/issues/43).
 
 ## Multi Architecture Support
 
@@ -136,8 +126,8 @@ You'll need a *feeder-id*. To get one, you can temporarily run the container, to
 Run the commands:
 
 ```shell
-docker pull mikenye/piaware:latest
-timeout 30 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE mikenye/piaware:latest | grep "my feeder ID"
+docker pull ghcr.io/sdr-enthusiasts/docker-piaware:latest
+timeout 30 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE ghcr.io/sdr-enthusiasts/docker-piaware:latest | grep "my feeder ID"
 ```
 
 Be sure to change the following:
@@ -150,7 +140,7 @@ The command will run the container for 30 seconds, which should be ample time fo
 For example:
 
 ```shell
-timeout 30 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 mikenye/piaware:latest | grep "my feeder ID"
+timeout 30 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 ghcr.io/sdr-enthusiasts/docker-piaware:latest | grep "my feeder ID"
 ```
 
 Will output:
@@ -189,7 +179,7 @@ docker run \
  -p 8080:80 \
  --tmpfs=/run:exec,size=64M \
  --tmpfs=/var/log \
- mikenye/piaware
+ ghcr.io/sdr-enthusiasts/docker-piaware:latest
 ```
 
 ### Example `docker-compose.yml` with RTL-SDR USB for reception of 1090MHz
@@ -199,7 +189,7 @@ version: '2.0'
 
 services:
   piaware:
-    image: mikenye/piaware:latest
+    image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
     tty: true
     container_name: piaware
     restart: always
@@ -246,7 +236,7 @@ docker run \
  -p 8080:80 \
  --tmpfs=/run:exec,size=64M \
  --tmpfs=/var/log \
- mikenye/piaware
+ ghcr.io/sdr-enthusiasts/docker-piaware:latest
 ```
 
 ### Example `docker-compose.yml` with 2x RTL-SDR USB for reception of 1090MHz and 978MHz
@@ -258,7 +248,7 @@ version: '2.0'
 
 services:
   piaware:
-    image: mikenye/piaware:latest
+    image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
     tty: true
     container_name: piaware
     restart: always
@@ -286,7 +276,7 @@ services:
 
 An example of an external Mode-S/BEAST provider would be:
 
-* [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) container
+* [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) container
 * Another hardware feeder that provides BEAST output data on port 30005
 
 In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
@@ -305,14 +295,14 @@ docker run \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  --tmpfs=/run:exec,size=64M \
  --tmpfs=/var/log \
- mikenye/piaware
+ ghcr.io/sdr-enthusiasts/docker-piaware:latest
 ```
 
 ### Example `docker-compose.yml` with external Mode-S/BEAST provider
 
 An example of an external Mode-S/BEAST provider would be:
 
-* [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) container
+* [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) container
 * Another hardware feeder that provides BEAST output data on port 30005
 
 In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
@@ -322,7 +312,7 @@ version: '2.0'
 
 services:
   piaware:
-    image: mikenye/piaware:latest
+    image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
     tty: true
     container_name: piaware
     restart: always
@@ -345,14 +335,14 @@ This will currently only work in the United States of America, as they are the o
 
 An example of an external Mode-S/BEAST provider would be:
 
-* [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) container
+* [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) container
 * Another hardware feeder that provides BEAST output data on port 30005
 
 In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
 
 An example of an external UAT provider would be:
 
-* [`mikenye/dump978`](https://github.com/mikenye/docker-dump978) container
+* [`sdr-enthusiasts/docker-dump978`](https://github.com/sdr-enthusiasts/docker-dump978) container
 
 In the example below, it is assumed that the external UAT provider resolves to `uathost` and is listening for connections on TCP port `30978`.
 
@@ -373,7 +363,7 @@ docker run \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  --tmpfs=/run:exec,size=64M \
  --tmpfs=/var/log \
- mikenye/piaware
+ ghcr.io/sdr-enthusiasts/docker-piaware:latest
 ```
 
 ### Example `docker-compose.yml` with external Mode-S/BEAST provider and external UAT provider
@@ -382,14 +372,14 @@ This will currently only work in the United States of America, as they are the o
 
 An example of an external Mode-S/BEAST provider would be:
 
-* [`mikenye/readsb-protobuf`](https://github.com/mikenye/docker-readsb-protobuf) container
+* [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) container
 * Another hardware feeder that provides BEAST output data on port 30005
 
 In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
 
 An example of an external UAT provider would be:
 
-* [`mikenye/dump978`](https://github.com/mikenye/docker-dump978) container
+* [`sdr-enthusiasts/docker-dump978`](https://github.com/sdr-enthusiasts/docker-dump978) container
 
 In the example below, it is assumed that the external UAT provider resolves to `uathost` and is listening for connections on TCP port `30978`.
 
@@ -398,7 +388,7 @@ version: '2.0'
 
 services:
   piaware:
-    image: mikenye/piaware:latest
+    image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
     tty: true
     container_name: piaware
     restart: always
@@ -526,21 +516,10 @@ Since version 3.8.0 the `flightaware-user` and `flightaware-password` configurat
 
 ## Other services to feed
 
-Check out these other images:
-
-* [`mikenye/adsbexchange`](https://hub.docker.com/r/mikenye/adsbexchange) to feed ADSB data to [adsbexchange.com](https://adsbexchange.com)
-* [`mikenye/adsbhub`](https://hub.docker.com/r/mikenye/adsbhub) to feed ADSB data into [adsbhub.org](https://adsbhub.org/)
-* [`mikenye/fr24feed`](https://hub.docker.com/r/mikenye/fr24feed) to feed ADSB data into [flightradar24.com](https://www.flightradar24.com)
-* [`mikenye/radarbox`](https://hub.docker.com/r/mikenye/radarbox) to feed ADSB data into [radarbox.com](https://www.radarbox.com)
-* [`mikenye/opensky-network`](https://hub.docker.com/r/mikenye/opensky-network) to feed ADSB data into [opensky-network.org](https://opensky-network.org/)
-* [`mikenye/planefinder`](https://hub.docker.com/r/mikenye/planefinder) to feed ADSB data into [planefinder.net](https://planefinder.net/)
+Check out these other images [here](https://github.com/sdr-enthusiasts?q=docker-*&type=all&language=&sort=).
 
 ## Getting help
 
-Please feel free to [open an issue on the project's GitHub](https://github.com/mikenye/docker-piaware/issues).
+Please feel free to [open an issue on the project's GitHub](https://github.com/sdr-enthusiasts/docker-piaware/issues).
 
-I also have a [Discord channel](https://discord.gg/sTf9uYF), feel free to [join](https://discord.gg/sTf9uYF) and converse.
-
-## Changelog
-
-See the project's [commit history](https://github.com/mikenye/docker-piaware/commits/master).
+We also have a [Discord channel](https://discord.gg/sTf9uYF), feel free to [join](https://discord.gg/sTf9uYF) and converse.
