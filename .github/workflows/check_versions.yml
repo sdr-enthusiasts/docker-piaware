@@ -1,0 +1,67 @@
+---
+
+name: Check upstream versions
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * *"
+
+jobs:
+
+  version_in_container:
+    name: Check version in 'latest' image
+    runs-on: ubuntu-latest
+    outputs:
+      currver: ${{ steps.current-version.outputs.currver }}
+    steps:
+      - name: Get version from ghcr.io/sdr-enthusiasts/docker-radarbox:latest
+        id: current-version
+        run: |
+          set -x
+          echo "::set-output name=currver::$(docker run --rm --entrypoint cat ghcr.io/sdr-enthusiasts/docker-radarbox:latest /CONTAINER_VERSION)"
+
+  latest_version:
+    name: Check latest version of 'rbfeeder'
+    runs-on: ubuntu-latest
+    outputs:
+      latestver: ${{ steps.latest-version.outputs.latestver }}
+    steps:
+      - name: Build image
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          load: true
+          tags: local-docker-radarbox:latest
+      - name: Get version from newly built image
+        id: latest-version
+        run: |
+          set -x
+          echo "::set-output name=latestver::$(docker run --rm --entrypoint cat local-docker-radarbox:latest /CONTAINER_VERSION)"
+
+  display_versions:
+    name: Display versions
+    needs: [version_in_container, latest_version]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display versions
+        run: |
+          echo "rbfeeder version in ghcr.io/sdr-enthusiasts/docker-radarbox:latest = ${{ needs.version_in_container.outputs.currver }}"
+          echo "rbfeeder version in apt repository = ${{ needs.latest_version.outputs.latestver }}"
+          echo "will a deployment be triggered = ${{ needs.version_in_container.outputs.currver != needs.latest_version.outputs.latestver }}"
+
+  trigger_deploy:
+    name: Trigger deployment on new version of 'rbfeeder'
+    needs: [version_in_container, latest_version]
+    if: ${{ needs.version_in_container.outputs.currver != needs.latest_version.outputs.latestver }}
+    runs-on: ubuntu-latest
+    env:
+      WORKFLOW_AUTH_TOKEN: ${{ secrets.GH_PAT_MIKENYE }}
+      WORKFLOW_REPO: sdr-enthusiasts/docker-radarbox
+      WORKFLOW_FILE: deploy.yml
+      WORKFLOW_REASON: "triggered via check_rbfeeder_version.yml in sdr-enthusiasts/docker-radarbox"
+    steps:
+      - name: Trigger ${{ env.WORKFLOW_FILE }} in ${{ env.WORKFLOW_REPO }}
+        run: |
+          echo "$WORKFLOW_AUTH_TOKEN" | gh auth login --with-token
+          gh workflow run --ref main --repo "$WORKFLOW_REPO" "$WORKFLOW_FILE" -f reason="$WORKFLOW_REASON"

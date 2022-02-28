@@ -69,6 +69,9 @@ RUN set -x && \
     # Build & install HackRF
     BRANCH_HACKRF=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/mossmann/hackrf.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v' | tail -1) && \
     git clone --depth 1 --branch "$BRANCH_HACKRF" "https://github.com/mossmann/hackrf.git" "/src/hackrf" && \
+    pushd "/src/hackrf" && \
+    echo "hackrf $(git log | head -1 | tr -s ' ' '_')" >> /VERSIONS && \
+    popd && \
     mkdir -p /src/hackrf/host/build && \
     pushd /src/hackrf/host/build && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
@@ -78,6 +81,9 @@ RUN set -x && \
     popd && \
     # Build & install LimeSuite
     git clone --depth 1 --branch stable "https://github.com/myriadrf/LimeSuite.git" "/src/LimeSuite" && \
+    pushd "/src/LimeSuite" && \
+    echo "LimeSuite commit_$(git log | head -1 | tr -s ' ' '_')" >> /VERSIONS && \
+    popd && \
     mkdir "/src/LimeSuite/builddir" && \
     pushd "/src/LimeSuite/builddir" && \
     cmake ../ -DCMAKE_BUILD_TYPE=Release && \
@@ -95,6 +101,9 @@ RUN set -x && \
       'https://github.com/Nuand/bladeRF.git' \
       /src/bladeRF \
       && \
+    pushd "/src/bladeRF" && \
+    echo "bladeRF $BRANCH_BLADERF" >> /VERSIONS && \
+    popd && \
     # bladeRF: prepare to build
     mkdir /src/bladeRF/build && \
     pushd /src/bladeRF/build && \
@@ -159,7 +168,6 @@ RUN set -x && \
     git clone --depth 1 --branch "$BRANCH_MLATCLIENT" "https://github.com/mutability/mlat-client.git" "/src/mlat-client" && \
     pushd /src/mlat-client && \
     BRANCH_MLATCLIENT="$(git tag --sort='-creatordate' | head -1)" && \
-    git checkout "${BRANCH_MLATCLIENT}" && \
     echo "mlat-client ${BRANCH_MLATCLIENT}" >> /VERSIONS && \
     ./setup.py install && \
     ln -s /usr/local/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
