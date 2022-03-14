@@ -22,7 +22,7 @@ jobs:
           echo "::set-output name=currver::$(docker run --rm --entrypoint cat ghcr.io/sdr-enthusiasts/docker-radarbox:latest /CONTAINER_VERSION)"
 
   latest_version:
-    name: Check latest version of 'rbfeeder'
+    name: Check latest versions
     runs-on: ubuntu-latest
     outputs:
       latestver: ${{ steps.latest-version.outputs.latestver }}
@@ -51,7 +51,7 @@ jobs:
           echo "will a deployment be triggered = ${{ needs.version_in_container.outputs.currver != needs.latest_version.outputs.latestver }}"
 
   trigger_deploy:
-    name: Trigger deployment on new version of 'rbfeeder'
+    name: Trigger deployment on new versions
     needs: [version_in_container, latest_version]
     if: ${{ needs.version_in_container.outputs.currver != needs.latest_version.outputs.latestver }}
     runs-on: ubuntu-latest
