@@ -15,7 +15,7 @@ jobs:
     outputs:
       currver: ${{ steps.current-version.outputs.currver }}
     steps:
-      - name: Get version from ghcr.io/sdr-enthusiasts/docker-radarbox:latest
+      - name: Get version from ghcr.io/${{ github.repository }}:latest
         id: current-version
         run: |
           set -x
