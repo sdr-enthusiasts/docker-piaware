@@ -15,11 +15,11 @@ jobs:
     outputs:
       currver: ${{ steps.current-version.outputs.currver }}
     steps:
-      - name: Get version from ghcr.io/sdr-enthusiasts/docker-radarbox:latest
+      - name: Get version from ghcr.io/${{ github.repository }}:latest
         id: current-version
         run: |
           set -x
-          echo "::set-output name=currver::$(docker run --rm --entrypoint cat ghcr.io/sdr-enthusiasts/docker-radarbox:latest /CONTAINER_VERSION)"
+          echo "::set-output name=currver::$(docker run --rm --entrypoint cat ghcr.io/${{ github.repository }}:latest /CONTAINER_VERSION)"
 
   latest_version:
     name: Check latest versions
@@ -32,12 +32,12 @@ jobs:
         with:
           push: false
           load: true
-          tags: local-docker-radarbox:latest
+          tags: testing:latest
       - name: Get version from newly built image
         id: latest-version
         run: |
           set -x
-          echo "::set-output name=latestver::$(docker run --rm --entrypoint cat local-docker-radarbox:latest /CONTAINER_VERSION)"
+          echo "::set-output name=latestver::$(docker run --rm --entrypoint cat testing:latest /CONTAINER_VERSION)"
 
   display_versions:
     name: Display versions
@@ -46,8 +46,8 @@ jobs:
     steps:
       - name: Display versions
         run: |
-          echo "rbfeeder version in ghcr.io/sdr-enthusiasts/docker-radarbox:latest = ${{ needs.version_in_container.outputs.currver }}"
-          echo "rbfeeder version in apt repository = ${{ needs.latest_version.outputs.latestver }}"
+          echo "versions in ghcr.io/${{ github.repository }}:latest = ${{ needs.version_in_container.outputs.currver }}"
+          echo "versions in apt repository = ${{ needs.latest_version.outputs.latestver }}"
           echo "will a deployment be triggered = ${{ needs.version_in_container.outputs.currver != needs.latest_version.outputs.latestver }}"
 
   trigger_deploy:
@@ -57,9 +57,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKFLOW_AUTH_TOKEN: ${{ secrets.GH_PAT_MIKENYE }}
-      WORKFLOW_REPO: sdr-enthusiasts/docker-radarbox
+      WORKFLOW_REPO: ${{ github.repository }}
       WORKFLOW_FILE: deploy.yml
-      WORKFLOW_REASON: "triggered via check_rbfeeder_version.yml in sdr-enthusiasts/docker-radarbox"
+      WORKFLOW_REASON: "triggered via check_versions.yml in ${{ github.repository }}"
     steps:
       - name: Trigger ${{ env.WORKFLOW_FILE }} in ${{ env.WORKFLOW_REPO }}
         run: |
