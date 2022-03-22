@@ -1,0 +1,20 @@
+---
+name: Linting (Markdown)
+
+on:
+  pull_request:
+    branches:
+      - main
+      # only run these if markdown files are updated
+
+jobs:
+  shellcheck:
+    name: Run shellcheck against shell scripts
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Pull koalaman/shellcheck:stable Image
+        run: docker pull koalaman/shellcheck:stable
+      - name: Run Shellcheck against shell scripts
+        run: docker run --rm -i -v "$PWD:/mnt" koalaman/shellcheck:stable $(find . -type f -exec grep -m1 -l -E '^#!.*sh.*' {} \; | grep -v '/.git/')
