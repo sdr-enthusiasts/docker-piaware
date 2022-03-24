@@ -1,5 +1,5 @@
 ---
-name: Linting (Markdown)
+name: Linting (Shellcheck)
 
 on:
   pull_request:
