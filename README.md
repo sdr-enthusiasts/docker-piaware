@@ -42,6 +42,7 @@ Please see: [Buster-Docker-Fixes](https://github.com/sdr-enthusiasts/Buster-Dock
     * [Multilateration](#multilateration)
     * [Receiver Configuration (1090MHz)](#receiver-configuration-1090mhz)
     * [RTL-SDR Configuration (1090MHz)](#rtl-sdr-configuration-1090mhz)
+      * [Adaptive Gain Configuration (1090MHz)](#adaptive-gain-configuration-1090mhz)
     * [Relay Configuration (1090MHz)](#relay-configuration-1090mhz)
     * [Receiver Configuration (978MHz)](#receiver-configuration-978mhz)
     * [RTL-SDR Configuration (978MHz)](#rtl-sdr-configuration-978mhz)
@@ -452,6 +453,19 @@ Use only with `RECEIVER_TYPE=rtlsdr`.
 | `RTLSDR_GAIN`  | `max` or a numeric gain level | Optimizing gain (optional) -- See [FlightAware -- Optimizing Gain](https://discussions.flightaware.com/t/thoughts-on-optimizing-gain/44482/2) | `max` |
 | `DUMP1090_DEVICE` | rtlsdr device serial number | Configures which dongle to use for 1090MHz reception if there is more than one connected | first available device |
 
+#### Adaptive Gain Configuration (1090MHz)
+
+The following settings control the [adaptive gain configuration](https://github.com/flightaware/dump1090/blob/master/README.adaptive-gain.md) of `dump1090` when using `RECEIVER_TYPE=rtlsdr`.
+
+| Environment Variable | Possible Values | Description | Default |
+| -------------------- | --------------- | ------- | ------- |
+| `DUMP1090_ADAPTIVE_RANGE` | `true` or unset | Set to any value to adjust gain for target dynamic range. | |
+| `DUMP1090_ADAPTIVE_RANGE_TARGET` | A value in dB | Set target dynamic range in dB. | |
+| `DUMP1090_ADAPTIVE_BURST` | `true` or unset | Set to any value to adjust gain for too-loud message bursts. | |
+| `DUMP1090_ADAPTIVE_MIN_GAIN` | A value in dB | Set gain adjustment range lower limit (dB). | |
+| `DUMP1090_ADAPTIVE_MAX_GAIN` | A value in dB | Set gain adjustment range upper limit (dB). | |
+| `DUMP1090_ADAPTIVE_DUTY_CYCLE` | A percentage | Set adaptive gain duty cycle % (1..100) </br> See [Reducing the CPU cost of adaptive gain](https://github.com/flightaware/dump1090/blob/master/README.adaptive-gain.md#reducing-the-cpu-cost-of-adaptive-gain) | |
+
 ### Relay Configuration (1090MHz)
 
 Use only with `RECEIVER_TYPE=relay`.
@@ -460,6 +474,8 @@ Use only with `RECEIVER_TYPE=relay`.
 | -------------------- | --------------- | ------- | ------- |
 | `BEASTHOST` | a hostname or IP | Specify an external BEAST protocol provider (dump1090/readsb/etc). | |
 | `BEASTPORT` | a port number | Specify the TCP port number of the external BEAST protocol provider. | `30005` |
+| `MLAT_RESULTS_BEASTHOST` | a hostname or IP | Specify an external host where MLAT results should be sent. | |
+| `MLAT_RESULTS_BEASTPORT` | a port number | Specify the TCP port number where MLAT results should be sent. | `30104` |
 
 ### Receiver Configuration (978MHz)
 

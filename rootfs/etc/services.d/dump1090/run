@@ -9,6 +9,9 @@ fi
 if [[ -n "$DUMP1090_DEVICE" ]]; then
   RUN_DUMP1090="true"
 fi
+if [[ -n "$RECEIVER_TYPE" ]]; then
+  RUN_DUMP1090="true"
+fi
 if [[ -z "$RUN_DUMP1090" ]]; then
   sleep 86400
   exit 0
@@ -53,6 +56,29 @@ else
         DUMP1090_CMD+=("--gain" "$RTLSDR_GAIN")
     fi
 
+    if [[ -n "$DUMP1090_ADAPTIVE_RANGE" ]]; then
+        DUMP1090_CMD+=("--adaptive-range")
+    fi
+
+    if [[ -n "$DUMP1090_ADAPTIVE_RANGE_TARGET" ]]; then
+        DUMP1090_CMD+=("--adaptive-range-target" "$DUMP1090_ADAPTIVE_RANGE_TARGET")
+    fi
+
+    if [[ -n "$DUMP1090_ADAPTIVE_BURST" ]]; then
+        DUMP1090_CMD+=("--adaptive-burst")
+    fi
+
+    if [[ -n "$DUMP1090_ADAPTIVE_MIN_GAIN" ]]; then
+        DUMP1090_CMD+=("--adaptive-min-gain" "$DUMP1090_ADAPTIVE_MIN_GAIN")
+    fi
+
+    if [[ -n "$DUMP1090_ADAPTIVE_MAX_GAIN" ]]; then
+        DUMP1090_CMD+=("--adaptive-max-gain" "$DUMP1090_ADAPTIVE_MAX_GAIN")
+    fi
+
+    if [[ -n "$DUMP1090_ADAPTIVE_DUTY_CYCLE" ]]; then
+        DUMP1090_CMD+=("--adaptive-duty-cycle" "$DUMP1090_ADAPTIVE_DUTY_CYCLE")
+    fi
 fi
 
 # shellcheck disable=SC2016
