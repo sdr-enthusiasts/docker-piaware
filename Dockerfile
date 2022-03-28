@@ -145,6 +145,8 @@ RUN set -x && \
     # Build & install piaware-web
     git clone "https://github.com/flightaware/piaware-web.git" "/src/piaware-web" && \
     cp -Rv /src/piaware-web/web/. /var/www/html/ && \
+    # Symlink for skyaware978
+    ln -vs /usr/share/dump978-fa /usr/share/skyaware978 && \
     # get dump1090 sources
     DUMP1090_VERSION=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/dump1090.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
     export DUMP1090_VERSION && \
