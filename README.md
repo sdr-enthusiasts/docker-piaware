@@ -459,9 +459,9 @@ The following settings control the [adaptive gain configuration](https://github.
 
 | Environment Variable | Possible Values | Description | Default |
 | -------------------- | --------------- | ------- | ------- |
-| `DUMP1090_ADAPTIVE_RANGE` | | Set to any value to adjust gain for target dynamic range. | |
+| `DUMP1090_ADAPTIVE_RANGE` | `true` or unset | Set to any value to adjust gain for target dynamic range. | |
 | `DUMP1090_ADAPTIVE_RANGE_TARGET` | A value in dB | Set target dynamic range in dB. | |
-| `DUMP1090_ADAPTIVE_BURST` | | Adjust gain for too-loud message bursts. | |
+| `DUMP1090_ADAPTIVE_BURST` | `true` or unset | Set to any value to adjust gain for too-loud message bursts. | |
 | `DUMP1090_ADAPTIVE_MIN_GAIN` | A value in dB | Set gain adjustment range lower limit (dB). | |
 | `DUMP1090_ADAPTIVE_MAX_GAIN` | A value in dB | Set gain adjustment range upper limit (dB). | |
 | `DUMP1090_ADAPTIVE_DUTY_CYCLE` | A percentage | Set adaptive gain duty cycle % (1..100) </br> See [Reducing the CPU cost of adaptive gain](https://github.com/flightaware/dump1090/blob/master/README.adaptive-gain.md#reducing-the-cpu-cost-of-adaptive-gain) | |
