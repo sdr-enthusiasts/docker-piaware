@@ -49,10 +49,6 @@ else
   ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" >/etc/timezone
 fi
 
-# Wipe piaware config, will be re-created below
-rm /etc/piaware.conf > /dev/null 2>&1
-touch /etc/piaware.conf
-
 # Set up piaware
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
