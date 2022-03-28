@@ -49,6 +49,9 @@ else
   ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" >/etc/timezone
 fi
 
+# Wipe piaware config, will be re-created below
+rm /etc/piaware.conf > /dev/null 2>&1
+
 # Set up piaware
 piaware-config allow-auto-updates no
 piaware-config allow-manual-updates no
@@ -80,6 +83,11 @@ if [[ -n "$UAT_RECEIVER_HOST" ]]; then
 elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
   piaware-config uat-receiver-type "sdr"
 
+fi
+
+# If MLAT_RESULTS_BEAST_CONNECT is specified
+if [[ -n "$MLAT_RESULTS_BEASTHOST" ]]; then
+  piaware-config mlat-results-format "$(piaware-config -show mlat-results-format) beast,connect,${MLAT_RESULTS_BEASTHOST}:${MLAT_RESULTS_BEASTHOST:-30104}"
 fi
 
 # Create log dir for piaware
