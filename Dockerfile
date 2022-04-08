@@ -86,7 +86,11 @@ RUN set -x && \
     popd && \
     mkdir "/src/LimeSuite/builddir" && \
     pushd "/src/LimeSuite/builddir" && \
-    cmake ../ -DCMAKE_BUILD_TYPE=Release && \
+    cmake \
+      ../ \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DENABLE_SIMD_FLAGS=SSE3 \
+      && \
     make -j "$(nproc)" && \
     make install && \
     ldconfig && \
