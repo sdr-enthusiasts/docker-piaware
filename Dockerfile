@@ -89,7 +89,7 @@ RUN set -x && \
     cmake \
       ../ \
       -DCMAKE_BUILD_TYPE=Release \
-      -DENABLE_SIMD_FLAGS=none \
+      -DCMAKE_INSTALL_PREFIX=/usr \
       && \
     make -j "$(nproc)" && \
     make install && \
