@@ -89,7 +89,7 @@ RUN set -x && \
     cmake \
       ../ \
       -DCMAKE_BUILD_TYPE=Release \
-      -DENABLE_SIMD_FLAGS=SSE3 \
+      -DENABLE_SIMD_FLAGS=none \
       && \
     make -j "$(nproc)" && \
     make install && \
