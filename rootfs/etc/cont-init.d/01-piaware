@@ -84,7 +84,7 @@ fi
 
 # If MLAT_RESULTS_BEAST_CONNECT is specified
 if [[ -n "$MLAT_RESULTS_BEASTHOST" ]]; then
-  piaware-config mlat-results-format "$(piaware-config -show mlat-results-format) beast,connect,${MLAT_RESULTS_BEASTHOST}:${MLAT_RESULTS_BEASTHOST:-30104}"
+  piaware-config mlat-results-format "$(piaware-config -show mlat-results-format) beast,connect,${MLAT_RESULTS_BEASTHOST}:${MLAT_RESULTS_BEASTPORT:-30104}"
 fi
 
 # Create log dir for piaware
