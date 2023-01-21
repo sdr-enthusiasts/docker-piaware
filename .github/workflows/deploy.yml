@@ -47,6 +47,7 @@ jobs:
       ghcr_repo: ${{ github.repository }}
       dockerhub_profile: mikenye
       dockerhub_repo: piaware
+      build_platform_specific: false
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
       dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
