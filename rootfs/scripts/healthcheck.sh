@@ -13,10 +13,6 @@ FA_SERVER_IPS=$(piaware-config -show adept-serverhosts | cut -d '{' -f 2 | cut -
 # Get flightaware server port
 FA_SERVER_PORT=$(piaware-config -show adept-serverport)
 
-# Get netstat output
-NETSTAT_AN=$(netstat -an)
-NETSTAT=$(netstat)
-
 # Define function to return number msgs sent to FA from a process for a given time
 function check_logs_for_msgs_sent_to_fa () {
     # $1 = sending process (eg: dump1090, socat, dump978-fa)
@@ -34,21 +30,18 @@ function check_logs_for_msgs_sent_to_fa () {
 # Make sure there is an established connection to flightaware
 CONNECTED_TO_FA=""
 for FA_SERVER_IP in $FA_SERVER_IPS; do
-    IP_ESCAPED_DOTS=${FA_SERVER_IP//./\\.}
-    REGEX_FA_CONNECTION_FROM_NETSTAT="^\s*tcp\s+\d+\s+\d+\s+(?>\d{1,3}\.{0,1}){4}:\d{1,5}\s+(?>${IP_ESCAPED_DOTS}):(?>${FA_SERVER_PORT})\s+ESTABLISHED\s*$"
-    if echo "$NETSTAT_AN" | grep -P "$REGEX_FA_CONNECTION_FROM_NETSTAT" > /dev/null 2>&1; then
+    SS_LINES=$(ss -Hnt state established dport "$FA_SERVER_PORT" dst "$FA_SERVER_IP" | wc -l)
+    if [ "$SS_LINES" -ge 1 ]; then
         CONNECTED_TO_FA="true"
         break 2
     fi
 done
 # if previous section didn't find a connection to FA, lets try something else
-# should match lines that look like
-# tcp        0      0 c8fbd48fe046:40469      liniy.dal.flightaw:1200 ESTABLISHED
 if [[ -z "$CONNECTED_TO_FA" ]]; then
-   REGEX_FA_CONNECTION_FROM_NETSTAT="^\s*tcp\s+\d+\s+\d+\s+\S+:\d+\s+[a-z]+\.?[a-z]+\.?[a-z]+:(?>${FA_SERVER_PORT})\s+ESTABLISHED\s*$"
-   if echo "$NETSTAT" | grep -P "$REGEX_FA_CONNECTION_FROM_NETSTAT" > /dev/null 2>&1; then
-      CONNECTED_TO_FA="true"
-   fi
+    SS_LINES=$(ss -Hnt state established dport "$FA_SERVER_PORT" | wc -l)
+    if [ "$SS_LINES" -ge 1 ]; then
+        CONNECTED_TO_FA="true"
+    fi
 fi
 if [[ -z "$CONNECTED_TO_FA" ]]; then
     echo "No connection to Flightaware, NOT OK."
@@ -91,29 +84,19 @@ elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
 fi
 
 # Make sure web server listening on port 80
-WEBSERVER_LISTENING_PORT_80=""
-REGEX_WEBSERVER_LISTENING_PORT_80="^\s*tcp\s+\d+\s+\d+\s+(?>0\.0\.0\.0):80\s+(?>0\.0\.0\.0):(?>\*)\s+LISTEN\s*$"
-if echo "$NETSTAT_AN" | grep -P "$REGEX_WEBSERVER_LISTENING_PORT_80" > /dev/null 2>&1; then
-        WEBSERVER_LISTENING_PORT_80="true"
-fi
-if [[ -z "$WEBSERVER_LISTENING_PORT_80" ]]; then
+if [ "$(ss -Hltn sport 80 | wc -l)" -ge 1 ]; then
+    echo "Webserver listening on port 80, OK."
+else
     echo "Webserver not listening on port 80, NOT OK."
     EXITCODE=1
-else
-    echo "Webserver listening on port 80, OK."
 fi
 
 # Make sure web server listening on port 8080
-WEBSERVER_LISTENING_PORT_80=""
-REGEX_WEBSERVER_LISTENING_PORT_80="^\s*tcp\s+\d+\s+\d+\s+(?>0\.0\.0\.0):8080\s+(?>0\.0\.0\.0):(?>\*)\s+LISTEN\s*$"
-if echo "$NETSTAT_AN" | grep -P "$REGEX_WEBSERVER_LISTENING_PORT_80" > /dev/null 2>&1; then
-        WEBSERVER_LISTENING_PORT_80="true"
-fi
-if [[ -z "$WEBSERVER_LISTENING_PORT_80" ]]; then
+if [ "$(ss -Hltn sport 8080 | wc -l)" -ge 1 ]; then
+    echo "Webserver listening on port 8080, OK."
+else
     echo "Webserver not listening on port 8080, NOT OK."
     EXITCODE=1
-else
-    echo "Webserver listening on port 8080, OK."
 fi
 
 # Exit with determined exit status
