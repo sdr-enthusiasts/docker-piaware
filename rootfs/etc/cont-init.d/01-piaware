@@ -7,14 +7,6 @@ touch /etc/piaware.conf
 
 # Check to make sure the correct command line arguments have been set
 EXITCODE=0
-if [ -z "${LAT}" ]; then
-  echo "ERROR: LAT environment variable not set"
-  EXITCODE=1
-fi
-if [ -z "${LONG}" ]; then
-  echo "ERROR: LONG environment variable not set"
-  EXITCODE=1
-fi
 if [[ -n "${USERNAME}" ]]; then
   echo "WARNING: USERNAME environment variable is DEPRECATED and does nothing"
 fi
