@@ -128,20 +128,15 @@ Run the commands:
 
 ```shell
 docker pull ghcr.io/sdr-enthusiasts/docker-piaware:latest
-timeout 30 docker run --rm -e LAT=YOURLATITUDE -e LONG=YOURLONGITUDE ghcr.io/sdr-enthusiasts/docker-piaware:latest | grep "my feeder ID"
+timeout 30 docker run --rm ghcr.io/sdr-enthusiasts/docker-piaware:latest | grep "my feeder ID"
 ```
-
-Be sure to change the following:
-
-* Replace `YOURLATITUDE` with the latitude of your antenna (xx.xxxxx)
-* Replace `YOURLONGITUDE` with the longitude of your antenna (xx.xxxxx)
 
 The command will run the container for 30 seconds, which should be ample time for the container to receive a feeder-id.
 
 For example:
 
 ```shell
-timeout 30 docker run --rm -e LAT=-33.33333 -e LONG=111.11111 ghcr.io/sdr-enthusiasts/docker-piaware:latest | grep "my feeder ID"
+timeout 30 docker run --rm ghcr.io/sdr-enthusiasts/docker-piaware:latest | grep "my feeder ID"
 ```
 
 Will output:
@@ -173,8 +168,6 @@ docker run \
  --name piaware \
  --device /dev/bus/usb \
  -e TZ="Australia/Perth" \
- -e LAT=-33.33333 \
- -e LONG=111.11111 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  -e RECEIVER_TYPE=rtlsdr \
  -p 8080:80 \
@@ -202,8 +195,6 @@ services:
       - 30005:30005
     environment:
       - TZ="Australia/Perth"
-      - LAT=-33.33333
-      - LONG=111.11111
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
       - RECEIVER_TYPE=rtlsdr
     tmpfs:
@@ -227,8 +218,6 @@ docker run \
  --name piaware \
  --device /dev/bus/usb \
  -e TZ="Australia/Perth" \
- -e LAT=-33.33333 \
- -e LONG=111.11111 \
  -e RECEIVER_TYPE=rtlsdr \
  -e DUMP1090_DEVICE=00001090 \
  -e UAT_RECEIVER_TYPE=rtlsdr \
@@ -261,8 +250,6 @@ services:
       - 30005:30005
     environment:
       - TZ="Australia/Perth"
-      - LAT=-33.33333
-      - LONG=111.11111
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
       - RECEIVER_TYPE=rtlsdr
       - DUMP1090_DEVICE=00001090
@@ -288,8 +275,6 @@ docker run \
  --rm \
  --name piaware \
  -e TZ="Australia/Perth" \
- -e LAT=-33.33333 \
- -e LONG=111.11111 \
  -e RECEIVER_TYPE=relay \
  -e BEASTHOST=beasthost \
  -e BEASTPORT=30005 \
@@ -319,8 +304,6 @@ services:
     restart: always
     environment:
       - TZ="Australia/Perth"
-      - LAT=-33.33333
-      - LONG=111.11111
       - RECEIVER_TYPE=relay
       - BEASTHOST=beasthost
       - BEASTPORT=30005
@@ -353,8 +336,6 @@ docker run \
  --rm \
  --name piaware \
  -e TZ="Australia/Perth" \
- -e LAT=-33.33333 \
- -e LONG=111.11111 \
  -e RECEIVER_TYPE=relay \
  -e BEASTHOST=beasthost \
  -e BEASTPORT=30005
@@ -395,8 +376,6 @@ services:
     restart: always
     environment:
       - TZ="Australia/Perth"
-      - LAT=-33.33333
-      - LONG=111.11111
       - RECEIVER_TYPE=relay
       - BEASTHOST=beasthost
       - BEASTPORT=30005

@@ -23,8 +23,6 @@ DUMP1090_BIN="/usr/local/bin/dump1090"
 
 # Global settings
 DUMP1090_CMD=("--quiet")
-DUMP1090_CMD+=("--lat" "$LAT")
-DUMP1090_CMD+=("--lon" "$LONG")
 DUMP1090_CMD+=("--net")
 DUMP1090_CMD+=("--fix")
 DUMP1090_CMD+=("--json-location-accuracy" "2")
