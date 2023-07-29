@@ -1,4 +1,4 @@
-FROM ghcr.io/sdr-enthusiasts/docker-baseimage:dump978-full-test-pr
+FROM ghcr.io/sdr-enthusiasts/docker-baseimage:dump978-full
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
   VERBOSE_LOGGING="false"
