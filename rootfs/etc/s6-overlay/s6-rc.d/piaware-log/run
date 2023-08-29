@@ -1,2 +1,2 @@
 #!/bin/sh
-exec /etc/s6-overlay/scripts/piaware-log
+exec logutil-service /var/log/piaware

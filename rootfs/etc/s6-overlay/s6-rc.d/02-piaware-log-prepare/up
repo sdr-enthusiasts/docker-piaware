@@ -1,0 +1,3 @@
+if { mkdir -p /var/log/piaware }
+if { chown nobody:nogroup /var/log/piaware }
+chmod 02755 /var/log/piaware
