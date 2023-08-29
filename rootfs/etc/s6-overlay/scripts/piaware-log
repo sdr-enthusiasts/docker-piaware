@@ -1,4 +1,4 @@
-#!/usr/bin/execlineb
+#!/command/execlineb
 #shellcheck shell=sh
 
 s6-envuidgid nobody
