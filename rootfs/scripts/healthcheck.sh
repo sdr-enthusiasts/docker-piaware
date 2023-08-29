@@ -18,7 +18,7 @@ function check_logs_for_msgs_sent_to_fa () {
     # $1 = sending process (eg: dump1090, socat, dump978-fa)
     # $2 = number of output lines to consider (every line represents 5 minutes, so 12 would be an hour)
     # ------
-    REGEX_FA_MSGS_SENT_PAST_5MIN="^(?'date'\d{4}-\d{1,2}-\d{1,2})\s+(?'time'\d{1,2}:\d{1,2}:[\d\.]+)\s+\[piaware\]\s+(?'date2'\d{4}\/\d{1,2}\/\d{1,2})\s+(?'time2'\d{1,2}:\d{1,2}:[\d\.]+)\s+\d+ msgs recv'd from $1 \(\K(?'msgslast5m'\d+) in last 5m\);\s+\d+ msgs sent to FlightAware\s*$"
+    REGEX_FA_MSGS_SENT_PAST_5MIN="^\[piaware\]\s+(?'date2'\d{4}\/\d{1,2}\/\d{1,2})\s+(?'time2'\d{1,2}:\d{1,2}:[\d\.]+)\s+\d+ msgs recv'd from $1 \(\K(?'msgslast5m'\d+) in last 5m\);\s+\d+ msgs sent to FlightAware\s*$"
     NUM_MSGS_RECEIVED=$(tail -$(($2 * 10)) /var/log/piaware/current | grep -oP "$REGEX_FA_MSGS_SENT_PAST_5MIN" | tail "-$2" | tr -s " " | cut -d " " -f 1)
     TOTAL_MSGS_RECEIVED=0
     for NUM_MSGS in $NUM_MSGS_RECEIVED; do
