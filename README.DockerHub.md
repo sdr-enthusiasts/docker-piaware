@@ -11,7 +11,7 @@ For more information on what PiAware is, see here: [FlightAware - PiAware](https
 
 This container can operate in "net only" mode and pull ADS-B Mode-S & UAT data from another host/container. **This is the recommended way of deploying the container**, and I'd humbly suggest [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) and [`sdr-enthusiasts/docker-dump978`](https://github.com/sdr-enthusiasts/docker-dump978) (if you live in an area that uses UAT).
 
-*Note:* `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapper/helper scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
+_Note:_ `bladerf`/`hackrf`/`limesdr`/`radarcape` - Support for these is compiled in, but I need to complete the wrapper/helper scripts. I don't have access to these devices. If you do, and would be willing to test, please get in touch with me!
 
 ## Documentation
 

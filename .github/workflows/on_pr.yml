@@ -11,16 +11,15 @@ on:
       - main
     # Don't trigger if it's just a documentation update
     paths-ignore:
-      - '**.md'
-      - '**.MD'
-      - '**.yml'
-      - 'LICENSE'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.dockerignore'
+      - "**.md"
+      - "**.MD"
+      - "**.yml"
+      - "LICENSE"
+      - ".gitattributes"
+      - ".gitignore"
+      - ".dockerignore"
 
 jobs:
-
   test-build:
     name: Test
     uses: sdr-enthusiasts/common-github-workflows/.github/workflows/build_and_push_image.yml@main

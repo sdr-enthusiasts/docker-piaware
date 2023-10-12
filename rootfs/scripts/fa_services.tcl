@@ -22,9 +22,9 @@ namespace eval ::fa_services {
 	# return 1 if we have invoke-rc.d
 	proc has_invoke_rcd {} {
                 # Check if we are running on docker because no runlevel exists to use invoke-rc.d and return immediately 0
-		if {[is_docker]} { 
+		if {[is_docker]} {
 			logger "has_invoke_rcd: Running on docker ignoring invoke-rc.d"
-                        return 0 
+                        return 0
 		}
 
 		if {![info exists ::invoke_rcd_path]} {
