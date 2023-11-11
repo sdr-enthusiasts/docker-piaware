@@ -171,8 +171,8 @@ RUN set -x && \
   popd && \
   dump1090 --version && \
   # Build & install mlat-client
-  #BRANCH_MLATCLIENT=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/mutability/mlat-client.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
-  git clone --depth 1 --branch master "https://github.com/wiedehopf/mlat-client.git" "/src/mlat-client" && \
+  BRANCH_MLATCLIENT=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/mutability/mlat-client.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
+  git clone --depth 1 --branch "$BRANCH_MLATCLIENT" "https://github.com/mutability/mlat-client.git" "/src/mlat-client" && \
   pushd /src/mlat-client && \
   BRANCH_MLATCLIENT="$(git tag --sort='-creatordate' | head -1)" && \
   echo "mlat-client ${BRANCH_MLATCLIENT}" >> /VERSIONS && \
