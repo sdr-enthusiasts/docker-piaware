@@ -5,6 +5,11 @@
 rm /etc/piaware.conf > /dev/null 2>&1 || true
 touch /etc/piaware.conf
 
+# piaware-config is very slow, as we have full control over the config file, just use a function to directly write the config settings into the config file
+function piaware-config() {
+    echo "$1 \"$2\"" | tee -a /etc/piaware.conf
+}
+
 # Check to make sure the correct command line arguments have been set
 EXITCODE=0
 if [[ -n "${USERNAME}" ]]; then
