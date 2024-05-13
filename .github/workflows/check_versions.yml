@@ -17,7 +17,7 @@ jobs:
         id: current-version
         run: |
           set -x
-          echo "::set-output name=currver::$(docker run --rm --entrypoint cat ghcr.io/${{ github.repository }}:latest /CONTAINER_VERSION)"
+          echo "currver=$(docker run --rm --entrypoint cat ghcr.io/${{ github.repository }}:latest /CONTAINER_VERSION)" >> $GITHUB_OUTPUT
 
   latest_version:
     name: Check latest versions
@@ -35,7 +35,7 @@ jobs:
         id: latest-version
         run: |
           set -x
-          echo "::set-output name=latestver::$(docker run --rm --entrypoint cat testing:latest /CONTAINER_VERSION)"
+          echo "latestver=$(docker run --rm --entrypoint cat testing:latest /CONTAINER_VERSION)" >> $GITHUB_OUTPUT
 
   display_versions:
     name: Display versions
