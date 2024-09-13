@@ -1,6 +1,8 @@
 #!/command/with-contenv bash
 #shellcheck shell=bash
 
+source /scripts/common
+
 # Don't continue if UAT not used
 if [[ -n "$UAT_RECEIVER_HOST" ]]; then
   RUN_SKYAWARE978="true"
@@ -13,8 +15,7 @@ if [[ -n "$UAT_RECEIVER_TYPE" ]]; then
 fi
 
 if [[ -z "$RUN_SKYAWARE978" ]]; then
-  sleep 86400
-  exit 0
+    stop_service
 fi
 
 mkdir -p /run/skyaware978
