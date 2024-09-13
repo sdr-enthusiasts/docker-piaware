@@ -2,10 +2,11 @@
 # shellcheck shell=bash
 set -eo pipefail
 
+source /scripts/common
+
 # Don't continue if UAT_RECEIVER_HOST isn't set
 if [[ -z "$UAT_RECEIVER_HOST" ]]; then
-  sleep 86400
-  exit 0
+    stop_service
 fi
 
 # shellcheck disable=SC2016

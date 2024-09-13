@@ -2,6 +2,8 @@
 # shellcheck shell=bash
 set -eo pipefail
 
+source /scripts/common
+
 # Don't continue if ADSB not used
 if [[ -n "$BEASTHOST" ]]; then
   RUN_DUMP1090="true"
@@ -13,8 +15,7 @@ if [[ -n "$RECEIVER_TYPE" ]]; then
   RUN_DUMP1090="true"
 fi
 if [[ -z "$RUN_DUMP1090" ]]; then
-  sleep 86400
-  exit 0
+    stop_service
 fi
 
 mkdir -p /run/dump1090-fa

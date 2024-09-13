@@ -2,10 +2,11 @@
 # shellcheck shell=bash
 set -eo pipefail
 
+source /scripts/common
+
 # Don't continue if BEASTHOST isn't set
 if [[ -z "$BEASTHOST" ]]; then
-  sleep 86400
-  exit 0
+    stop_service
 fi
 
 # Prepare beast-splitter command line

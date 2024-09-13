@@ -44,8 +44,10 @@ RUN set -x && \
   TEMP_PACKAGES+=(libfftw3-dev) && \
   # mlat-client dependencies
   KEPT_PACKAGES+=(python3-minimal) && \
-  KEPT_PACKAGES+=(python3-distutils) && \
+  KEPT_PACKAGES+=(python3-pkg-resources) && \
+  TEMP_PACKAGES+=(python3-distutils) && \
   TEMP_PACKAGES+=(python3-dev) && \
+  TEMP_PACKAGES+=(python3-setuptools) && \
   # piaware dependencies
   KEPT_PACKAGES+=(itcl3) && \
   KEPT_PACKAGES+=(tcllib) && \
@@ -203,10 +205,11 @@ RUN set -x && \
   curl -L -o "$BLADERF_RBF_PATH/adsbx115.rbf" https://www.nuand.com/fpga/adsbx115.rbf && \
   # Clean up
   apt-get remove -y ${TEMP_PACKAGES[@]} && \
-  apt-get autoremove -y && \
+  apt-get autoremove -q -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 -y && \
   apt-get clean -y && \
-  rm -rf /src /tmp/* /var/lib/apt/lists/* && \
-  find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
+  # remove pycache
+  find /usr | grep -E "/__pycache__$" | xargs rm -rf || true && \
+  rm -rf /src /tmp/* /var/lib/apt/lists/* /var/log/* /var/cache/* && \
   # Store container version
   grep piaware /VERSIONS | cut -d " " -f 2 > /IMAGE_VERSION
 
