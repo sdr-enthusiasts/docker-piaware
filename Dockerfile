@@ -208,7 +208,7 @@ RUN set -x && \
   apt-get autoremove -q -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 -y && \
   apt-get clean -y && \
   # remove pycache
-  find /usr | grep -E "/__pycache__$" | xargs rm -rf || true && \
+  { find /usr | grep -E "/__pycache__$" | xargs rm -rf || true; } && \
   rm -rf /src /tmp/* /var/lib/apt/lists/* /var/log/* /var/cache/* && \
   # Store container version
   grep piaware /VERSIONS | cut -d " " -f 2 > /IMAGE_VERSION
