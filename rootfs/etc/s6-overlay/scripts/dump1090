@@ -82,7 +82,4 @@ fi
 
 # shellcheck disable=SC2016
 # run dump1090
-"${DUMP1090_BIN}" "${DUMP1090_CMD[@]}" \
-  2>&1 | stdbuf -o0 sed '/^$/d' | stdbuf -o0 awk '{print "[dump1090] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
-
-sleep 5
+exec "${s6wrap[@]}" "${DUMP1090_BIN}" "${DUMP1090_CMD[@]}"

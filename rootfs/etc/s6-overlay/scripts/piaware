@@ -2,6 +2,8 @@
 # shellcheck shell=bash
 set -eo pipefail
 
+source /scripts/common
+
 # Depends on beastproxy (only if an external beasthost is used) and dump1090
 
 mkdir -p /run/piaware
@@ -15,7 +17,4 @@ if [ "$VERBOSE_LOGGING" = "true" ]; then
 fi
 
 # shellcheck disable=SC2016
-"${PIAWARE_BIN}" "${PIAWARE_CMD[@]}" \
-  2>&1 | stdbuf -o0 sed '/^$/d' | stdbuf -o0 awk '{print "[piaware] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}' | tee -a /var/log/piaware/current
-
-sleep 5
+"${s6wrap[@]}" "${PIAWARE_BIN}" "${PIAWARE_CMD[@]}" | tee -a /var/log/piaware/current

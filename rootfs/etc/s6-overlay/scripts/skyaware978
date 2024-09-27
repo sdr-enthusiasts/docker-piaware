@@ -23,9 +23,6 @@ mkdir -p /run/skyaware978
 set -eo pipefail
 
 # shellcheck disable=SC2016
-skyaware978 \
+exec "${s6wrap[@]}" skyaware978 \
   --connect 127.0.0.1:30978 \
-  --json-dir "/run/skyaware978" \
-  2>&1 | stdbuf -o0 sed '/^$/d' | stdbuf -o0 sed --unbuffered '/^$/d' | stdbuf -o0 awk '{print "[skyaware978] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
-
-sleep 5
+  --json-dir "/run/skyaware978"

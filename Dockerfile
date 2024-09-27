@@ -16,14 +16,13 @@ RUN set -x && \
   TEMP_PACKAGES+=(build-essential) && \
   TEMP_PACKAGES+=(ca-certificates) && \
   TEMP_PACKAGES+=(cmake) && \
-  TEMP_PACKAGES+=(curl) && \
+  # curl is included in the base image
+  # TEMP_PACKAGES+=(curl) && \
   TEMP_PACKAGES+=(git) && \
   TEMP_PACKAGES+=(pkg-config) && \
   # s6-overlay dependencies
   TEMP_PACKAGES+=(gnupg2) && \
   TEMP_PACKAGES+=(file) && \
-  # logging
-  KEPT_PACKAGES+=(gawk) && \
   # libusb for a number of things
   KEPT_PACKAGES+=(libusb-1.0-0) && \
   TEMP_PACKAGES+=(libusb-1.0-0-dev) && \
