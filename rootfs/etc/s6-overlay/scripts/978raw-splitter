@@ -4,6 +4,10 @@ set -eo pipefail
 
 source /scripts/common
 
+# DEPRECATED
+# this should no longer be needed but keep it around just in case
+stop_service
+
 # Don't continue if UAT_RECEIVER_HOST isn't set
 if [[ -z "$UAT_RECEIVER_HOST" ]]; then
     stop_service

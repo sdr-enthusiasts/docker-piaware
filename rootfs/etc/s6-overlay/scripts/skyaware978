@@ -27,5 +27,5 @@ set -eo pipefail
 
 # shellcheck disable=SC2016
 exec "${s6wrap[@]}" skyaware978 \
-  --connect 127.0.0.1:30978 \
+  --connect "${UAT_RECEIVER_HOST:-127.0.0.1}:${UAT_RECEIVER_PORT:-30978}" \
   --json-dir "/run/skyaware978"

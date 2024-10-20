@@ -76,7 +76,7 @@ fi
 
 # If a UAT_RECEIVER_HOST is specified
 if [[ -n "$UAT_RECEIVER_HOST" ]]; then
-  piaware-config uat-receiver-type "sdr"
+  piaware-config uat-receiver-type "other"
   piaware-config uat-receiver-host "$UAT_RECEIVER_HOST"
   piaware-config uat-receiver-port "${UAT_RECEIVER_PORT:-30978}"
 
