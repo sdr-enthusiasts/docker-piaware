@@ -5,8 +5,6 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-COPY rootfs/ /
-
 # hadolint ignore=DL3008,SC2086,SC2039,SC2068
 RUN set -x && \
   TEMP_PACKAGES=() && \
@@ -16,14 +14,13 @@ RUN set -x && \
   TEMP_PACKAGES+=(build-essential) && \
   TEMP_PACKAGES+=(ca-certificates) && \
   TEMP_PACKAGES+=(cmake) && \
-  TEMP_PACKAGES+=(curl) && \
+  # curl is included in the base image
+  # TEMP_PACKAGES+=(curl) && \
   TEMP_PACKAGES+=(git) && \
   TEMP_PACKAGES+=(pkg-config) && \
   # s6-overlay dependencies
   TEMP_PACKAGES+=(gnupg2) && \
   TEMP_PACKAGES+=(file) && \
-  # logging
-  KEPT_PACKAGES+=(gawk) && \
   # libusb for a number of things
   KEPT_PACKAGES+=(libusb-1.0-0) && \
   TEMP_PACKAGES+=(libusb-1.0-0-dev) && \
@@ -190,7 +187,6 @@ RUN set -x && \
   make -j "$(nproc)" && \
   cp -v ./beast-splitter /usr/local/bin/ && \
   popd && \
-  cp /scripts/fa_services.tcl /usr/lib/piaware_packages/ && \
   # bladeRF: download bladeRF FPGA images
   BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" && \
   export BLADERF_RBF_PATH && \
@@ -212,6 +208,8 @@ RUN set -x && \
   rm -rf /src /tmp/* /var/lib/apt/lists/* /var/log/* /var/cache/* && \
   # Store container version
   grep piaware /VERSIONS | cut -d " " -f 2 > /IMAGE_VERSION
+
+COPY rootfs/ /
 
 EXPOSE 80/tcp 30003/tcp 30005/tcp 30105/tcp 30978/tcp 30979/tcp
 

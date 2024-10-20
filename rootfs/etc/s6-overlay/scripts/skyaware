@@ -5,10 +5,9 @@
 
 set -eo pipefail
 
-# shellcheck disable=SC2016
-/usr/sbin/lighttpd \
-    -f /etc/lighttpd/skyaware.lighttpd.conf \
-    -D \
-    2>&1 | stdbuf -o0 sed '/^$/d' | stdbuf -o0 awk '{print "[skyaware] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
+source /scripts/common
 
-sleep 5
+# shellcheck disable=SC2016
+exec "${s6wrap[@]}" /usr/sbin/lighttpd \
+    -f /etc/lighttpd/skyaware.lighttpd.conf \
+    -D

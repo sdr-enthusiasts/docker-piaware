@@ -15,7 +15,4 @@ BEASTSPLITTER_CMD=("--net" "$BEASTHOST:${BEASTPORT:-30005}")
 BEASTSPLITTER_CMD+=("--connect" "127.0.0.1:30004")
 
 # shellcheck disable=SC2016
-"${BEASTSPLITTER_BIN}" "${BEASTSPLITTER_CMD[@]}" \
-  2>&1 | stdbuf -o0 sed '/^$/d' | stdbuf -o0 awk '{print "[beast-splitter] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
-
-sleep 5
+exec "${s6wrap[@]}" "${BEASTSPLITTER_BIN}" "${BEASTSPLITTER_CMD[@]}"

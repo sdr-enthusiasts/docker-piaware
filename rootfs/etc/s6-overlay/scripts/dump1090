@@ -30,6 +30,11 @@ DUMP1090_CMD+=("--json-location-accuracy" "2")
 DUMP1090_CMD+=("--write-json" "/run/dump1090-fa")
 DUMP1090_CMD+=("--net-bind-address" "0.0.0.0")
 
+# use location from /var/cache/piaware/location.env
+source /var/cache/piaware/location.env
+DUMP1090_CMD+=("--lat" "$PIAWARE_LAT")
+DUMP1090_CMD+=("--lon" "$PIAWARE_LON")
+
 # Handle "--modeac"
 if [[ "$ALLOW_MODEAC" == "yes" ]]; then
         DUMP1090_CMD+=("--modeac")
@@ -82,7 +87,4 @@ fi
 
 # shellcheck disable=SC2016
 # run dump1090
-"${DUMP1090_BIN}" "${DUMP1090_CMD[@]}" \
-  2>&1 | stdbuf -o0 sed '/^$/d' | stdbuf -o0 awk '{print "[dump1090] " strftime("%Y/%m/%d %H:%M:%S", systime()) " " $0}'
-
-sleep 5
+exec "${s6wrap[@]}" "${DUMP1090_BIN}" "${DUMP1090_CMD[@]}"
