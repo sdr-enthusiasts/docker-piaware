@@ -1,5 +1,5 @@
 #!/command/with-contenv bash
-# shellcheck shell=bash
+# shellcheck shell=bash disable=SC1091,2154
 set -eo pipefail
 
 source /scripts/common
@@ -13,6 +13,17 @@ fi
 BEASTSPLITTER_BIN="/usr/local/bin/beast-splitter"
 BEASTSPLITTER_CMD=("--net" "$BEASTHOST:${BEASTPORT:-30005}")
 BEASTSPLITTER_CMD+=("--connect" "127.0.0.1:30004")
+
+# beast-splitter takes 60 seconds to reconnect
+# wait for data source to be online
+while ! nc -z "${BEASTHOST}" "${BEASTPORT:-30005}" >/dev/null 2>&1; do
+    sleep 1
+done
+# wait for dump1090 to be online
+while ! nc -z 127.0.0.1 30004 >/dev/null 2>&1; do
+    sleep 1
+done
+
 
 # shellcheck disable=SC2016
 exec "${s6wrap[@]}" "${BEASTSPLITTER_BIN}" "${BEASTSPLITTER_CMD[@]}"
