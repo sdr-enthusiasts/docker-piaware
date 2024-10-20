@@ -8,6 +8,9 @@ source /scripts/common
 if [[ -z "$BEASTHOST" ]]; then
     stop_service
 fi
+if chk_enabled "${PIAWARE_MINIMAL}"; then
+    stop_service
+fi
 
 # Prepare beast-splitter command line
 BEASTSPLITTER_BIN="/usr/local/bin/beast-splitter"

@@ -455,6 +455,7 @@ Use only with `RECEIVER_TYPE=relay`.
 | `BEASTPORT`              | a port number    | Specify the TCP port number of the external BEAST protocol provider. | `30005` |
 | `MLAT_RESULTS_BEASTHOST` | a hostname or IP | Specify an external host where MLAT results should be sent.          |         |
 | `MLAT_RESULTS_BEASTPORT` | a port number    | Specify the TCP port number where MLAT results should be sent.       | `30104` |
+| `PIAWARE_MINIMAL`        | true or false    | Minimal feed configuration without maps                              | `false` |
 
 ### Receiver Configuration (978MHz)
 

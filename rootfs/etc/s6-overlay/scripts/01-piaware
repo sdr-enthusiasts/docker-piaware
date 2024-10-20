@@ -1,5 +1,7 @@
 #!/command/with-contenv bash
-# shellcheck shell=bash
+# shellcheck shell=bash disable=SC1091,2154
+
+source /scripts/common
 
 # Remove existing piaware config
 rm /etc/piaware.conf > /dev/null 2>&1 || true
@@ -54,7 +56,11 @@ piaware-config mlat-results "${MLAT_RESULTS:-yes}"
 
 # If a BEASTHOST is specified
 if [[ -n "$BEASTHOST" ]]; then
-  piaware-config receiver-type "relay"
+  if chk_enabled "${PIAWARE_MINIMAL}"; then
+    piaware-config receiver-type "other"
+  else
+    piaware-config receiver-type "relay"
+  fi
   piaware-config receiver-host "$BEASTHOST"
   piaware-config receiver-port "${BEASTPORT:-30005}"
 
@@ -79,10 +85,16 @@ elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
 
 fi
 
+MLAT_RESULTS_STRING="beast,listen,30105 ext_basestation,listen,30106 "
+if ! chk_enabled "${PIAWARE_MINIMAL}"; then
+    MLAT_RESULTS_STRING+="beast,connect,localhost:30104 "
+fi
+
 # If MLAT_RESULTS_BEAST_CONNECT is specified
 if [[ -n "$MLAT_RESULTS_BEASTHOST" ]]; then
-  piaware-config mlat-results-format "beast,connect,localhost:30104 beast,listen,30105 ext_basestation,listen,30106 beast,connect,${MLAT_RESULTS_BEASTHOST}:${MLAT_RESULTS_BEASTPORT:-30104}"
+    MLAT_RESULTS_STRING+="beast,connect,${MLAT_RESULTS_BEASTHOST}:${MLAT_RESULTS_BEASTPORT:-30104} "
 fi
+piaware-config mlat-results-format "${MLAT_RESULTS_STRING}"
 
 # Create log dir for piaware
 mkdir -p /var/log/piaware

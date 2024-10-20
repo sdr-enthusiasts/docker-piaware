@@ -17,6 +17,9 @@ fi
 if [[ -z "$RUN_DUMP1090" ]]; then
     stop_service
 fi
+if chk_enabled "${PIAWARE_MINIMAL}"; then
+    stop_service
+fi
 
 mkdir -p /run/dump1090-fa
 
