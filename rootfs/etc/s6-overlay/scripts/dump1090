@@ -30,6 +30,11 @@ DUMP1090_CMD+=("--json-location-accuracy" "2")
 DUMP1090_CMD+=("--write-json" "/run/dump1090-fa")
 DUMP1090_CMD+=("--net-bind-address" "0.0.0.0")
 
+# use location from /var/cache/piaware/location.env
+source /var/cache/piaware/location.env
+DUMP1090_CMD+=("--lat" "$PIAWARE_LAT")
+DUMP1090_CMD+=("--lon" "$PIAWARE_LON")
+
 # Handle "--modeac"
 if [[ "$ALLOW_MODEAC" == "yes" ]]; then
         DUMP1090_CMD+=("--modeac")
