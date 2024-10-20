@@ -9,6 +9,10 @@
 case "$1" in
     restart)
     pkill dump1090
+    # sleep a bit to wait until dump1090 has restarted
+    sleep 2
+    # beast-splitter takes 60 seconds to reconnect, just restart it so it reconnects quicker
+    pkill beast-splitter
     ;;
     *)
     echo "Usage: $0 {start|stop|restart|status}"
