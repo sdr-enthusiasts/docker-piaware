@@ -1,0 +1,19 @@
+#!/command/with-contenv sh
+# shellcheck shell=sh
+
+# "dummy" SysV-style init script, to allow piaware to restart skyaware978.
+# piaware calls SysV init script to restart skyaware978 (package/fa_services.tcl invoke_service_action).
+# this script allows that, while still using s6-supervise.
+
+
+case "$1" in
+    restart)
+    s6-svc -r /run/service/skyaware978
+    ;;
+    *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+
+exit 0
