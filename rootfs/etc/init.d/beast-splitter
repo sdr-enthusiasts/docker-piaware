@@ -1,4 +1,5 @@
 #!/command/with-contenv sh
+# shellcheck shell=sh
 
 # "dummy" SysV-style init script, to allow piaware to restart beast-splitter.
 # piaware calls SysV init script to restart beast-splitter (package/fa_services.tcl invoke_service_action).
