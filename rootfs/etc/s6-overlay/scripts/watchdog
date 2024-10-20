@@ -1,0 +1,22 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash disable=SC1091,2154
+
+source /scripts/common
+
+# checking every 60 seconds
+sleep 60
+
+# check if the current date is larger than the expiry field of the status json
+if (( $(date +%s) * 1000 > $(grep -o -E -e '(expiry)" *: ([0-9]+)' /run/piaware/status.json | awk '{print $3}') )); then
+    # current date being larger means piaware is hanging, kill it
+    "${s6wrap[@]}" echo "piaware is not updating /run/piaware/status.json, sending SIGKILL"
+    pkill -9 piaware
+fi
+
+
+# make sure /var/log/piaware/current doesn't grow too large
+if (( $(wc -l < /var/log/piaware/current) > 400 )); then
+    keep=$(tail -n200 /var/log/piaware/current)
+    truncate -s 0 /var/log/piaware/current
+    cat >> /var/log/piaware/current <<< "$keep"
+fi
