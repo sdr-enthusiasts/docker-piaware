@@ -2,6 +2,7 @@
 name: Linting (Shellcheck)
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -11,7 +12,7 @@ jobs:
   shellcheck:
     name: Run shellcheck against shell scripts
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
     steps:
       - uses: actions/checkout@v4.2.0
       - name: Pull koalaman/shellcheck:stable Image
