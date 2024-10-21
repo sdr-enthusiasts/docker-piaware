@@ -36,6 +36,9 @@ RUN set -x && \
   # piaware-web dependencies
   KEPT_PACKAGES+=(lighttpd) && \
   KEPT_PACKAGES+=(lighttpd-mod-deflate) && \
+  # hackrf dependencies
+  KEPT_PACKAGES+=(libfftw3-bin) && \
+  TEMP_PACKAGES+=(libfftw3-dev) && \
   # mlat-client dependencies
   KEPT_PACKAGES+=(python3-minimal) && \
   KEPT_PACKAGES+=(python3-pkg-resources) && \
@@ -63,6 +66,64 @@ RUN set -x && \
   ${TEMP_PACKAGES[@]} \
   && \
   git config --global advice.detachedHead false && \
+  # Build & install HackRF
+  BRANCH_HACKRF=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/mossmann/hackrf.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v' | tail -1) && \
+  git clone --depth 1 --branch "$BRANCH_HACKRF" "https://github.com/mossmann/hackrf.git" "/src/hackrf" && \
+  pushd "/src/hackrf" && \
+  echo "hackrf $(git log | head -1 | tr -s ' ' '_')" >> /VERSIONS && \
+  popd && \
+  mkdir -p /src/hackrf/host/build && \
+  pushd /src/hackrf/host/build && \
+  cmake ../ -DCMAKE_BUILD_TYPE=Release && \
+  make -j "$(nproc)" && \
+  make install && \
+  ldconfig && \
+  popd && \
+  # Build & install LimeSuite
+  git clone --depth 1 --branch stable "https://github.com/myriadrf/LimeSuite.git" "/src/LimeSuite" && \
+  pushd "/src/LimeSuite" && \
+  echo "LimeSuite commit_$(git log | head -1 | tr -s ' ' '_')" >> /VERSIONS && \
+  popd && \
+  mkdir "/src/LimeSuite/builddir" && \
+  pushd "/src/LimeSuite/builddir" && \
+  cmake \
+  ../ \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/usr \
+  && \
+  make -j "$(nproc)" && \
+  make install && \
+  ldconfig && \
+  popd && \
+  # bladeRF: get latest release tag without cloning repo
+  BRANCH_BLADERF=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/Nuand/bladeRF.git' | grep -v '\^' | grep 'refs/tags/libbladeRF_' | cut -d '/' -f 3 | tail -1) && \
+  # bladeRF: clone repo
+  git clone \
+  --branch "$BRANCH_BLADERF" \
+  --depth 1 \
+  --single-branch \
+  'https://github.com/Nuand/bladeRF.git' \
+  /src/bladeRF \
+  && \
+  pushd "/src/bladeRF" && \
+  echo "bladeRF $BRANCH_BLADERF" >> /VERSIONS && \
+  popd && \
+  # bladeRF: prepare to build
+  mkdir /src/bladeRF/build && \
+  pushd /src/bladeRF/build && \
+  cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/usr/local \
+  -DINSTALL_UDEV_RULES=ON \
+  ../ \
+  && \
+  # bladeRF: build & install
+  make -j "$(nproc)" && \
+  make install && \
+  ldconfig && \
+  popd && \
+  # bladeRF: simple test
+  bladeRF-cli --version && \
   # Build & install tcllauncher
   BRANCH_TCLLAUNCHER=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/tcllauncher.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
   git clone --depth 1 --branch "$BRANCH_TCLLAUNCHER" "https://github.com/flightaware/tcllauncher.git" "/src/tcllauncher" && \
@@ -96,9 +157,9 @@ RUN set -x && \
   git clone --depth 1 --branch "$DUMP1090_VERSION" "https://github.com/flightaware/dump1090.git" "/src/dump1090" && \
   pushd "/src/dump1090" && \
   echo "dump1090 ${DUMP1090_VERSION}" >> /VERSIONS && \
-  make -j "$(nproc)" showconfig RTLSDR=yes && \
-  make -j "$(nproc)" all RTLSDR=yes -j && \
-  make -j "$(nproc)" faup1090 RTLSDR=yes -j && \
+  make -j "$(nproc)" showconfig BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes && \
+  make -j "$(nproc)" all BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
+  make -j "$(nproc)" faup1090 BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
   cp -v view1090 dump1090 /usr/local/bin/ && \
   cp -v faup1090 /usr/lib/piaware/helpers/ && \
   mkdir -p /usr/share/dump1090-fa/html && \
@@ -126,6 +187,18 @@ RUN set -x && \
   make -j "$(nproc)" && \
   cp -v ./beast-splitter /usr/local/bin/ && \
   popd && \
+  # bladeRF: download bladeRF FPGA images
+  BLADERF_RBF_PATH="/usr/share/Nuand/bladeRF" && \
+  export BLADERF_RBF_PATH && \
+  mkdir -p "$BLADERF_RBF_PATH" && \
+  curl -L -o "$BLADERF_RBF_PATH/hostedxA4.rbf" https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
+  curl -L -o "$BLADERF_RBF_PATH/hostedxA9.rbf" https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
+  curl -L -o "$BLADERF_RBF_PATH/hostedx40.rbf" https://www.nuand.com/fpga/hostedx40-latest.rbf && \
+  curl -L -o "$BLADERF_RBF_PATH/hostedx115.rbf" https://www.nuand.com/fpga/hostedx115-latest.rbf && \
+  curl -L -o "$BLADERF_RBF_PATH/adsbxA4.rbf" https://www.nuand.com/fpga/adsbxA4.rbf && \
+  curl -L -o "$BLADERF_RBF_PATH/adsbxA9.rbf" https://www.nuand.com/fpga/adsbxA9.rbf && \
+  curl -L -o "$BLADERF_RBF_PATH/adsbx40.rbf" https://www.nuand.com/fpga/adsbx40.rbf && \
+  curl -L -o "$BLADERF_RBF_PATH/adsbx115.rbf" https://www.nuand.com/fpga/adsbx115.rbf && \
   # Clean up
   apt-get remove -y ${TEMP_PACKAGES[@]} && \
   apt-get autoremove -q -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 -y && \
