@@ -12,10 +12,7 @@ RUN set -x && \
   # Essentials
   TEMP_PACKAGES+=(automake) && \
   TEMP_PACKAGES+=(build-essential) && \
-  TEMP_PACKAGES+=(ca-certificates) && \
   TEMP_PACKAGES+=(cmake) && \
-  # curl is included in the base image
-  # TEMP_PACKAGES+=(curl) && \
   TEMP_PACKAGES+=(git) && \
   TEMP_PACKAGES+=(pkg-config) && \
   # s6-overlay dependencies
@@ -125,8 +122,7 @@ RUN set -x && \
   cp -v ./beast-splitter /usr/local/bin/ && \
   popd && \
   # Clean up
-  apt-get remove -y ${TEMP_PACKAGES[@]} && \
-  apt-get autoremove -q -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 -y && \
+  apt-get autoremove -q -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 -y "${TEMP_PACKAGES[@]}" && \
   apt-get clean -y && \
   # remove pycache
   { find /usr | grep -E "/__pycache__$" | xargs rm -rf || true; } && \
