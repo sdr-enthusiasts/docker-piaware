@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.1
       - name: Pull koalaman/shellcheck:stable Image
         run: docker pull koalaman/shellcheck:stable
       - name: Run Shellcheck against shell scripts
