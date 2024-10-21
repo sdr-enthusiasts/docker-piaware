@@ -162,8 +162,6 @@ RUN set -x && \
   make -j "$(nproc)" faup1090 BLADERF=yes RTLSDR=yes HACKRF=yes LIMESDR=yes -j && \
   cp -v view1090 dump1090 /usr/local/bin/ && \
   cp -v faup1090 /usr/lib/piaware/helpers/ && \
-  mkdir -p /usr/share/dump1090-fa/html && \
-  cp -a /src/dump1090/public_html/* /usr/share/dump1090-fa/html/ && \
   mkdir -p /usr/share/skyaware/html && \
   cp -a /src/dump1090/public_html/* /usr/share/skyaware/html && \
   ldconfig && \
