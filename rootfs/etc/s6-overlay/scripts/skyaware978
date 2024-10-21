@@ -23,9 +23,16 @@ fi
 
 mkdir -p /run/skyaware978
 
-set -eo pipefail
+ARGS=()
+ARGS+=(--connect "${UAT_RECEIVER_HOST:-127.0.0.1}:${UAT_RECEIVER_PORT:-30978}")
+ARGS+=(--json-dir "/run/skyaware978")
+
+# use location from /var/cache/piaware/location.env
+source /var/cache/piaware/location.env &>/dev/null || true
+if [[ -n "$PIAWARE_LAT" ]] && [[ -n "$PIAWARE_LON" ]]; then
+    ARGS+=("--lat" "$PIAWARE_LAT")
+    ARGS+=("--lon" "$PIAWARE_LON")
+fi
 
 # shellcheck disable=SC2016
-exec "${s6wrap[@]}" skyaware978 \
-  --connect "${UAT_RECEIVER_HOST:-127.0.0.1}:${UAT_RECEIVER_PORT:-30978}" \
-  --json-dir "/run/skyaware978"
+exec "${s6wrap[@]}" skyaware978 "${ARGS[@]}"

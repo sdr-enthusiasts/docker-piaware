@@ -34,7 +34,7 @@ DUMP1090_CMD+=("--write-json" "/run/dump1090-fa")
 DUMP1090_CMD+=("--net-bind-address" "0.0.0.0")
 
 # use location from /var/cache/piaware/location.env
-source /var/cache/piaware/location.env || true
+source /var/cache/piaware/location.env &>/dev/null || true
 if [[ -n "$PIAWARE_LAT" ]] && [[ -n "$PIAWARE_LON" ]]; then
     DUMP1090_CMD+=("--lat" "$PIAWARE_LAT")
     DUMP1090_CMD+=("--lon" "$PIAWARE_LON")
