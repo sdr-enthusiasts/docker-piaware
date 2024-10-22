@@ -32,12 +32,12 @@ fi
 
 # If BINGMAPSAPIKEY is set, modify dump1090's config.js to include it
 if [ -n "${BINGMAPSAPIKEY}" ]; then
-  echo "INFO: setting BINGMAPSAPIKEY in /usr/share/dump1090-fa/html/config.js"
+  echo "INFO: setting BINGMAPSAPIKEY in /usr/share/skyaware/html/config.js"
 
   sed \
     -i \
     "/^BingMapsAPIKey = /c\BingMapsAPIKey = "'"'"${BINGMAPSAPIKEY}"'"'";" \
-    /usr/share/dump1090-fa/html/config.js
+    /usr/share/skyaware/html/config.js
 
 fi
 

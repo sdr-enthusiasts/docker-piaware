@@ -15,8 +15,8 @@ fi
 
 
 # make sure /var/log/piaware/current doesn't grow too large
-if (( $(wc -l < /var/log/piaware/current) > 400 )); then
-    keep=$(tail -n200 /var/log/piaware/current)
+if (( $(wc -l < /var/log/piaware/current) > 800 )); then
+    keep=$(tail -n400 /var/log/piaware/current)
     truncate -s 0 /var/log/piaware/current
     cat >> /var/log/piaware/current <<< "$keep"
 fi
