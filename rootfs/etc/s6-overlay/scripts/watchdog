@@ -6,11 +6,14 @@ source /scripts/common
 # checking every 60 seconds
 sleep 60
 
+# set this so the || echo 0 works after the pipe
+set -eo pipefail
+
 # check if the current date is larger than the expiry field of the status json
-if (( $(date +%s) * 1000 > $(grep -o -E -e '(expiry)" *: ([0-9]+)' /run/piaware/status.json | awk '{print $3}') )); then
+if (( $(date +%s) * 1000 > "$(grep -o -E -e '(expiry)" *: ([0-9]+)' /run/piaware/status.json | awk '{print $3}' || echo 0)" )); then
     # current date being larger means piaware is hanging, kill it
     "${s6wrap[@]}" echo "piaware is not updating /run/piaware/status.json, sending SIGKILL"
-    pkill -9 piaware
+    "${s6wrap[@]}" pkill -e -9 piaware
 fi
 
 
