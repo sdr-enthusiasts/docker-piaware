@@ -4,7 +4,11 @@
 source /scripts/common
 
 # checking every 60 seconds
-sleep 60
+IVAL=60
+if [[ $(s6-svdt /run/service/watchdog | wc -l) == 0 ]]; then
+    # do nothing on first run
+    exec sleep "$IVAL"
+fi
 
 # set this so the || echo 0 works after the pipe
 set -eo pipefail
@@ -23,3 +27,5 @@ if (( $(wc -l < /var/log/piaware/current) > 800 )); then
     truncate -s 0 /var/log/piaware/current
     cat >> /var/log/piaware/current <<< "$keep"
 fi
+
+exec sleep "$IVAL"
