@@ -17,4 +17,4 @@ if [ "$VERBOSE_LOGGING" = "true" ]; then
 fi
 
 # shellcheck disable=SC2016
-"${s6wrap[@]}" "${PIAWARE_BIN}" "${PIAWARE_CMD[@]}" | tee -a /var/log/piaware/current
+exec "${s6wrap[@]}" "${PIAWARE_BIN}" "${PIAWARE_CMD[@]}" > >(tee -a /var/log/piaware/current)
