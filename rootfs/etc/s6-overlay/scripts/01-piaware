@@ -86,7 +86,11 @@ elif [[ "$UAT_RECEIVER_TYPE" == "rtlsdr" ]]; then
 fi
 
 MLAT_RESULTS_STRING="beast,listen,30105 ext_basestation,listen,30106 "
-if ! chk_enabled "${PIAWARE_MINIMAL}"; then
+
+if [[ -n "$BEASTHOST" ]] && chk_enabled "${PIAWARE_MINIMAL}"; then
+    # make it obvious the map is not available when PIAWARE_MINIMAL is set
+    sed -i -e "s#'/skyaware.*/'#''#g" -e "s/Go to.*SkyAware Map/Map disabled/g" /var/www/html/index.js
+else
     MLAT_RESULTS_STRING+="beast,connect,localhost:30104 "
 fi
 
