@@ -182,7 +182,6 @@ version: "2.0"
 services:
   piaware:
     image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
-    tty: true
     container_name: piaware
     restart: always
     devices:
@@ -237,7 +236,6 @@ version: "2.0"
 services:
   piaware:
     image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
-    tty: true
     container_name: piaware
     restart: always
     devices:
@@ -297,7 +295,6 @@ version: "2.0"
 services:
   piaware:
     image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
-    tty: true
     container_name: piaware
     restart: always
     environment:
@@ -369,7 +366,6 @@ version: "2.0"
 services:
   piaware:
     image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
-    tty: true
     container_name: piaware
     restart: always
     environment:
