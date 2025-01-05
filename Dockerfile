@@ -80,6 +80,8 @@ RUN set -x && \
   cp -v /src/piaware/package/ca/*.pem /etc/ssl/ && \
   touch /etc/piaware.conf && \
   mkdir -p /run/piaware && \
+  # set debian package version message to get 3 green boxes
+  sed /usr/lib/piaware/login.tcl -i -e 's/\tforeach {packageName packageVersion}/\tset message(piaware_package_version) $::piawareVersion\n\tset message(image_type) piaware_package\n\0/' && \
   ldconfig && \
   popd && \
   # Build & install piaware-web
