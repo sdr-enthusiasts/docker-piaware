@@ -65,7 +65,7 @@ fi
 # Make sure 978MHz data is being sent to flightaware
 if [[ -n "$UAT_RECEIVER_HOST" ]]; then
     # look for log messages from UAT_RECEIVER_PORT
-    FA_DUMP978_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa $UAT_RECEIVER_PORT 24)
+    FA_DUMP978_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa "${UAT_RECEIVER_PORT:-30978}" 24)
     if [[ "$FA_DUMP978_MSGS_SENT_PAST_HOUR" -gt 0 ]]; then
         echo "$FA_DUMP978_MSGS_SENT_PAST_HOUR dump978 messages sent in past 2 hours, OK."
     else
