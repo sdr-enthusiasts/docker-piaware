@@ -10,14 +10,10 @@ on:
     branches:
       - main
     # Don't trigger if it's just a documentation update
-    paths-ignore:
-      - "**.md"
-      - "**.MD"
+    paths:
       - "**.yml"
-      - "LICENSE"
-      - ".gitattributes"
-      - ".gitignore"
-      - ".dockerignore"
+      - "rootfs/**"
+      - "Dockerfile**"
 
 jobs:
   test-build:
