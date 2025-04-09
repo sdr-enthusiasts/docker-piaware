@@ -25,3 +25,6 @@ jobs:
     uses: sdr-enthusiasts/common-github-workflows/.github/workflows/build_and_push_image.yml@main
     with:
       push_enabled: false
+      build_version_specific: false
+      build_platform_specific: false
+      build_nohealthcheck: false
