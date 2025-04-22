@@ -102,6 +102,8 @@ RUN set -x && \
   cp -v faup1090 /usr/lib/piaware/helpers/ && \
   mkdir -p /usr/share/skyaware/html && \
   cp -a /src/dump1090/public_html/* /usr/share/skyaware/html && \
+  # deduplicate using symlinks
+  bash /scripts/deduplicate.sh /usr/share/dump978-fa/html /usr/share/skyaware/html && \
   ldconfig && \
   popd && \
   dump1090 --version && \
@@ -126,8 +128,8 @@ RUN set -x && \
   # Clean up
   apt-get autoremove -q -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 -y "${TEMP_PACKAGES[@]}" && \
   apt-get clean -y && \
-  # remove pycache
-  { find /usr | grep -E "/__pycache__$" | xargs rm -rf || true; } && \
+  # remove pycache and other cleanup
+  bash /scripts/clean-build.sh && \
   rm -rf /src /tmp/* /var/lib/apt/lists/* /var/log/* /var/cache/* && \
   # Store container version
   grep piaware /VERSIONS | cut -d " " -f 2 > /IMAGE_VERSION
