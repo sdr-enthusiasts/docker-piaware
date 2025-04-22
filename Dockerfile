@@ -102,6 +102,8 @@ RUN set -x && \
   cp -v faup1090 /usr/lib/piaware/helpers/ && \
   mkdir -p /usr/share/skyaware/html && \
   cp -a /src/dump1090/public_html/* /usr/share/skyaware/html && \
+  # deduplicate using symlinks
+  bash /scripts/deduplicate.sh /usr/share/dump978-fa/html /usr/share/skyaware/html && \
   ldconfig && \
   popd && \
   dump1090 --version && \
