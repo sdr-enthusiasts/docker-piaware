@@ -18,9 +18,8 @@ on:
 jobs:
   test-build:
     name: Test
-    uses: sdr-enthusiasts/common-github-workflows/.github/workflows/build_and_push_image.yml@main
+    uses: sdr-enthusiasts/common-github-workflows/.github/workflows/sdre.yml@main
     with:
       push_enabled: false
-      build_version_specific: false
-      build_platform_specific: false
-      build_nohealthcheck: false
+      ghcr_repo_owner: ${{ github.repository_owner }}
+      ghcr_repo: ${{ github.repository }}
