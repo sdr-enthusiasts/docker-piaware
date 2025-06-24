@@ -94,6 +94,7 @@ RUN set -x && \
   export DUMP1090_VERSION && \
   git clone --depth 1 --branch "$DUMP1090_VERSION" "https://github.com/flightaware/dump1090.git" "/src/dump1090" && \
   pushd "/src/dump1090" && \
+  sed -i -e 's/uname -m/dpkg --print-architecture/' Makefile && \
   echo "dump1090 ${DUMP1090_VERSION}" >> /VERSIONS && \
   make -j "$(nproc)" showconfig RTLSDR=yes && \
   make -j "$(nproc)" all RTLSDR=yes -j && \
