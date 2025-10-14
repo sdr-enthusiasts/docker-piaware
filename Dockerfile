@@ -1,4 +1,4 @@
-FROM ghcr.io/sdr-enthusiasts/docker-baseimage:dump978-full
+FROM ghcr.io/sdr-enthusiasts/docker-baseimage:trixie-dump978-full
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
   VERBOSE_LOGGING="false"
@@ -36,7 +36,6 @@ RUN set -x && \
   # mlat-client dependencies
   KEPT_PACKAGES+=(python3-minimal) && \
   KEPT_PACKAGES+=(python3-pkg-resources) && \
-  TEMP_PACKAGES+=(python3-distutils) && \
   TEMP_PACKAGES+=(python3-dev) && \
   TEMP_PACKAGES+=(python3-setuptools) && \
   # piaware dependencies
@@ -46,6 +45,20 @@ RUN set -x && \
   KEPT_PACKAGES+=(procps) && \
   KEPT_PACKAGES+=(socat) && \
   # beast-splitter dependencies
+  # if we are on trixie, we want libglib2.0-0t64, otherwise we want libglib2.0-0
+  . /etc/os-release && \
+  # distro="$ID" && \
+  # version="$VERSION_ID" && \
+  codename="$VERSION_CODENAME" && \
+  if [[ "$codename" == "trixie" ]]; then \
+  TEMP_PACKAGES+=(libboost1.83-dev) && \
+  TEMP_PACKAGES+=(libboost-system1.83-dev) && \
+  KEPT_PACKAGES+=(libboost-system1.83.0) && \
+  TEMP_PACKAGES+=(libboost-program-options1.83-dev) && \
+  KEPT_PACKAGES+=(libboost-program-options1.83.0) && \
+  TEMP_PACKAGES+=(libboost-regex1.83-dev) && \
+  KEPT_PACKAGES+=(libboost-regex1.83.0); \
+  else \
   TEMP_PACKAGES+=(libboost1.74-dev) && \
   TEMP_PACKAGES+=(libboost-system1.74-dev) && \
   KEPT_PACKAGES+=(libboost-system1.74.0) && \
@@ -53,6 +66,8 @@ RUN set -x && \
   KEPT_PACKAGES+=(libboost-program-options1.74.0) && \
   TEMP_PACKAGES+=(libboost-regex1.74-dev) && \
   KEPT_PACKAGES+=(libboost-regex1.74.0) && \
+  TEMP_PACKAGES+=(python3-distutils) ; \
+  fi && \
   # Install packages.
   apt-get update && \
   apt-get install -y --no-install-recommends \
