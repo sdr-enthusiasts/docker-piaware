@@ -25,11 +25,6 @@ RUN set -x && \
   KEPT_PACKAGES+=(libatomic1) && \
   KEPT_PACKAGES+=(libncurses6) && \
   TEMP_PACKAGES+=(libncurses-dev) && \
-  # tcllauncher dependencies
-  KEPT_PACKAGES+=(tcl) && \
-  TEMP_PACKAGES+=(tcl-dev) && \
-  KEPT_PACKAGES+=(tcl-tls) && \
-  KEPT_PACKAGES+=(tclx) && \
   # piaware-web dependencies
   KEPT_PACKAGES+=(lighttpd) && \
   KEPT_PACKAGES+=(lighttpd-mod-deflate) && \
@@ -44,6 +39,10 @@ RUN set -x && \
   KEPT_PACKAGES+=(net-tools) && \
   KEPT_PACKAGES+=(procps) && \
   KEPT_PACKAGES+=(socat) && \
+  # tcl
+  KEPT_PACKAGES+=(tcl) && \
+  TEMP_PACKAGES+=(tcl-dev) && \
+  KEPT_PACKAGES+=(tclx) && \
   # beast-splitter dependencies
   # if we are on trixie, we want libglib2.0-0t64, otherwise we want libglib2.0-0
   . /etc/os-release && \
@@ -51,6 +50,15 @@ RUN set -x && \
   # version="$VERSION_ID" && \
   codename="$VERSION_CODENAME" && \
   if [[ "$codename" == "trixie" ]]; then \
+  # needed for the stupid tcl build system
+  TEMP_PACKAGES+=(devscripts) && \
+  TEMP_PACKAGES+=(debhelper) && \
+  TEMP_PACKAGES+=(tcl8.6-dev) && \
+  TEMP_PACKAGES+=(autoconf) && \
+  TEMP_PACKAGES+=(libssl-dev) && \
+  TEMP_PACKAGES+=(tcl-dev) && \
+  KEPT_PACKAGES+=(chrpath) && \
+  # trixie specific boost 1.83 packages for tcllauncher
   TEMP_PACKAGES+=(libboost1.83-dev) && \
   TEMP_PACKAGES+=(libboost-system1.83-dev) && \
   KEPT_PACKAGES+=(libboost-system1.83.0) && \
@@ -59,6 +67,8 @@ RUN set -x && \
   TEMP_PACKAGES+=(libboost-regex1.83-dev) && \
   KEPT_PACKAGES+=(libboost-regex1.83.0); \
   else \
+  # tcllauncher dependencies
+  KEPT_PACKAGES+=(tcl-tls) && \
   TEMP_PACKAGES+=(libboost1.74-dev) && \
   TEMP_PACKAGES+=(libboost-system1.74-dev) && \
   KEPT_PACKAGES+=(libboost-system1.74.0) && \
@@ -75,6 +85,17 @@ RUN set -x && \
   ${TEMP_PACKAGES[@]} \
   && \
   git config --global advice.detachedHead false && \
+  if [[ "$codename" == "trixie" ]]; then \
+  # needed for the stupid tcl build system
+  git clone --depth 1 https://github.com/flightaware/tcltls-rebuild.git /src/tcltls-rebuild && \
+  pushd /src/tcltls-rebuild && \
+  ./prepare-build.sh bullseye && \
+  pushd package-bullseye && \
+  dpkg-buildpackage -b --no-sign && \
+  popd && \
+  dpkg -i tcl-tls_*.deb && \
+  popd; \
+  fi && \
   # Build & install tcllauncher
   BRANCH_TCLLAUNCHER=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' 'https://github.com/flightaware/tcllauncher.git' | grep -v '\^' | cut -d '/' -f 3 | grep '^v.*' | tail -1) && \
   git clone --depth 1 --branch "$BRANCH_TCLLAUNCHER" "https://github.com/flightaware/tcllauncher.git" "/src/tcllauncher" && \
