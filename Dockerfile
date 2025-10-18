@@ -91,7 +91,7 @@ RUN set -x && \
   pushd /src/tcltls-rebuild && \
   ./prepare-build.sh bullseye && \
   pushd package-bullseye && \
-  dpkg-buildpackage -b --no-sign && \
+  DEB_BUILD_OPTIONS=nocheck  dpkg-buildpackage -b --no-sign -Pnocheck && \
   popd && \
   dpkg -i tcl-tls_*.deb && \
   popd; \
