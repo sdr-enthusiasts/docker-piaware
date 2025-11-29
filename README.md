@@ -177,8 +177,6 @@ docker run \
 ### Example `docker-compose.yml` with RTL-SDR USB for reception of 1090MHz
 
 ```yaml
-version: "2.0"
-
 services:
   piaware:
     image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
@@ -231,8 +229,6 @@ docker run \
 This will currently only work in the United States of America, as they are the only country that uses ADS-B UAT on 978MHz.
 
 ```yaml
-version: "2.0"
-
 services:
   piaware:
     image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
@@ -260,10 +256,11 @@ services:
 
 An example of an external Mode-S/BEAST provider would be:
 
-- [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) container
+- [`sdr-enthusiasts/docker-adsb-ultrafeeder`](https://github.com/sdr-enthusiasts/docker-adsb-ultrafeeder) container
 - Another hardware feeder that provides BEAST output data on port 30005
 
 In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
+If you don't need the MLAT results sent to ultrafeeder, remove those lines.
 
 ```shell
 docker run \
@@ -274,6 +271,8 @@ docker run \
  -e RECEIVER_TYPE=relay \
  -e BEASTHOST=beasthost \
  -e BEASTPORT=30005 \
+ -e MLAT_RESULTS_BEASTHOST=ultrafeeder \
+ -e MLAT_RESULTS_BEASTPORT=31004 \
  -e FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37 \
  --tmpfs=/run:exec,size=64M \
  --tmpfs=/var/log \
@@ -284,14 +283,13 @@ docker run \
 
 An example of an external Mode-S/BEAST provider would be:
 
-- [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) container
+- [`sdr-enthusiasts/docker-adsb-ultrafeeder`](https://github.com/sdr-enthusiasts/docker-adsb-ultrafeeder) container
 - Another hardware feeder that provides BEAST output data on port 30005
 
 In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
+If you don't need the MLAT results sent to ultrafeeder, remove those lines.
 
 ```yaml
-version: "2.0"
-
 services:
   piaware:
     image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
@@ -302,6 +300,8 @@ services:
       - RECEIVER_TYPE=relay
       - BEASTHOST=beasthost
       - BEASTPORT=30005
+      - MLAT_RESULTS_BEASTHOST=ultrafeeder
+      - MLAT_RESULTS_BEASTPORT=31004
       - FEEDER_ID=c478b1c99-23d3-4376-1f82-47352a28cg37
     tmpfs:
       - /run:exec,size=64M
@@ -314,10 +314,11 @@ This will currently only work in the United States of America, as they are the o
 
 An example of an external Mode-S/BEAST provider would be:
 
-- [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) container
+- [`sdr-enthusiasts/docker-adsb-ultrafeeder`](https://github.com/sdr-enthusiasts/docker-adsb-ultrafeeder) container
 - Another hardware feeder that provides BEAST output data on port 30005
 
 In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
+If you don't need the MLAT results sent to ultrafeeder, remove those lines.
 
 An example of an external UAT provider would be:
 
@@ -334,6 +335,8 @@ docker run \
  -e RECEIVER_TYPE=relay \
  -e BEASTHOST=beasthost \
  -e BEASTPORT=30005
+ -e MLAT_RESULTS_BEASTHOST=ultrafeeder \
+ -e MLAT_RESULTS_BEASTPORT=31004 \
  -e UAT_RECEIVER_TYPE=relay \
  -e UAT_RECEIVER_HOST=uathost \
  -e UAT_RECEIVER_PORT=30978 \
@@ -349,10 +352,11 @@ This will currently only work in the United States of America, as they are the o
 
 An example of an external Mode-S/BEAST provider would be:
 
-- [`sdr-enthusiasts/docker-readsb-protobuf`](https://github.com/sdr-enthusiasts/docker-readsb-protobuf) container
+- [`sdr-enthusiasts/docker-adsb-ultrafeeder`](https://github.com/sdr-enthusiasts/docker-adsb-ultrafeeder) container
 - Another hardware feeder that provides BEAST output data on port 30005
 
 In the example below, it is assumed that the external BEAST provider resolves to `beasthost` and is listening for connections on TCP port `30005`.
+If you don't need the MLAT results sent to ultrafeeder, remove those lines.
 
 An example of an external UAT provider would be:
 
@@ -361,8 +365,6 @@ An example of an external UAT provider would be:
 In the example below, it is assumed that the external UAT provider resolves to `uathost` and is listening for connections on TCP port `30978`.
 
 ```yaml
-version: "2.0"
-
 services:
   piaware:
     image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
@@ -373,6 +375,8 @@ services:
       - RECEIVER_TYPE=relay
       - BEASTHOST=beasthost
       - BEASTPORT=30005
+      - MLAT_RESULTS_BEASTHOST=ultrafeeder
+      - MLAT_RESULTS_BEASTPORT=31004
       - UAT_RECEIVER_TYPE=relay
       - UAT_RECEIVER_HOST=uathost
       - UAT_RECEIVER_PORT=30978
