@@ -33,6 +33,7 @@ RUN set -x && \
   KEPT_PACKAGES+=(python3-pkg-resources) && \
   TEMP_PACKAGES+=(python3-dev) && \
   TEMP_PACKAGES+=(python3-setuptools) && \
+  TEMP_PACKAGES+=(python3-pip) && \
   # piaware dependencies
   KEPT_PACKAGES+=(itcl3) && \
   KEPT_PACKAGES+=(tcllib) && \
@@ -151,7 +152,7 @@ RUN set -x && \
   pushd /src/mlat-client && \
   BRANCH_MLATCLIENT="$(git tag --sort='-creatordate' | head -1)" && \
   echo "mlat-client ${BRANCH_MLATCLIENT}" >> /VERSIONS && \
-  ./setup.py install && \
+  pip install . --break-system-packages && \
   ln -s /usr/local/bin/fa-mlat-client /usr/lib/piaware/helpers/ && \
   ldconfig && \
   popd && \
