@@ -410,8 +410,8 @@ For an explanation of `piaware-config` variables, see [FlightAware PiAware Advan
 
 | Environment Variable                                    | Possible Values   | Description                                                                              | Default  |
 | ------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------- | -------- |
-| `ALLOW_MODEAC`                                          | `yes` or `no`     | If `yes`, piaware and dump1090-fa will enable Mode A/C decoding if a client requests it. |
-| Mode A/C decoding requires additional CPU when enabled. | `yes`             |
+| `ALLOW_MODEAC`                                          | `yes` or `no`     | If `yes`, piaware and dump1090-fa will enable Mode A/C decoding if a client requests it. |          |
+| Mode A/C decoding requires additional CPU when enabled. | `yes`             |                                                                                          |          |
 | `RECEIVER_TYPE`                                         | `rtlsdr`, `relay` | Configures how PiAware attempts to talk to the ADS-B receiver                            | `rtlsdr` |
 
 Receiver types:
@@ -510,7 +510,7 @@ Since version 3.8.0 the `flightaware-user` and `flightaware-password` configurat
 
 ## Other services to feed
 
-Check out these other images [here](https://github.com/sdr-enthusiasts?q=docker-*&type=all&language=&sort=).
+Check out these other images [in our ecosystem](https://github.com/sdr-enthusiasts?q=docker-*&type=all&language=&sort=).
 
 ## Getting help
 

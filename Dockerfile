@@ -5,7 +5,7 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# hadolint ignore=DL3008,SC2086,SC2039,SC2068
+# hadolint ignore=DL3008,SC2086,SC2039,SC2068,DL3042
 RUN set -x && \
   TEMP_PACKAGES=() && \
   KEPT_PACKAGES=() && \
