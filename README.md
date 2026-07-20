@@ -497,6 +497,10 @@ The following ports are used by this container:
 - `30978` - If UAT decoding is enabled, UAT raw data published on this port - optional, recommended to leave unmapped unless explicitly needed
 - `30979` - If UAT decoding is enabled, UAT decoded JSON published on this port - optional, recommended to leave unmapped unless explicitly needed
 
+Note: This container uses the original piaware lighttpd config which also serves http via port:
+- 8080 (1090 ADS-B)
+- 8978 (978 UAT)
+
 ## Claiming Your Receiver
 
 Since version 3.8.0 the `flightaware-user` and `flightaware-password` configuration options are no longer used; please use the normal site-claiming mechanisms to associate sites with a FlightAware account.
