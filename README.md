@@ -498,6 +498,7 @@ The following ports are used by this container:
 - `30979` - If UAT decoding is enabled, UAT decoded JSON published on this port - optional, recommended to leave unmapped unless explicitly needed
 
 Note: This container uses the original piaware lighttpd config which also serves http via port:
+
 - 8080 (1090 ADS-B)
 - 8978 (978 UAT)
 
