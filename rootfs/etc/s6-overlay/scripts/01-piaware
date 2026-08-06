@@ -27,7 +27,7 @@ else
   piaware-config feeder-id "${FEEDER_ID}"
 fi
 if [ $EXITCODE -ne 0 ]; then
-  exit 1
+  exit 78
 fi
 
 # If BINGMAPSAPIKEY is set, modify dump1090's config.js to include it
