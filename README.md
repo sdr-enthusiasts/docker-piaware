@@ -398,6 +398,7 @@ For an explanation of `piaware-config` variables, see [FlightAware PiAware Advan
 | `FEEDER_ID`          | Your FlightAware feeder ID (required)                                                                        |         |
 | `BINGMAPSAPIKEY`     | Optional. Bing Maps API Key. If set, it is configured in `dump1090`'s `config.js`.                           |         |
 | `VERBOSE_LOGGING`    | Optional. Set to `true` for more verbose logs.                                                               |         |
+| `HEALTHCHECK_NO_MSG_TIMEOUT` | Optional. Minutes without messages sent to FlightAware before the container is reported unhealthy, between `30` and `1440`. Applies to both 1090MHz and 978MHz. After the container starts, data is assumed to be flowing for this long or 2 hours, whichever is longer, so a receiver that doesn't work from the start is only reported after that. Raise it if there is no air traffic over your receiver at night; the container then keeps proportionally more of `/var/log/piaware/current` so the check can look that far back. | `60` for 1090MHz, `120` for 978MHz |
 
 ### Multilateration
 

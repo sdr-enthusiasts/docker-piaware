@@ -2,6 +2,7 @@
 # shellcheck shell=bash disable=SC1091,2154
 
 source /scripts/common
+source /scripts/healthcheck-common
 
 # checking every 60 seconds
 IVAL=60
@@ -21,9 +22,15 @@ if (( $(date +%s) * 1000 > "$(grep -o -E -e '(expiry)" *: ([0-9]+)' /run/piaware
 fi
 
 
-# make sure /var/log/piaware/current doesn't grow too large
-if (( $(wc -l < /var/log/piaware/current) > 800 )); then
-    keep=$(tail -n400 /var/log/piaware/current)
+# make sure /var/log/piaware/current doesn't grow too large, while keeping
+# enough history for the healthcheck to look back over its longest (978MHz)
+# no-message window: one line per 5 minutes, reading 10 log lines for each
+keep_lines=$((PIAWARE_NO_MSG_TIMEOUT_978 / 5 * 10))
+if (( keep_lines < 400 )); then
+    keep_lines=400
+fi
+if (( $(wc -l < /var/log/piaware/current) > keep_lines * 2 )); then
+    keep=$(tail -n"$keep_lines" /var/log/piaware/current)
     truncate -s 0 /var/log/piaware/current
     cat >> /var/log/piaware/current <<< "$keep"
 fi
