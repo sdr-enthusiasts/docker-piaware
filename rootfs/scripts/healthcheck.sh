@@ -19,7 +19,14 @@ function check_logs_for_msgs_sent_to_fa () {
     # $2 = number of output lines to consider (every line represents 5 minutes, so 12 would be an hour)
     # ------
     REGEX_FA_MSGS_SENT_PAST_5MIN="^\[+(?'date2'\d{4}-\d{1,2}-\d{1,2})\s+(?'time2'\d{1,2}:\d{1,2}:[\d\.]+)\]\[piaware\]\s+\d+ msgs recv'd from [^(]*$1[^(]*\(\K(?'msgslast5m'\d+) in last 5m\);\s+\d+ msgs sent to FlightAware\s*$"
-    NUM_MSGS_RECEIVED=$(tail -$(($2 * 10)) /var/log/piaware/current | grep -oP "$REGEX_FA_MSGS_SENT_PAST_5MIN" | tail "-$2" | tr -s " " | cut -d " " -f 1)
+    # Matches piaware's first cumulative summary (no "(N in last 5m)" delta).
+    REGEX_FA_MSGS_SENT_CUMULATIVE="^\[+(?'date2'\d{4}-\d{1,2}-\d{1,2})\s+(?'time2'\d{1,2}:\d{1,2}:[\d\.]+)\]\[piaware\]\s+\K\d+(?= msgs recv'd from [^(]*$1[^(]*;\s+\d+ msgs sent to FlightAware\s*$)"
+    if [[ "$IN_GRACE_PERIOD" == "true" ]]; then
+        REGEX_TO_USE="$REGEX_FA_MSGS_SENT_CUMULATIVE"
+    else
+        REGEX_TO_USE="$REGEX_FA_MSGS_SENT_PAST_5MIN"
+    fi
+    NUM_MSGS_RECEIVED=$(tail -$(($2 * 10)) /var/log/piaware/current | grep -oP "$REGEX_TO_USE" | tail "-$2" | tr -s " " | cut -d " " -f 1)
     TOTAL_MSGS_RECEIVED=0
     for NUM_MSGS in $NUM_MSGS_RECEIVED; do
         TOTAL_MSGS_RECEIVED=$((TOTAL_MSGS_RECEIVED + NUM_MSGS))
@@ -48,6 +55,24 @@ if [[ -z "$CONNECTED_TO_FA" ]]; then
     EXITCODE=1
 else
     echo "Connected to Flightaware, OK."
+fi
+
+# Startup grace period: piaware's first summary is cumulative-only (no 5m
+# delta), so use the cumulative regex until the second summary appears.
+GRACE_PERIOD_SECONDS=360  # 6 minutes — covers the gap until the 2nd summary
+IN_GRACE_PERIOD=false
+FIRST_LOG_LINE=$(head -1 /var/log/piaware/current 2>/dev/null || true)
+if [[ -n "$FIRST_LOG_LINE" ]]; then
+    FIRST_LOG_TS="${FIRST_LOG_LINE#\[}"
+    FIRST_LOG_TS="${FIRST_LOG_TS%%\]*}"
+    FIRST_LOG_TS="${FIRST_LOG_TS%.*}"
+    FIRST_LOG_EPOCH=$(date -d "$FIRST_LOG_TS" +%s 2>/dev/null || true)
+    if [[ -n "$FIRST_LOG_EPOCH" ]]; then
+        NOW_EPOCH=$(date +%s)
+        if (( NOW_EPOCH - FIRST_LOG_EPOCH < GRACE_PERIOD_SECONDS )); then
+            IN_GRACE_PERIOD=true
+        fi
+    fi
 fi
 
 # Make sure 1090MHz data is being sent to flightaware
