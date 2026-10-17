@@ -119,6 +119,10 @@ RUN set -x && \
   mkdir -p /run/piaware && \
   # set debian package version message to get 3 green boxes
   sed /usr/lib/piaware/login.tcl -i -e 's/\tforeach {packageName packageVersion}/\tset message(piaware_package_version) $::piawareVersion\n\tset message(image_type) piaware_package\n\0/' && \
+  # remove invoke-rc.d so piaware will invoke /etc/init.d directly
+  # this was previously done by modifying fa_services.tcl
+  # but overriding part of upstream software is pretty ugly and might cause complications
+  rm -vf /usr/sbin/invoke-rc.d && \
   ldconfig && \
   popd && \
   # Build & install piaware-web
