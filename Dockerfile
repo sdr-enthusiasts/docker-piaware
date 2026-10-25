@@ -31,7 +31,6 @@ RUN --mount=type=bind,source=patches,target=/patches \
   KEPT_PACKAGES+=(lighttpd-mod-deflate) && \
   # mlat-client dependencies
   KEPT_PACKAGES+=(python3-minimal) && \
-  KEPT_PACKAGES+=(python3-pkg-resources) && \
   TEMP_PACKAGES+=(python3-dev) && \
   TEMP_PACKAGES+=(python3-setuptools) && \
   TEMP_PACKAGES+=(python3-pip) && \
@@ -51,7 +50,11 @@ RUN --mount=type=bind,source=patches,target=/patches \
   # distro="$ID" && \
   # version="$VERSION_ID" && \
   codename="$VERSION_CODENAME" && \
-  if [[ "$codename" == "trixie" ]]; then \
+  if [[ "$codename" == "bookworm" ]]; then \
+  # tcllauncher dependencies
+  KEPT_PACKAGES+=(tcl-tls) && \
+  TEMP_PACKAGES+=(python3-distutils) ; \
+  else \
   # needed for the stupid tcl build system
   TEMP_PACKAGES+=(devscripts) && \
   TEMP_PACKAGES+=(debhelper) && \
@@ -60,10 +63,6 @@ RUN --mount=type=bind,source=patches,target=/patches \
   TEMP_PACKAGES+=(libssl-dev) && \
   TEMP_PACKAGES+=(tcl-dev) && \
   KEPT_PACKAGES+=(chrpath); \
-  else \
-  # tcllauncher dependencies
-  KEPT_PACKAGES+=(tcl-tls) && \
-  TEMP_PACKAGES+=(python3-distutils) ; \
   fi && \
   # beast-splitter, dump978 and faup978: the distribution's default Boost.
   # Runtime libraries are resolved after apt-get update (runtime_pkg below).
@@ -93,12 +92,17 @@ RUN --mount=type=bind,source=patches,target=/patches \
   TEMP_PACKAGES+=(libboost-system-dev) && \
   KEPT_PACKAGES+=("$(runtime_pkg libboost-system-dev 'libboost-system[0-9.]+')"); \
   fi && \
+  # pkg_resources was split out of setuptools and removed in setuptools 82
+  # (forky); keep it where Debian still ships it.
+  if has_candidate python3-pkg-resources; then \
+  KEPT_PACKAGES+=(python3-pkg-resources); \
+  fi && \
   apt-get install -y --no-install-recommends \
   ${KEPT_PACKAGES[@]} \
   ${TEMP_PACKAGES[@]} \
   && \
   git config --global advice.detachedHead false && \
-  if [[ "$codename" == "trixie" ]]; then \
+  if [[ "$codename" != "bookworm" ]]; then \
   # needed for the stupid tcl build system
   git clone --depth 1 https://github.com/flightaware/tcltls-rebuild.git /src/tcltls-rebuild && \
   pushd /src/tcltls-rebuild && \
@@ -125,7 +129,17 @@ RUN --mount=type=bind,source=patches,target=/patches \
   git clone --depth 1 --branch "$BRANCH_PIAWARE" "https://github.com/flightaware/piaware.git" "/src/piaware" && \
   pushd "/src/piaware" && \
   echo "piaware ${BRANCH_PIAWARE}" >> /VERSIONS && \
+  # piaware's install runs c_rehash for its CA bundle. OpenSSL in forky no longer
+  # ships the c_rehash script; "openssl rehash -compat" creates the same old- and
+  # new-style hash links, so provide it for the install only.
+  c_rehash_shim="" && \
+  if ! command -v c_rehash >/dev/null; then \
+  c_rehash_shim=/usr/local/bin/c_rehash && \
+  printf '#!/bin/sh\nexec openssl rehash -compat "$@"\n' > "$c_rehash_shim" && \
+  chmod +x "$c_rehash_shim"; \
+  fi && \
   make -j "$(nproc)" install && \
+  if [ -n "$c_rehash_shim" ]; then rm -f "$c_rehash_shim"; fi && \
   cp -v /src/piaware/package/ca/*.pem /etc/ssl/ && \
   touch /etc/piaware.conf && \
   mkdir -p /run/piaware && \
@@ -150,9 +164,14 @@ RUN --mount=type=bind,source=patches,target=/patches \
   # this fixes the architecture detection for armhf on the github native runners
   sed -i -e 's/uname -m/dpkg --print-architecture/' Makefile && \
   echo "dump1090 ${DUMP1090_VERSION}" >> /VERSIONS && \
+  # GCC 15+ (forky) adds -Wunterminated-string-initialization and GCC 16 extends
+  # -Wformat-truncation; upstream builds with -Werror. Diagnostics only. The
+  # Makefile's CFLAGS default is "-O3 -g", kept here; GCC 14 ignores unknown -Wno-.
+  export CFLAGS="-O3 -g -Wno-format-truncation -Wno-unterminated-string-initialization" && \
   make -j "$(nproc)" showconfig RTLSDR=yes && \
   make -j "$(nproc)" all RTLSDR=yes -j && \
   make -j "$(nproc)" faup1090 RTLSDR=yes -j && \
+  unset CFLAGS && \
   cp -v view1090 dump1090 /usr/local/bin/ && \
   cp -v faup1090 /usr/lib/piaware/helpers/ && \
   mkdir -p /usr/share/skyaware/html && \
