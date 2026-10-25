@@ -6,7 +6,8 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # hadolint ignore=DL3008,SC2086,SC2039,SC2068,DL3042
-RUN set -x && \
+RUN --mount=type=bind,source=patches,target=/patches \
+  set -x && \
   TEMP_PACKAGES=() && \
   KEPT_PACKAGES=() && \
   # Essentials
@@ -58,29 +59,40 @@ RUN set -x && \
   TEMP_PACKAGES+=(autoconf) && \
   TEMP_PACKAGES+=(libssl-dev) && \
   TEMP_PACKAGES+=(tcl-dev) && \
-  KEPT_PACKAGES+=(chrpath) && \
-  # trixie specific boost 1.83 packages for tcllauncher
-  TEMP_PACKAGES+=(libboost1.83-dev) && \
-  TEMP_PACKAGES+=(libboost-system1.83-dev) && \
-  KEPT_PACKAGES+=(libboost-system1.83.0) && \
-  TEMP_PACKAGES+=(libboost-program-options1.83-dev) && \
-  KEPT_PACKAGES+=(libboost-program-options1.83.0) && \
-  TEMP_PACKAGES+=(libboost-regex1.83-dev) && \
-  KEPT_PACKAGES+=(libboost-regex1.83.0); \
+  KEPT_PACKAGES+=(chrpath); \
   else \
   # tcllauncher dependencies
   KEPT_PACKAGES+=(tcl-tls) && \
-  TEMP_PACKAGES+=(libboost1.74-dev) && \
-  TEMP_PACKAGES+=(libboost-system1.74-dev) && \
-  KEPT_PACKAGES+=(libboost-system1.74.0) && \
-  TEMP_PACKAGES+=(libboost-program-options1.74-dev) && \
-  KEPT_PACKAGES+=(libboost-program-options1.74.0) && \
-  TEMP_PACKAGES+=(libboost-regex1.74-dev) && \
-  KEPT_PACKAGES+=(libboost-regex1.74.0) && \
   TEMP_PACKAGES+=(python3-distutils) ; \
   fi && \
+  # beast-splitter, dump978 and faup978: the distribution's default Boost.
+  # Runtime libraries are resolved after apt-get update (runtime_pkg below).
+  TEMP_PACKAGES+=(libboost-dev) && \
+  TEMP_PACKAGES+=(libboost-program-options-dev) && \
+  TEMP_PACKAGES+=(libboost-regex-dev) && \
   # Install packages.
   apt-get update && \
+  # Runtime library packages are renamed with Debian releases (soname bumps), so
+  # resolve the one each -dev package depends on instead of naming a version.
+  runtime_pkg() { \
+  p="$(apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances "$1" | sed -nE "s/^ *Depends: ($2)\$/\1/p" | head -n1)"; \
+  if [ -z "$p" ]; then echo "no runtime package matching $2 for $1" >&2; return 1; fi; \
+  echo "$p"; \
+  } && \
+  # True when apt can install the package (it may still be referenced, but
+  # removed, in newer Debian releases).
+  has_candidate() { \
+  c="$(apt-cache policy "$1" 2>/dev/null | sed -n 's/^ *Candidate: //p')"; \
+  [ -n "$c" ] && [ "$c" != "(none)" ]; \
+  } && \
+  KEPT_PACKAGES+=("$(runtime_pkg libboost-program-options-dev 'libboost-program-options[0-9.]+')") && \
+  KEPT_PACKAGES+=("$(runtime_pkg libboost-regex-dev 'libboost-regex[0-9.]+')") && \
+  # Boost.System is header-only since Boost 1.69 and its stub library is gone in
+  # 1.89+. Unpatched beast-splitter links it, so install it where it still exists.
+  if has_candidate libboost-system-dev; then \
+  TEMP_PACKAGES+=(libboost-system-dev) && \
+  KEPT_PACKAGES+=("$(runtime_pkg libboost-system-dev 'libboost-system[0-9.]+')"); \
+  fi && \
   apt-get install -y --no-install-recommends \
   ${KEPT_PACKAGES[@]} \
   ${TEMP_PACKAGES[@]} \
@@ -165,6 +177,13 @@ RUN set -x && \
   git clone --depth 1 --branch "$BRANCH_BEASTSPLITTER" "https://github.com/flightaware/beast-splitter.git" "/src/beast-splitter" && \
   pushd "/src/beast-splitter" && \
   echo "beast-splitter ${BRANCH_BEASTSPLITTER}" >> /VERSIONS && \
+  # Boost 1.87 removed asio::io_service and friends, which beast-splitter v11.1
+  # still uses. Port it only where needed: when the source still uses io_service
+  # and the installed Boost no longer has it. Stable (Boost 1.83) builds upstream
+  # unchanged, and the patch is skipped once an upstream release is fixed.
+  if grep -q "boost/asio/io_service.hpp" beast_input.h && [ ! -e /usr/include/boost/asio/io_service.hpp ]; then \
+  git apply --verbose /patches/beast-splitter-boost-1.87.patch; \
+  fi && \
   make -j "$(nproc)" && \
   cp -v ./beast-splitter /usr/local/bin/ && \
   popd && \

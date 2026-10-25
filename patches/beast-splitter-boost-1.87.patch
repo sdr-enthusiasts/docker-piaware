@@ -1,0 +1,506 @@
+Port beast-splitter v11.1 off the Boost.Asio APIs removed in Boost 1.87.
+
+Applied by the Dockerfile only when the source still uses io_service and the
+installed Boost no longer provides it (Debian forky and later). Every
+replacement exists since Boost 1.66:
+
+- io_service -> io_context
+- steady_timer::expires_from_now() -> expires_after()
+- io_context::post() -> boost::asio::post()
+- resolver::query / resolver::iterator -> resolve(host, service) / results_type
+- no longer link -lboost_system (header-only since Boost 1.69, removed in 1.89)
+
+Remove this patch once a beast-splitter release no longer uses io_service.
+
+diff --git a/Makefile b/Makefile
+index 0f8c9e7..1a5fd1d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,6 @@
+ CXX=g++
+ CXXFLAGS+=-std=c++11 -Wall -Werror -O -g
+-LIBS=-lboost_system -lboost_program_options -lboost_regex -lpthread
++LIBS=-lboost_program_options -lboost_regex -lpthread
+
+ all: beast-splitter
+
+diff --git a/beast_input.cc b/beast_input.cc
+index eea311d..0087f22 100644
+--- a/beast_input.cc
++++ b/beast_input.cc
+@@ -35,7 +35,7 @@ using namespace beast;
+
+ enum class BeastInput::ParserState { RESYNC, READ_1A, READ_TYPE, READ_DATA, READ_ESCAPED_1A };
+
+-BeastInput::BeastInput(boost::asio::io_service &service_, const Settings &fixed_settings_, const modes::Filter &filter_) : receiver_type(ReceiverType::UNKNOWN), fixed_settings(fixed_settings_), filter(filter_), receiving_gps_timestamps(false), autodetect_timer(service_), reconnect_timer(service_), liveness_timer(service_), good_sync(false), good_messages_count(0), bad_bytes_count(0), first_message(true), state(ParserState::RESYNC) {}
++BeastInput::BeastInput(boost::asio::io_context &service_, const Settings &fixed_settings_, const modes::Filter &filter_) : receiver_type(ReceiverType::UNKNOWN), fixed_settings(fixed_settings_), filter(filter_), receiving_gps_timestamps(false), autodetect_timer(service_), reconnect_timer(service_), liveness_timer(service_), good_sync(false), good_messages_count(0), bad_bytes_count(0), first_message(true), state(ParserState::RESYNC) {}
+
+ void BeastInput::start() { try_to_connect(); }
+
+@@ -62,7 +62,7 @@ void BeastInput::connection_established() {
+         receiver_type = ReceiverType::BEAST;
+     else {
+         receiver_type = ReceiverType::UNKNOWN;
+-        autodetect_timer.expires_from_now(radarcape_detect_interval);
++        autodetect_timer.expires_after(radarcape_detect_interval);
+         autodetect_timer.async_wait([this, self](const boost::system::error_code &ec) {
+             if (!ec) {
+                 receiver_type = ReceiverType::BEAST;
+@@ -80,7 +80,7 @@ void BeastInput::connection_failed() {
+
+     // schedule reconnect.
+     auto self(shared_from_this());
+-    reconnect_timer.expires_from_now(reconnect_interval);
++    reconnect_timer.expires_after(reconnect_interval);
+     reconnect_timer.async_wait([this, self](const boost::system::error_code &ec) {
+         if (!ec) {
+             try_to_connect();
+@@ -274,7 +274,7 @@ void BeastInput::dispatch_message() {
+         }
+
+         auto self(shared_from_this());
+-        liveness_timer.expires_from_now(radarcape_liveness_interval);
++        liveness_timer.expires_after(radarcape_liveness_interval);
+         liveness_timer.async_wait([this, self](const boost::system::error_code &ec) {
+             if (!ec) {
+                 std::cerr << what() << ": no recent status messages received" << std::endl;
+diff --git a/beast_input.h b/beast_input.h
+index fe8f215..533968b 100644
+--- a/beast_input.h
++++ b/beast_input.h
+@@ -33,7 +33,7 @@
+ #include <memory>
+ #include <vector>
+
+-#include <boost/asio/io_service.hpp>
++#include <boost/asio/io_context.hpp>
+ #include <boost/asio/serial_port.hpp>
+ #include <boost/asio/steady_timer.hpp>
+
+@@ -95,7 +95,7 @@ namespace beast {
+
+       protected:
+         // construct a new input instance
+-        BeastInput(boost::asio::io_service &service_, const Settings &fixed_settings_, const modes::Filter &filter_);
++        BeastInput(boost::asio::io_context &service_, const Settings &fixed_settings_, const modes::Filter &filter_);
+
+         virtual ~BeastInput() {}
+
+diff --git a/beast_input_net.cc b/beast_input_net.cc
+index 244c9d7..fe26674 100644
+--- a/beast_input_net.cc
++++ b/beast_input_net.cc
+@@ -37,17 +37,16 @@
+ using namespace beast;
+ using boost::asio::ip::tcp;
+
+-NetInput::NetInput(boost::asio::io_service &service_, const std::string &host_, const std::string &port_or_service_, const Settings &fixed_settings_, const modes::Filter &filter_) : BeastInput(service_, fixed_settings_, filter_), host(host_), port_or_service(port_or_service_), resolver(service_), socket(service_), reconnect_timer(service_), readbuf(std::make_shared<helpers::bytebuf>(read_buffer_size)), warned_about_framing(false) {}
++NetInput::NetInput(boost::asio::io_context &service_, const std::string &host_, const std::string &port_or_service_, const Settings &fixed_settings_, const modes::Filter &filter_) : BeastInput(service_, fixed_settings_, filter_), host(host_), port_or_service(port_or_service_), resolver(service_), socket(service_), reconnect_timer(service_), readbuf(std::make_shared<helpers::bytebuf>(read_buffer_size)), warned_about_framing(false) {}
+
+ std::string NetInput::what() const { return std::string("net(") + host + std::string(":") + port_or_service + std::string(")"); }
+
+ void NetInput::try_to_connect(void) {
+     auto self(shared_from_this());
+
+-    tcp::resolver::query query(host, port_or_service);
+-    resolver.async_resolve(query, [this, self](const boost::system::error_code &ec, tcp::resolver::iterator it) {
++    resolver.async_resolve(host, port_or_service, [this, self](const boost::system::error_code &ec, tcp::resolver::results_type results) {
+         if (!ec) {
+-            next_endpoint = it;
++            next_endpoint = results.begin();
+             try_next_endpoint();
+         } else if (ec == boost::asio::error::operation_aborted) {
+             return;
+@@ -60,7 +59,7 @@ void NetInput::try_to_connect(void) {
+ }
+
+ void NetInput::try_next_endpoint() {
+-    if (next_endpoint == tcp::resolver::iterator()) {
++    if (next_endpoint == tcp::resolver::results_type::const_iterator()) {
+         // No more addresses to try
+         connection_failed();
+         return;
+diff --git a/beast_input_net.h b/beast_input_net.h
+index d525d02..e21435d 100644
+--- a/beast_input_net.h
++++ b/beast_input_net.h
+@@ -41,7 +41,7 @@ namespace beast {
+         const size_t read_buffer_size = 4096;
+
+         // factory method
+-        static pointer create(boost::asio::io_service &service, const std::string &host, const std::string &port_or_service, const Settings &fixed_settings = Settings(), const modes::Filter &filter = modes::Filter()) { return pointer(new NetInput(service, host, port_or_service, fixed_settings, filter)); }
++        static pointer create(boost::asio::io_context &service, const std::string &host, const std::string &port_or_service, const Settings &fixed_settings = Settings(), const modes::Filter &filter = modes::Filter()) { return pointer(new NetInput(service, host, port_or_service, fixed_settings, filter)); }
+
+       protected:
+         std::string what() const override;
+@@ -51,7 +51,7 @@ namespace beast {
+
+       private:
+         // construct a new net input instance, don't start yet
+-        NetInput(boost::asio::io_service &service_, const std::string &host_, const std::string &port_or_service_, const Settings &fixed_settings_, const modes::Filter &filter_);
++        NetInput(boost::asio::io_context &service_, const std::string &host_, const std::string &port_or_service_, const Settings &fixed_settings_, const modes::Filter &filter_);
+
+         void resolve_and_connect(const boost::system::error_code &ec = boost::system::error_code());
+         void try_next_endpoint();
+@@ -66,7 +66,7 @@ namespace beast {
+         boost::asio::ip::tcp::resolver resolver;
+         boost::asio::ip::tcp::socket socket;
+         boost::asio::steady_timer reconnect_timer;
+-        boost::asio::ip::tcp::resolver::iterator next_endpoint;
++        boost::asio::ip::tcp::resolver::results_type::const_iterator next_endpoint;
+
+         // cached buffer used for reads
+         std::shared_ptr<helpers::bytebuf> readbuf;
+diff --git a/beast_input_serial.cc b/beast_input_serial.cc
+index da36669..7606615 100644
+--- a/beast_input_serial.cc
++++ b/beast_input_serial.cc
+@@ -37,7 +37,7 @@
+
+ using namespace beast;
+
+-SerialInput::SerialInput(boost::asio::io_service &service_, const std::string &path_, unsigned int fixed_baud_rate_, const Settings &fixed_settings_, const modes::Filter &filter_) : BeastInput(service_, fixed_settings_, filter_), path(path_), port(service_), autobaud_interval(autobaud_base_interval), autobaud_timer(service_), read_timer(service_), readbuf(std::make_shared<helpers::bytebuf>(read_buffer_size)), warned_about_rate(false) {
++SerialInput::SerialInput(boost::asio::io_context &service_, const std::string &path_, unsigned int fixed_baud_rate_, const Settings &fixed_settings_, const modes::Filter &filter_) : BeastInput(service_, fixed_settings_, filter_), path(path_), port(service_), autobaud_interval(autobaud_base_interval), autobaud_timer(service_), read_timer(service_), readbuf(std::make_shared<helpers::bytebuf>(read_buffer_size)), warned_about_rate(false) {
+     // set up autobaud
+     if (fixed_baud_rate_ == 0) {
+         autobauding = true;
+@@ -80,7 +80,7 @@ void SerialInput::try_to_connect(void) {
+     }
+
+     if (autobaud_rates.size() > 1) {
+-        autobaud_timer.expires_from_now(autobaud_interval);
++        autobaud_timer.expires_after(autobaud_interval);
+
+         autobaud_timer.async_wait([this, self](const boost::system::error_code &ec) {
+             if (!ec) {
+@@ -185,7 +185,7 @@ void SerialInput::start_reading(const boost::system::error_code &ec) {
+         buf = std::make_shared<helpers::bytebuf>(read_buffer_size);
+     }
+
+-    read_timer.expires_from_now(read_interval);
++    read_timer.expires_after(read_interval);
+     port.async_read_some(boost::asio::buffer(*buf), [this, self, buf](const boost::system::error_code &ec, std::size_t len) {
+         if (ec) {
+             readbuf = buf;
+diff --git a/beast_input_serial.h b/beast_input_serial.h
+index 0106c94..35241cf 100644
+--- a/beast_input_serial.h
++++ b/beast_input_serial.h
+@@ -59,7 +59,7 @@ namespace beast {
+         const std::chrono::milliseconds read_interval = std::chrono::milliseconds(50);
+
+         // factory method
+-        static pointer create(boost::asio::io_service &service, const std::string &path, unsigned int fixed_baud_rate = 0, const Settings &fixed_settings = Settings(), const modes::Filter &filter = modes::Filter()) { return pointer(new SerialInput(service, path, fixed_baud_rate, fixed_settings, filter)); }
++        static pointer create(boost::asio::io_context &service, const std::string &path, unsigned int fixed_baud_rate = 0, const Settings &fixed_settings = Settings(), const modes::Filter &filter = modes::Filter()) { return pointer(new SerialInput(service, path, fixed_baud_rate, fixed_settings, filter)); }
+
+       protected:
+         std::string what() const override;
+@@ -72,7 +72,7 @@ namespace beast {
+
+       private:
+         // construct a new serial input instance, don't start yet
+-        SerialInput(boost::asio::io_service &service_, const std::string &path_, unsigned int fixed_baud_rate, const Settings &fixed_settings_, const modes::Filter &filter_);
++        SerialInput(boost::asio::io_context &service_, const std::string &path_, unsigned int fixed_baud_rate, const Settings &fixed_settings_, const modes::Filter &filter_);
+
+         void start_reading(const boost::system::error_code &ec = boost::system::error_code());
+         void advance_autobaud(void);
+diff --git a/beast_output.cc b/beast_output.cc
+index fc5214e..b14b1ed 100644
+--- a/beast_output.cc
++++ b/beast_output.cc
+@@ -39,7 +39,7 @@ using boost::asio::ip::tcp;
+ namespace beast {
+     enum class SocketOutput::ParserState { FIND_1A, READ_1, READ_OPTION };
+
+-    SocketOutput::SocketOutput(asio::io_service &service_, tcp::socket &&socket_, const Settings &settings_) : service(service_), socket(std::move(socket_)), peer(socket.remote_endpoint()), state(ParserState::FIND_1A), settings(settings_), flush_pending(false) {}
++    SocketOutput::SocketOutput(asio::io_context &service_, tcp::socket &&socket_, const Settings &settings_) : service(service_), socket(std::move(socket_)), peer(socket.remote_endpoint()), state(ParserState::FIND_1A), settings(settings_), flush_pending(false) {}
+
+     void SocketOutput::start() { read_commands(); }
+
+@@ -205,7 +205,7 @@ namespace beast {
+     void SocketOutput::complete_write() {
+         if (!flush_pending && !outbuf->empty()) {
+             flush_pending = true;
+-            service.post(std::bind(&SocketOutput::flush_outbuf, shared_from_this()));
++            boost::asio::post(service, std::bind(&SocketOutput::flush_outbuf, shared_from_this()));
+         }
+     }
+
+@@ -318,7 +318,7 @@ namespace beast {
+
+     //////////////
+
+-    SocketListener::SocketListener(asio::io_service &service_, const tcp::endpoint &endpoint_, modes::FilterDistributor &distributor_, const Settings &initial_settings_) : service(service_), acceptor(service_), endpoint(endpoint_), socket(service_), distributor(distributor_), initial_settings(initial_settings_) {}
++    SocketListener::SocketListener(asio::io_context &service_, const tcp::endpoint &endpoint_, modes::FilterDistributor &distributor_, const Settings &initial_settings_) : service(service_), acceptor(service_), endpoint(endpoint_), socket(service_), distributor(distributor_), initial_settings(initial_settings_) {}
+
+     void SocketListener::start() {
+         acceptor.open(endpoint.protocol());
+@@ -366,7 +366,7 @@ namespace beast {
+
+     //////////////
+
+-    SocketConnector::SocketConnector(asio::io_service &service_, const std::string &host_, const std::string &port_or_service_, modes::FilterDistributor &distributor_, const Settings &initial_settings_) : service(service_), resolver(service_), socket(service_), reconnect_timer(service_), host(host_), port_or_service(port_or_service_), distributor(distributor_), initial_settings(initial_settings_), running(false) {}
++    SocketConnector::SocketConnector(asio::io_context &service_, const std::string &host_, const std::string &port_or_service_, modes::FilterDistributor &distributor_, const Settings &initial_settings_) : service(service_), resolver(service_), socket(service_), reconnect_timer(service_), host(host_), port_or_service(port_or_service_), distributor(distributor_), initial_settings(initial_settings_), running(false) {}
+
+     void SocketConnector::start() {
+         running = true;
+@@ -392,10 +392,9 @@ namespace beast {
+
+         auto self(shared_from_this());
+
+-        tcp::resolver::query query(host, port_or_service);
+-        resolver.async_resolve(query, [this, self](const boost::system::error_code &ec, tcp::resolver::iterator it) {
++        resolver.async_resolve(host, port_or_service, [this, self](const boost::system::error_code &ec, tcp::resolver::results_type results) {
+             if (!ec) {
+-                next_endpoint = it;
++                next_endpoint = results.begin();
+                 try_next_endpoint();
+             } else if (ec == boost::asio::error::operation_aborted) {
+                 return;
+@@ -412,7 +411,7 @@ namespace beast {
+             return;
+         }
+
+-        if (next_endpoint == tcp::resolver::iterator()) {
++        if (next_endpoint == tcp::resolver::results_type::const_iterator()) {
+             // No more addresses to try
+             schedule_reconnect();
+             return;
+@@ -439,7 +438,7 @@ namespace beast {
+             std::cerr << host << ":" << port_or_service << ": reconnecting in " << std::chrono::duration_cast<std::chrono::seconds>(reconnect_interval).count() << " seconds" << std::endl;
+
+             auto self(shared_from_this());
+-            reconnect_timer.expires_from_now(reconnect_interval);
++            reconnect_timer.expires_after(reconnect_interval);
+             reconnect_timer.async_wait(std::bind(&SocketConnector::resolve_and_connect, self, std::placeholders::_1));
+         }
+     }
+diff --git a/beast_output.h b/beast_output.h
+index a947ae5..eab51f8 100644
+--- a/beast_output.h
++++ b/beast_output.h
+@@ -30,7 +30,8 @@
+
+ #include <memory>
+
+-#include <boost/asio/io_service.hpp>
++#include <boost/asio/io_context.hpp>
++#include <boost/asio/post.hpp>
+ #include <boost/asio/ip/tcp.hpp>
+ #include <boost/asio/steady_timer.hpp>
+
+@@ -60,7 +61,7 @@ namespace beast {
+         const unsigned int read_buffer_size = 4096;
+
+         // factory method, this class must always be constructed via make_shared
+-        static pointer create(boost::asio::io_service &service, boost::asio::ip::tcp::socket &&socket, const Settings &settings = Settings()) { return pointer(new SocketOutput(service, std::move(socket), settings)); }
++        static pointer create(boost::asio::io_context &service, boost::asio::ip::tcp::socket &&socket, const Settings &settings = Settings()) { return pointer(new SocketOutput(service, std::move(socket), settings)); }
+
+         void start();
+         void close();
+@@ -72,7 +73,7 @@ namespace beast {
+         void write(const modes::Message &message);
+
+       private:
+-        SocketOutput(boost::asio::io_service &service_, boost::asio::ip::tcp::socket &&socket_, const Settings &settings_);
++        SocketOutput(boost::asio::io_context &service_, boost::asio::ip::tcp::socket &&socket_, const Settings &settings_);
+
+         void read_commands();
+         void process_commands(std::vector<std::uint8_t> data);
+@@ -92,7 +93,7 @@ namespace beast {
+         void complete_write();
+         void flush_outbuf();
+
+-        boost::asio::io_service &service;
++        boost::asio::io_context &service;
+         boost::asio::ip::tcp::socket socket;
+         boost::asio::ip::tcp::endpoint peer;
+
+@@ -113,17 +114,17 @@ namespace beast {
+         typedef std::shared_ptr<SocketListener> pointer;
+
+         // factory method, this class must always be constructed via make_shared
+-        static pointer create(boost::asio::io_service &service, const boost::asio::ip::tcp::endpoint &endpoint, modes::FilterDistributor &distributor, const Settings &initial_settings) { return pointer(new SocketListener(service, endpoint, distributor, initial_settings)); }
++        static pointer create(boost::asio::io_context &service, const boost::asio::ip::tcp::endpoint &endpoint, modes::FilterDistributor &distributor, const Settings &initial_settings) { return pointer(new SocketListener(service, endpoint, distributor, initial_settings)); }
+
+         void start();
+         void close();
+
+       private:
+-        SocketListener(boost::asio::io_service &service_, const boost::asio::ip::tcp::endpoint &endpoint_, modes::FilterDistributor &distributor, const Settings &initial_settings_);
++        SocketListener(boost::asio::io_context &service_, const boost::asio::ip::tcp::endpoint &endpoint_, modes::FilterDistributor &distributor, const Settings &initial_settings_);
+
+         void accept_connection();
+
+-        boost::asio::io_service &service;
++        boost::asio::io_context &service;
+         boost::asio::ip::tcp::acceptor acceptor;
+         boost::asio::ip::tcp::endpoint endpoint;
+         boost::asio::ip::tcp::socket socket;
+@@ -139,20 +140,20 @@ namespace beast {
+         const std::chrono::milliseconds reconnect_interval = std::chrono::seconds(60);
+
+         // factory method, this class must always be constructed via make_shared
+-        static pointer create(boost::asio::io_service &service, const std::string &host, const std::string &port_or_service, modes::FilterDistributor &distributor, const Settings &initial_settings) { return pointer(new SocketConnector(service, host, port_or_service, distributor, initial_settings)); }
++        static pointer create(boost::asio::io_context &service, const std::string &host, const std::string &port_or_service, modes::FilterDistributor &distributor, const Settings &initial_settings) { return pointer(new SocketConnector(service, host, port_or_service, distributor, initial_settings)); }
+
+         void start();
+         void close();
+
+       private:
+-        SocketConnector(boost::asio::io_service &service_, const std::string &host_, const std::string &port_or_service_, modes::FilterDistributor &distributor, const Settings &initial_settings_);
++        SocketConnector(boost::asio::io_context &service_, const std::string &host_, const std::string &port_or_service_, modes::FilterDistributor &distributor, const Settings &initial_settings_);
+
+         void schedule_reconnect();
+         void resolve_and_connect(const boost::system::error_code &ec = boost::system::error_code());
+         void try_next_endpoint();
+         void connection_established(const boost::asio::ip::tcp::endpoint &endpoint);
+
+-        boost::asio::io_service &service;
++        boost::asio::io_context &service;
+         boost::asio::ip::tcp::resolver resolver;
+         boost::asio::ip::tcp::socket socket;
+         boost::asio::steady_timer reconnect_timer;
+@@ -163,7 +164,7 @@ namespace beast {
+         Settings initial_settings;
+
+         bool running;
+-        boost::asio::ip::tcp::resolver::iterator next_endpoint;
++        boost::asio::ip::tcp::resolver::results_type::const_iterator next_endpoint;
+     };
+ }; // namespace beast
+
+diff --git a/splitter_main.cc b/splitter_main.cc
+index a4ec657..aa69b8e 100644
+--- a/splitter_main.cc
++++ b/splitter_main.cc
+@@ -123,7 +123,7 @@ namespace beast {
+ #define EXIT_NO_RESTART (64)
+
+ static int realmain(int argc, char **argv) {
+-    boost::asio::io_service io_service;
++    boost::asio::io_context io_context;
+     modes::FilterDistributor distributor;
+
+     po::options_description desc("Allowed options");
+@@ -154,10 +154,10 @@ static int realmain(int argc, char **argv) {
+
+     beast::BeastInput::pointer input;
+     if (opts.count("serial")) {
+-        input = beast::SerialInput::create(io_service, opts["serial"].as<std::string>(), opts["fixed-baud"].as<unsigned>(), opts["force"].as<beast::Settings>());
++        input = beast::SerialInput::create(io_context, opts["serial"].as<std::string>(), opts["fixed-baud"].as<unsigned>(), opts["force"].as<beast::Settings>());
+     } else if (opts.count("net")) {
+         auto net = opts["net"].as<net_option>();
+-        input = beast::NetInput::create(io_service, net.host, net.port, opts["force"].as<beast::Settings>());
++        input = beast::NetInput::create(io_context, net.host, net.port, opts["force"].as<beast::Settings>());
+     } else {
+         std::cerr << "A --serial or --net argument is needed" << std::endl;
+         std::cerr << desc << std::endl;
+@@ -166,20 +166,19 @@ static int realmain(int argc, char **argv) {
+
+     distributor.set_filter_notifier(std::bind(&beast::BeastInput::set_filter, input, std::placeholders::_1));
+
+-    tcp::resolver resolver(io_service);
++    tcp::resolver resolver(io_context);
+
+     if (opts.count("listen")) {
+         for (auto l : opts["listen"].as<std::vector<listen_option>>()) {
+-            tcp::resolver::query query(l.host, l.port, tcp::resolver::query::passive);
+             boost::system::error_code ec;
+
+             bool success = false;
+-            tcp::resolver::iterator end;
+-            for (auto i = resolver.resolve(query, ec); i != end; ++i) {
++            auto results = resolver.resolve(l.host, l.port, tcp::resolver::passive, ec);
++            for (auto i = results.begin(); i != results.end(); ++i) {
+                 const auto &endpoint = i->endpoint();
+
+                 try {
+-                    auto listener = beast::SocketListener::create(io_service, endpoint, distributor, l.settings);
++                    auto listener = beast::SocketListener::create(io_context, endpoint, distributor, l.settings);
+                     listener->start();
+                     std::cerr << "Listening on " << endpoint << std::endl;
+                     success = true;
+@@ -201,20 +200,20 @@ static int realmain(int argc, char **argv) {
+
+     if (opts.count("connect")) {
+         for (auto l : opts["connect"].as<std::vector<connect_option>>()) {
+-            auto connector = beast::SocketConnector::create(io_service, l.host, l.port, distributor, l.settings);
++            auto connector = beast::SocketConnector::create(io_context, l.host, l.port, distributor, l.settings);
+             connector->start();
+         }
+     }
+
+     if (opts.count("status-file")) {
+-        auto statuswriter = splitter::StatusWriter::create(io_service, distributor, input, opts["status-file"].as<std::string>());
++        auto statuswriter = splitter::StatusWriter::create(io_context, distributor, input, opts["status-file"].as<std::string>());
+         statuswriter->start();
+     }
+
+     input->set_message_notifier(std::bind(&modes::FilterDistributor::broadcast, &distributor, std::placeholders::_1));
+     input->start();
+
+-    io_service.run();
++    io_context.run();
+     return 0;
+ }
+
+diff --git a/status_writer.cc b/status_writer.cc
+index aeb7364..96600e3 100644
+--- a/status_writer.cc
++++ b/status_writer.cc
+@@ -36,7 +36,7 @@
+ namespace asio = boost::asio;
+
+ namespace splitter {
+-    StatusWriter::StatusWriter(asio::io_service &service_, modes::FilterDistributor &distributor_, beast::BeastInput::pointer input_, const std::string &path_) : service(service_), distributor(distributor_), input(input_), path(path_), timeout_timer(service_) { temppath = path_ + ".new"; }
++    StatusWriter::StatusWriter(asio::io_context &service_, modes::FilterDistributor &distributor_, beast::BeastInput::pointer input_, const std::string &path_) : service(service_), distributor(distributor_), input(input_), path(path_), timeout_timer(service_) { temppath = path_ + ".new"; }
+
+     void StatusWriter::start() {
+         auto self(shared_from_this());
+@@ -56,7 +56,7 @@ namespace splitter {
+     void StatusWriter::reset_timeout() {
+         auto self(shared_from_this());
+
+-        timeout_timer.expires_from_now(timeout_interval); // will cancel previous async_wait
++        timeout_timer.expires_after(timeout_interval); // will cancel previous async_wait
+         timeout_timer.async_wait(std::bind(&StatusWriter::status_timeout, self, std::placeholders::_1));
+     }
+
+diff --git a/status_writer.h b/status_writer.h
+index 8d482f3..6159b5a 100644
+--- a/status_writer.h
++++ b/status_writer.h
+@@ -28,7 +28,7 @@
+ #ifndef STATUS_WRITER_H
+ #define STATUS_WRITER_H
+
+-#include <boost/asio/io_service.hpp>
++#include <boost/asio/io_context.hpp>
+ #include <boost/asio/steady_timer.hpp>
+
+ #include "beast_input.h"
+@@ -43,20 +43,20 @@ namespace splitter {
+         const std::chrono::milliseconds timeout_interval = std::chrono::milliseconds(2500);
+
+         // factory method, this class must always be constructed via make_shared
+-        static pointer create(boost::asio::io_service &service, modes::FilterDistributor &distributor, beast::BeastInput::pointer input, const std::string &path) { return pointer(new StatusWriter(service, distributor, input, path)); }
++        static pointer create(boost::asio::io_context &service, modes::FilterDistributor &distributor, beast::BeastInput::pointer input, const std::string &path) { return pointer(new StatusWriter(service, distributor, input, path)); }
+
+         void start();
+         void close();
+
+       private:
+-        StatusWriter(boost::asio::io_service &service_, modes::FilterDistributor &distributor_, beast::BeastInput::pointer input_, const std::string &path);
++        StatusWriter(boost::asio::io_context &service_, modes::FilterDistributor &distributor_, beast::BeastInput::pointer input_, const std::string &path);
+
+         void write(const modes::Message &message);
+         void reset_timeout();
+         void status_timeout(const boost::system::error_code &ec = boost::system::error_code());
+         void write_status_file(const std::string &gps_color = std::string(), const std::string &gps_message = std::string(), int pps_offset = -9999);
+
+-        boost::asio::io_service &service;
++        boost::asio::io_context &service;
+         modes::FilterDistributor &distributor;
+         beast::BeastInput::pointer input;
+         std::string path;
