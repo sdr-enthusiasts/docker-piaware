@@ -1,0 +1,36 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash disable=SC2034
+
+# Shared by /scripts/healthcheck.sh and the watchdog service: the healthcheck
+# reports the container unhealthy when no messages have been sent to FlightAware
+# for a while, and the watchdog has to keep enough of /var/log/piaware/current
+# around for that check to still see them.
+
+# Minutes without messages sent to FlightAware before the container is reported
+# unhealthy. Feeders in regions with no overnight traffic can raise this so a
+# quiet night doesn't mark the container unhealthy. When set, it applies to both
+# 1090MHz and 978MHz; otherwise each band falls back to its own default.
+PIAWARE_NO_MSG_TIMEOUT_MIN=30
+PIAWARE_NO_MSG_TIMEOUT_MAX=1440
+PIAWARE_NO_MSG_TIMEOUT_1090_DEFAULT=60
+PIAWARE_NO_MSG_TIMEOUT_978_DEFAULT=120
+
+PIAWARE_NO_MSG_TIMEOUT=""
+if [[ -n "$HEALTHCHECK_NO_MSG_TIMEOUT" ]]; then
+    if [[ ! "$HEALTHCHECK_NO_MSG_TIMEOUT" =~ ^0*[0-9]{1,9}$ ]]; then
+        echo "HEALTHCHECK_NO_MSG_TIMEOUT=\"$HEALTHCHECK_NO_MSG_TIMEOUT\" is not a valid number of minutes, using the defaults instead." >&2
+    else
+        # force base 10 so that a padded value such as 090 isn't read as octal
+        PIAWARE_NO_MSG_TIMEOUT=$((10#$HEALTHCHECK_NO_MSG_TIMEOUT))
+        if [[ "$PIAWARE_NO_MSG_TIMEOUT" -lt "$PIAWARE_NO_MSG_TIMEOUT_MIN" ]]; then
+            echo "HEALTHCHECK_NO_MSG_TIMEOUT=$PIAWARE_NO_MSG_TIMEOUT is below the $PIAWARE_NO_MSG_TIMEOUT_MIN minute minimum, using $PIAWARE_NO_MSG_TIMEOUT_MIN instead." >&2
+            PIAWARE_NO_MSG_TIMEOUT="$PIAWARE_NO_MSG_TIMEOUT_MIN"
+        elif [[ "$PIAWARE_NO_MSG_TIMEOUT" -gt "$PIAWARE_NO_MSG_TIMEOUT_MAX" ]]; then
+            echo "HEALTHCHECK_NO_MSG_TIMEOUT=$PIAWARE_NO_MSG_TIMEOUT is above the $PIAWARE_NO_MSG_TIMEOUT_MAX minute maximum, using $PIAWARE_NO_MSG_TIMEOUT_MAX instead." >&2
+            PIAWARE_NO_MSG_TIMEOUT="$PIAWARE_NO_MSG_TIMEOUT_MAX"
+        fi
+    fi
+fi
+
+PIAWARE_NO_MSG_TIMEOUT_1090="${PIAWARE_NO_MSG_TIMEOUT:-$PIAWARE_NO_MSG_TIMEOUT_1090_DEFAULT}"
+PIAWARE_NO_MSG_TIMEOUT_978="${PIAWARE_NO_MSG_TIMEOUT:-$PIAWARE_NO_MSG_TIMEOUT_978_DEFAULT}"
