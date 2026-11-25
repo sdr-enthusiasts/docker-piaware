@@ -78,7 +78,16 @@ fi
 # Make sure 1090MHz data is being sent to flightaware
 if [[ -n "$BEASTHOST" || "$RECEIVER_TYPE" == "rtlsdr" ]]; then
     # look for log messages from dump1090
-    FA_DUMP1090_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa dump1090 12)
+    # With PIAWARE_MINIMAL, piaware reads BEASTHOST directly (receiver-type "other", see 01-piaware)
+    # and its summaries say "msgs recv'd from the ADS-B data program at host/port" instead.
+    # Same values as chk_enabled in /scripts/common, which this script doesn't source.
+    FA_1090_SOURCE="dump1090"
+    if [[ -n "$BEASTHOST" ]]; then
+        case "${PIAWARE_MINIMAL,,}" in
+            1 | true | on | enabled | enable | yes | y | ok | always | set) FA_1090_SOURCE="ADS-B data program" ;;
+        esac
+    fi
+    FA_DUMP1090_MSGS_SENT_PAST_HOUR=$(check_logs_for_msgs_sent_to_fa "$FA_1090_SOURCE" 12)
     if [[ "$FA_DUMP1090_MSGS_SENT_PAST_HOUR" -gt 0 ]]; then
         echo "$FA_DUMP1090_MSGS_SENT_PAST_HOUR dump1090 messages sent in past hour, OK."
     else
